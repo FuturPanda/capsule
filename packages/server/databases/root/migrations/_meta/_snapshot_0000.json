@@ -1,0 +1,120 @@
+{
+  "version": "1",
+  "name": "root",
+  "id": "3a76c293-103a-4d9c-a8f7-230d794b5eeb",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "tables": {
+    "user": {
+      "columns": {
+        "id": {
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoIncrement": true
+        },
+        "email": {
+          "type": "text",
+          "notNull": true
+        },
+        "password": {
+          "type": "text"
+        },
+        "api_key": {
+          "type": "text"
+        },
+        "siret": {
+          "type": "text"
+        },
+        "schema": {
+          "type": "text"
+        },
+        "type": {
+          "type": "text",
+          "notNull": true
+        }
+      }
+    },
+    "user_resource_permission": {
+      "columns": {
+        "client_id": {
+          "type": "integer",
+          "notNull": true
+        },
+        "permission_id": {
+          "type": "integer",
+          "notNull": true
+        },
+        "resource_id": {
+          "type": "integer",
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": [
+        "client_id",
+        "permission_id",
+        "resource_id"
+      ]
+    },
+    "permission": {
+      "columns": {
+        "id": {
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoIncrement": true
+        },
+        "name": {
+          "type": "text",
+          "notNull": true
+        }
+      }
+    },
+    "database": {
+      "columns": {
+        "resource_id": {
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "type": "text",
+          "notNull": true
+        },
+        "schema": {
+          "type": "text",
+          "notNull": true
+        }
+      }
+    },
+    "kv": {
+      "columns": {
+        "resource_id": {
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "key": {
+          "type": "text",
+          "notNull": true
+        },
+        "value": {
+          "type": "text",
+          "notNull": true
+        }
+      }
+    },
+    "document": {
+      "columns": {
+        "resource_id": {
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "type": "text",
+          "notNull": true
+        }
+      }
+    }
+  }
+}

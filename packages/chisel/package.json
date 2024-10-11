@@ -1,0 +1,58 @@
+{
+  "name": "@capsule/chisel",
+  "version": "0.0.1",
+  "description": "A lightweight and efficient ORM for SQLite",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "jest",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "format": "prettier --write 'src/**/*.{js,ts}'",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "orm",
+    "sqlite",
+    "database",
+    "typescript",
+    "query-builder"
+  ],
+  "author": "Futur-panda",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/chisel-orm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/chisel-orm/issues"
+  },
+  "homepage": "https://github.com/yourusername/chisel-orm#readme",
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "pino": "^9.4.0",
+    "unique-names-generator": "^4.7.1",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/jest": "^29.5.3",
+    "@types/node": "^20.4.5",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.1",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.1",
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
