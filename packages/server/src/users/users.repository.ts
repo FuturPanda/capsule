@@ -28,10 +28,17 @@ export class UsersRepository {
     this.model
       .select()
       .where({ type: { $eq: 'OWNER' } })
-      .exec({ one: true }) as User;
+      .exec({ one: true });
 
-  /*
-  getUserByEmailOrThrow = (email: string) => this.db.query.users.findFirst({ where: eq(users.email, email) });
-  getUserByIdOrThrow = (id: number) => this.db.select().from(Users).where(eq(users.id, id));
-  */
+  findOneByEmail = (email: string) =>
+    this.model
+      .select()
+      .where({ email: { $eq: email } })
+      .exec({ one: true }) as User | null;
+
+  findOneById = (id: number) =>
+    this.model
+      .select()
+      .where({ id: { $eq: id } })
+      .exec({ one: true }) as User | null;
 }

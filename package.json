@@ -10,7 +10,9 @@
     "dev": "npm run dev --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "start:docker": "concurrently \"cd backend && npm run start:prod\" \"cd frontend && npm run preview\""
+    "server": "cd packages/server && npm run dev",
+    "start:docker": "concurrently \"cd packages/server && npm run start:prod\" \"cd packages/capsule-kit && npm run preview\"",
+    "capsule-kit": "cd packages/capsule-kit && npm run preview"
   },
   "keywords": [],
   "author": "",
