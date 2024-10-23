@@ -1,5 +1,5 @@
 export class GetUserDto {
   id: number;
-  userName: string;
-  mail: string;
+  userName: string | null;
+  email: string;
 }

@@ -1,7 +1,8 @@
-import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { UsersRepository } from '../users/users.repository';
+import * as bcrypt from 'bcrypt';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
+import { UsersRepository } from '../users/users.repository';
 
 export enum TestEnum {
   ONE = 'ONE',
@@ -9,20 +10,24 @@ export enum TestEnum {
 
 @Injectable()
 export class BootstrapService implements OnApplicationBootstrap {
-  constructor(private readonly configService: ConfigService, private readonly usersRepository: UsersRepository) {}
+  private readonly logger = new Logger(BootstrapService.name);
+
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly usersRepository: UsersRepository,
+  ) {}
+
   async onApplicationBootstrap(): Promise<any> {
-    console.log('In bootstrap');
-    console.log(this.configService.get('OWNER_EMAIL'));
+    this.logger.debug('In bootstrap');
+    this.logger.debug(this.configService.get('OWNER_EMAIL'));
 
     this.usersRepository.createUserIfNotExists(
       {
         email: this.configService.get('OWNER_EMAIL'),
-        password: this.configService.get('OWNER_PASSWORD'),
+        password: bcrypt.hashSync(this.configService.get('OWNER_PASSWORD'), 10),
         schema: '{}',
       },
       UserTypeEnum.OWNER,
     );
-
-    //const owner: User = this.usersRepository.getOwner();
   }
 }
