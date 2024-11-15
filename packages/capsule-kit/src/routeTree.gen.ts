@@ -14,8 +14,11 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedInvoicesImport } from './routes/_authenticated/invoices'
-import { Route as AuthenticatedAboutImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedDataIndexImport } from './routes/_authenticated/data/index'
+import { Route as AuthenticatedCapletsIndexImport } from './routes/_authenticated/caplets/index'
+import { Route as AuthenticatedAccountIndexImport } from './routes/_authenticated/account/index'
+import { Route as AuthenticatedDataDataSourceIdImport } from './routes/_authenticated/data/$dataSourceId'
+import { Route as AuthenticatedCapletsCapletIdImport } from './routes/_authenticated/caplets/$capletId'
 
 // Create/Update Routes
 
@@ -34,15 +37,32 @@ const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const AuthenticatedInvoicesRoute = AuthenticatedInvoicesImport.update({
-  path: '/invoices',
+const AuthenticatedDataIndexRoute = AuthenticatedDataIndexImport.update({
+  path: '/data/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
-const AuthenticatedAboutRoute = AuthenticatedAboutImport.update({
-  path: '/about',
+const AuthenticatedCapletsIndexRoute = AuthenticatedCapletsIndexImport.update({
+  path: '/caplets/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+
+const AuthenticatedAccountIndexRoute = AuthenticatedAccountIndexImport.update({
+  path: '/account/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const AuthenticatedDataDataSourceIdRoute =
+  AuthenticatedDataDataSourceIdImport.update({
+    path: '/data/$dataSourceId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+
+const AuthenticatedCapletsCapletIdRoute =
+  AuthenticatedCapletsCapletIdImport.update({
+    path: '/caplets/$capletId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -62,25 +82,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
-    '/_authenticated/about': {
-      id: '/_authenticated/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AuthenticatedAboutImport
-      parentRoute: typeof AuthenticatedImport
-    }
-    '/_authenticated/invoices': {
-      id: '/_authenticated/invoices'
-      path: '/invoices'
-      fullPath: '/invoices'
-      preLoaderRoute: typeof AuthenticatedInvoicesImport
-      parentRoute: typeof AuthenticatedImport
-    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/caplets/$capletId': {
+      id: '/_authenticated/caplets/$capletId'
+      path: '/caplets/$capletId'
+      fullPath: '/caplets/$capletId'
+      preLoaderRoute: typeof AuthenticatedCapletsCapletIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/data/$dataSourceId': {
+      id: '/_authenticated/data/$dataSourceId'
+      path: '/data/$dataSourceId'
+      fullPath: '/data/$dataSourceId'
+      preLoaderRoute: typeof AuthenticatedDataDataSourceIdImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/account/': {
+      id: '/_authenticated/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/caplets/': {
+      id: '/_authenticated/caplets/'
+      path: '/caplets'
+      fullPath: '/caplets'
+      preLoaderRoute: typeof AuthenticatedCapletsIndexImport
+      parentRoute: typeof AuthenticatedImport
+    }
+    '/_authenticated/data/': {
+      id: '/_authenticated/data/'
+      path: '/data'
+      fullPath: '/data'
+      preLoaderRoute: typeof AuthenticatedDataIndexImport
       parentRoute: typeof AuthenticatedImport
     }
   }
@@ -89,15 +130,21 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
-  AuthenticatedInvoicesRoute: typeof AuthenticatedInvoicesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedCapletsCapletIdRoute: typeof AuthenticatedCapletsCapletIdRoute
+  AuthenticatedDataDataSourceIdRoute: typeof AuthenticatedDataDataSourceIdRoute
+  AuthenticatedAccountIndexRoute: typeof AuthenticatedAccountIndexRoute
+  AuthenticatedCapletsIndexRoute: typeof AuthenticatedCapletsIndexRoute
+  AuthenticatedDataIndexRoute: typeof AuthenticatedDataIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAboutRoute: AuthenticatedAboutRoute,
-  AuthenticatedInvoicesRoute: AuthenticatedInvoicesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedCapletsCapletIdRoute: AuthenticatedCapletsCapletIdRoute,
+  AuthenticatedDataDataSourceIdRoute: AuthenticatedDataDataSourceIdRoute,
+  AuthenticatedAccountIndexRoute: AuthenticatedAccountIndexRoute,
+  AuthenticatedCapletsIndexRoute: AuthenticatedCapletsIndexRoute,
+  AuthenticatedDataIndexRoute: AuthenticatedDataIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -107,39 +154,66 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/about': typeof AuthenticatedAboutRoute
-  '/invoices': typeof AuthenticatedInvoicesRoute
   '/': typeof AuthenticatedIndexRoute
+  '/caplets/$capletId': typeof AuthenticatedCapletsCapletIdRoute
+  '/data/$dataSourceId': typeof AuthenticatedDataDataSourceIdRoute
+  '/account': typeof AuthenticatedAccountIndexRoute
+  '/caplets': typeof AuthenticatedCapletsIndexRoute
+  '/data': typeof AuthenticatedDataIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/about': typeof AuthenticatedAboutRoute
-  '/invoices': typeof AuthenticatedInvoicesRoute
   '/': typeof AuthenticatedIndexRoute
+  '/caplets/$capletId': typeof AuthenticatedCapletsCapletIdRoute
+  '/data/$dataSourceId': typeof AuthenticatedDataDataSourceIdRoute
+  '/account': typeof AuthenticatedAccountIndexRoute
+  '/caplets': typeof AuthenticatedCapletsIndexRoute
+  '/data': typeof AuthenticatedDataIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/_authenticated/about': typeof AuthenticatedAboutRoute
-  '/_authenticated/invoices': typeof AuthenticatedInvoicesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/caplets/$capletId': typeof AuthenticatedCapletsCapletIdRoute
+  '/_authenticated/data/$dataSourceId': typeof AuthenticatedDataDataSourceIdRoute
+  '/_authenticated/account/': typeof AuthenticatedAccountIndexRoute
+  '/_authenticated/caplets/': typeof AuthenticatedCapletsIndexRoute
+  '/_authenticated/data/': typeof AuthenticatedDataIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/about' | '/invoices' | '/'
+  fullPaths:
+    | ''
+    | '/login'
+    | '/'
+    | '/caplets/$capletId'
+    | '/data/$dataSourceId'
+    | '/account'
+    | '/caplets'
+    | '/data'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/about' | '/invoices' | '/'
+  to:
+    | '/login'
+    | '/'
+    | '/caplets/$capletId'
+    | '/data/$dataSourceId'
+    | '/account'
+    | '/caplets'
+    | '/data'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
-    | '/_authenticated/about'
-    | '/_authenticated/invoices'
     | '/_authenticated/'
+    | '/_authenticated/caplets/$capletId'
+    | '/_authenticated/data/$dataSourceId'
+    | '/_authenticated/account/'
+    | '/_authenticated/caplets/'
+    | '/_authenticated/data/'
   fileRoutesById: FileRoutesById
 }
 
@@ -172,24 +246,39 @@ export const routeTree = rootRoute
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
       "children": [
-        "/_authenticated/about",
-        "/_authenticated/invoices",
-        "/_authenticated/"
+        "/_authenticated/",
+        "/_authenticated/caplets/$capletId",
+        "/_authenticated/data/$dataSourceId",
+        "/_authenticated/account/",
+        "/_authenticated/caplets/",
+        "/_authenticated/data/"
       ]
     },
     "/login": {
       "filePath": "login.tsx"
     },
-    "/_authenticated/about": {
-      "filePath": "_authenticated/about.tsx",
-      "parent": "/_authenticated"
-    },
-    "/_authenticated/invoices": {
-      "filePath": "_authenticated/invoices.tsx",
-      "parent": "/_authenticated"
-    },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/caplets/$capletId": {
+      "filePath": "_authenticated/caplets/$capletId.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/data/$dataSourceId": {
+      "filePath": "_authenticated/data/$dataSourceId.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/account/": {
+      "filePath": "_authenticated/account/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/caplets/": {
+      "filePath": "_authenticated/caplets/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/data/": {
+      "filePath": "_authenticated/data/index.tsx",
       "parent": "/_authenticated"
     }
   }

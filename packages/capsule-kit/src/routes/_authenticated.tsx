@@ -1,4 +1,5 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { AppLayout } from "@/components/layout/AppLayout.tsx";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: ({ context, location }) => {
@@ -11,20 +12,5 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
   },
-  component: AuthLayout,
+  component: AppLayout,
 });
-
-function AuthLayout() {
-  // const auth = useAuth();
-  // const navigate = useNavigate();
-  // const handleLogout = async () => {
-  //   await new Promise(() => auth!.logout());
-  //   navigate({ to: "/login" });
-  // };
-
-  return (
-    <div className="p-2 h-full">
-      <Outlet />
-    </div>
-  );
-}

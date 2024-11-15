@@ -1,7 +1,4 @@
 import { useAuth } from "@/_utils/providers/contexts/AuthContext";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import * as React from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +7,107 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const formSchema = z.object({
+  email: z.string().min(2).max(50),
+  password: z.string(),
+});
+
+type LoginFormValues = z.infer<typeof formSchema>;
+
+function LoginComponent() {
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const auth = useAuth();
+  const navigate = useNavigate();
+  const [, setIsSubmitting] = useState(false);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    console.log("is submitting ");
+    try {
+      const email = values.email;
+      const password = values.password;
+      if (!email || !password) return;
+      await auth!.login(email, password);
+    } catch (error) {
+      console.error("Error logging in: ", error);
+    } finally {
+      setIsSubmitting(false);
+      await navigate({ to: "/" });
+    }
+  }
+
+  return (
+    <div className="flex justify-center items-center w-full h-full">
+      <Card className="mx-auto max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardDescription>
+            Enter your email below to login to your account blablablma
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8"
+                >
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="@" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input placeholder="" {...field} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit">Submit</Button>
+                </form>
+              </Form>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
@@ -22,70 +118,3 @@ export const Route = createFileRoute("/login")({
   },
   component: LoginComponent,
 });
-
-function LoginComponent() {
-  const auth = useAuth();
-  // const store = useStores();
-  // const isLoading = useRouterState({ select: (s) => s.isLoading });
-  const navigate = useNavigate();
-  const [, setIsSubmitting] = React.useState(false);
-  console.log("logging auth : ", auth);
-  if (auth.isAuthenticated) navigate({ to: "/" });
-
-  const onFormSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true);
-    try {
-      evt.preventDefault();
-      const data = new FormData(evt.currentTarget);
-      const email = data.get("email")?.toString();
-      const password = data.get("password")?.toString();
-      console.log(`password is : ${password} and email is : ${email}`);
-      if (!email || !password) return;
-      await auth!.login(email, password);
-    } catch (error) {
-      console.error("Error logging in: ", error);
-    } finally {
-      setIsSubmitting(false);
-      await navigate({ to: "/" });
-    }
-  };
-
-  return (
-    <div className="flex justify-center items-center w-full h-full">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-              />
-            </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-              </div>
-              <Input id="password" type="password" required />
-            </div>
-            <Button
-              type="submit"
-              onMouseDown={() => onFormSubmit}
-              className="w-full"
-            >
-              Login
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
