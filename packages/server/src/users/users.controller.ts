@@ -8,6 +8,7 @@ export class UsersController {
 
   @Post('/login')
   loginUser(@Body() loginUserDto: LoginUserDto) {
+    console.log('in usecontroller ', loginUserDto);
     return this.usersService.loginUser(loginUserDto);
   }
 

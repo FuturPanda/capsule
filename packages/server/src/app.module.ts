@@ -8,7 +8,6 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BootstrapModule } from './bootstrap/bootstrap.module';
 import { ChiselModule } from './chisel/chisel.module';
-import { DatabasesModule } from './databases/databases.module';
 import { FilesModule } from './files/files.module';
 import { UsersModule } from './users/users.module';
 
@@ -26,7 +25,6 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     FilesModule,
     BootstrapModule,
-    DatabasesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

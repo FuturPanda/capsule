@@ -1,26 +1,28 @@
 import { AuthContextType } from "@/_utils/providers/contexts/AuthContext";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/toaster.tsx";
+import { Suspense } from "react";
+import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 interface MyRouterContext {
   auth: AuthContextType;
 }
 
-// const TanStackRouterDevtools =
-//   process.env.NODE_ENV === "production"
-//     ? () => null
-//     : React.lazy(() =>
-//         import("@tanstack/router-devtools").then((res) => ({
-//           default: res.TanStackRouterDevtools,
-//         })),
-//       );
-
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
-    <>
-      <Outlet />
-      {/* <Suspense>
-        <TanStackRouterDevtools />
-      </Suspense> */}
-    </>
-  ),
+  component: () => {
+    const env = import.meta.env.VITE_ENVIRONMENT;
+    return (
+      <>
+        <Toaster />
+        <Outlet />
+        {env === "DEV" ? (
+          <Suspense>
+            <TanStackRouterDevtools position={"bottom-right"} />
+          </Suspense>
+        ) : (
+          <></>
+        )}
+      </>
+    );
+  },
 });
