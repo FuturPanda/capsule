@@ -42,7 +42,7 @@ const ToolBarButtons = [
 ];
 
 export default function ToolBar(props: ToolbarProps) {
-  const addContent = useBoundStore((state) => state.addContentToCaplet);
+  const addContent = useBoundStore((state) => state.createContent);
   const handleAddContent = (type: CapletContentTypeEnum) => {
     addContent(props.capletId, type);
   };
