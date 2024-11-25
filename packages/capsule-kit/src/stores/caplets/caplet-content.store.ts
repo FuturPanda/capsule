@@ -6,21 +6,24 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { OnboardingContentPool } from "@/stores/caplets/_utils/data/onboarding.data.ts";
 import { CapletSlice } from "@/stores/caplets/caplet.store.ts";
+import { QueueSlice } from "@/stores/queue/queue.store.ts";
+import { OperationType } from "@/stores/queue/queue.model.ts";
 
 export interface ContentPoolSlice {
   contentPool: Record<string, CapletContent>;
   findContent: (contentId: string) => CapletContent | undefined;
   updateContent: (contentId: string, updates: Partial<CapletContent>) => void;
-  createContent: (
-    type: CapletContentTypeEnum,
-    initialData?: Partial<CapletContent>,
-  ) => string;
-  removeContent: (contentId: string) => void;
+  createContent: (id: string, type: CapletContentTypeEnum) => Promise<string>;
+  deleteContent: (contentId: string) => void;
   bulkRemoveContent: (contentIds: string[]) => void;
+  removeContentFromCaplet: (
+    capletId: string,
+    contentId: string,
+  ) => Promise<void>;
 }
 
 export const createContentPoolSlice: StateCreator<
-  ContentPoolSlice & CapletSlice,
+  ContentPoolSlice & CapletSlice & QueueSlice,
   [],
   [["zustand/persist", unknown]],
   ContentPoolSlice
@@ -43,28 +46,67 @@ export const createContentPoolSlice: StateCreator<
       },
     })),
 
-  createContent: (type: CapletContentTypeEnum, initialData = {}) => {
+  createContent: async (id: string, type: CapletContentTypeEnum) => {
     const contentId = uuidv4();
-    set((state) => ({
-      contentPool: {
-        ...state.contentPool,
-        [contentId]: {
-          id: contentId,
-          type,
-          value: "",
-          ...initialData,
+    const newContent = {
+      id: contentId,
+      type,
+      value: "",
+    };
+    set((state) => {
+      const caplet = state.caplets.find((c) => c.id === id);
+
+      if (!caplet) return state;
+
+      return {
+        ...state,
+        contentPool: {
+          ...state.contentPool,
+          [contentId]: newContent,
         },
+        caplets: state.caplets.map((c) =>
+          c.id === id ? { ...c, contentIds: [...c.contentIds, contentId] } : c,
+        ),
+      };
+    });
+
+    await get().enqueue({
+      type: OperationType.CAPLET_CONTENT_ADD,
+      data: {
+        content: newContent,
       },
-    }));
+    });
     return contentId;
   },
 
-  removeContent: (contentId: string) =>
+  deleteContent: (contentId: string) =>
     set((state) => {
       const newPool = { ...state.contentPool };
       delete newPool[contentId];
       return { contentPool: newPool };
     }),
+
+  removeContentFromCaplet: async (capletId: string, contentId: string) => {
+    set((state) => ({
+      ...state,
+      caplets: state.caplets.map((c) =>
+        c.id === capletId
+          ? {
+              ...c,
+              contentIds: c.contentIds.filter((id) => id !== contentId),
+            }
+          : c,
+      ),
+    }));
+
+    await get().enqueue({
+      type: OperationType.CAPLET_CONTENT_REMOVE,
+      data: {
+        capletId: capletId,
+        contentId: contentId,
+      },
+    });
+  },
 
   bulkRemoveContent: (contentIds: string[]) =>
     set((state) => {

@@ -2,9 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils.ts";
 import { ComponentProps } from "react";
 
-type TopbarComponentProps = ComponentProps<"header">;
+type TopbarComponentProps = ComponentProps<"header"> & { isOnline: boolean };
 
-export function Topbar({ className, ...props }: TopbarComponentProps) {
+export function Topbar({
+  className,
+  isOnline,
+  ...props
+}: TopbarComponentProps) {
   const isProcessing = true;
   const queue = { length: 15 };
 
@@ -32,6 +36,15 @@ export function Topbar({ className, ...props }: TopbarComponentProps) {
           className={cn(
             "h-2 w-2 rounded-full",
             isProcessing ? "bg-blue-500 animate-pulse" : "bg-green-500",
+          )}
+        />
+        <div className="text-xs text-zinc-500 ">
+          {isOnline ? "Online" : "Offline"}
+        </div>
+        <div
+          className={cn(
+            "h-2 w-2 rounded-full",
+            !isOnline ? "bg-orange-400  animate-pulse" : "bg-green-500",
           )}
         />
       </div>

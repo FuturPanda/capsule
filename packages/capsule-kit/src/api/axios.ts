@@ -36,11 +36,7 @@ CapsuleAxios.interceptors.response.use(
         }
         const response = await userRequests.refreshToken(refreshToken);
         const newToken = response.access_token;
-        useBoundStore((state) => state.login)(
-          newToken,
-          refreshToken,
-          response.user,
-        );
+        useBoundStore((state) => state.login)(newToken, refreshToken, null);
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         return CapsuleAxios(originalRequest);
       } catch (refreshError) {

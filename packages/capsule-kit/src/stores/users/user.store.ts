@@ -5,7 +5,11 @@ export interface UserSlice {
   access_token: string | null;
   refresh_token: string | null;
   user: GetUserDto | null;
-  login: (accessToken: string, refreshToken: string, user: GetUserDto) => void;
+  login: (
+    accessToken: string,
+    refreshToken: string,
+    user: GetUserDto | null,
+  ) => void;
   logout: () => void;
   updateUser: (updatedUser: Partial<GetUserDto>) => void;
 }
@@ -18,7 +22,7 @@ export const createUserSlice: StateCreator<
   access_token: null,
   refresh_token: null,
   user: null,
-  login: (accessToken: string, refreshToken: string, user: GetUserDto) =>
+  login: (accessToken: string, refreshToken: string, user: GetUserDto | null) =>
     set({ access_token: accessToken, refresh_token: refreshToken, user: user }),
   logout: () => set({ access_token: null, user: null }),
   updateUser: (updatedUser: Partial<GetUserDto>) =>

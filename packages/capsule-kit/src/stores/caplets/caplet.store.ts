@@ -1,9 +1,5 @@
 import { StateCreator } from "zustand";
-import {
-  Caplet,
-  CapletContentTypeEnum,
-} from "@/stores/caplets/caplet.model.ts";
-import { v4 as uuidv4 } from "uuid";
+import { Caplet } from "@/stores/caplets/caplet.model.ts";
 import { OnboardingCaplets } from "@/stores/caplets/_utils/data/onboarding.data.ts";
 import { ContentPoolSlice } from "@/stores/caplets/caplet-content.store.ts";
 
@@ -14,8 +10,6 @@ export interface CapletSlice {
   updateCaplet: (id: string, updates: Partial<Caplet>) => void;
   removeCaplet: (id: string) => void;
   setCaplets: (caplets: Caplet[]) => void;
-  addContentToCaplet: (id: string, type: CapletContentTypeEnum) => void;
-  removeContentFromCaplet: (capletId: string, contentId: string) => void;
 }
 
 export const createCapletSlice: StateCreator<
@@ -56,44 +50,6 @@ export const createCapletSlice: StateCreator<
       ...state,
       caplets,
     })),
-
-  addContentToCaplet: (id: string, type: CapletContentTypeEnum) =>
-    set((state) => {
-      const contentId = uuidv4();
-      const caplet = state.caplets.find((c) => c.id === id);
-
-      if (!caplet) return state;
-
-      return {
-        ...state,
-        contentPool: {
-          ...state.contentPool,
-          [contentId]: {
-            id: contentId,
-            type: type,
-            value: "",
-          },
-        },
-
-        caplets: state.caplets.map((c) =>
-          c.id === id ? { ...c, contentIds: [...c.contentIds, contentId] } : c,
-        ),
-      };
-    }),
-  removeContentFromCaplet: (capletId: string, contentId: string) =>
-    set((state) => {
-      return {
-        ...state,
-        caplets: state.caplets.map((c) =>
-          c.id === capletId
-            ? {
-                ...c,
-                contentIds: c.contentIds.filter((id) => id !== contentId),
-              }
-            : c,
-        ),
-      };
-    }),
 
   reorderCapletContent: (
     capletId: string,
