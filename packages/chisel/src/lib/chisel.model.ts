@@ -1,11 +1,11 @@
-import { Database } from "better-sqlite3";
+import {Database} from "better-sqlite3";
 import console from "node:console";
-import {
-  ClassType,
-  ExecParams,
-  FilterQuery,
-  QuerySelector,
-} from "./_utils/types/queries.type";
+import {ClassType, ExecParams, FilterQuery, QuerySelector,} from "./_utils/types/queries.type";
+
+/**
+ * Main Class for the NestJs Module.
+ * To use when the model is known.
+ */
 
 export class ChiselModel<T> {
   private readonly db: Database;
@@ -22,20 +22,34 @@ export class ChiselModel<T> {
     params: Partial<Pick<T, keyof T>> | Record<string, string>,
     opts?: { ignoreExisting: boolean },
   ) {
-    let query: string = `INSERT ${opts?.ignoreExisting ? "OR IGNORE " : ""}INTO ${this.modelName}`;
+    let query: string = `INSERT
+        ${opts?.ignoreExisting ? "OR IGNORE " : ""}INTO
+        ${this.modelName}`;
     const keys = Object.keys(params);
     const placeholders = keys.map(() => "?").join(", ");
     query += ` (${keys.join(", ")}) VALUES (${placeholders})`;
+    let output = {
+      success: false,
+      id: null,
+      changes: 0,
+    };
     try {
       const stmt = this.db.prepare(query);
-      stmt.run(Object.values(params));
+      const res = stmt.run(Object.values(params));
+      output = {
+        success: res.changes > 0,
+        id: res.lastInsertRowid,
+        changes: res.changes,
+      };
     } catch (error) {
       console.error("Error writing to the database:", error);
     }
+    return output;
   }
 
   select(params?: (keyof T)[]) {
-    let query = `SELECT ${params ? Object.values(params).join(", ") : "*"} FROM ${this.modelName} `;
+    let query = `SELECT ${params ? Object.values(params).join(", ") : "*"}
+                     FROM ${this.modelName} `;
 
     const where = (params: FilterQuery<T>) => {
       for (const field in params) {
@@ -61,6 +75,7 @@ export class ChiselModel<T> {
         limit,
       };
     };
+
     //function groupBy(params: OrderByQuery) {}
     function limit(params: number) {
       query += `LIMIT ${params}`;
@@ -139,7 +154,8 @@ export class ChiselModel<T> {
 
   delete() {
     if (!this) throw new Error("Database not initialized");
-    let query: string = `DELETE FROM ${this.model} `;
+    let query: string = `DELETE
+                             FROM ${this.model} `;
 
     const where = (params: FilterQuery<T>) => {
       for (const field in params) {

@@ -5,12 +5,8 @@ import {
 } from "unique-names-generator";
 import { v4 as uuidv4 } from "uuid";
 import { JournalType } from "./_utils/types/journal.type";
-import {
-  ChiselSchema,
-  ColumnOptions,
-  TableOptions,
-} from "./_utils/types/schema.type";
-import { SnapShotTableType, SnapshotType } from "./_utils/types/snapshot.type";
+import { ColumnOptions, TableOptions } from "./_utils/types/schema.type";
+import { SnapshotType } from "./_utils/types/snapshot.type";
 
 const NAMES_DICTIONARY: string[] = names.map((name) => name.toLowerCase());
 const UUID_ZERO = uuidv4().replace(/[0-9a-fA-F]/g, "0");
@@ -20,11 +16,16 @@ export function generateUniqueFilename(versionNumber?: number): string {
     dictionaries: [adjectives, adjectives, NAMES_DICTIONARY, NAMES_DICTIONARY],
     separator: "_",
   });
+  const number = versionNumber
+    ? Math.round(versionNumber * 1000)
+        .toString()
+        .padStart(4, "0")
+    : "0000";
 
-  return `${versionNumber ? versionNumber : "0000"}_${randomName}`;
+  return `${number}_${randomName}`;
 }
 
-const escapeIdentifier = (identifier: string): string => {
+export const escapeIdentifier = (identifier: string): string => {
   return `\`${identifier.replace(/`/g, "``")}\``;
 };
 
@@ -40,32 +41,7 @@ const safeDefaultValues = (value: string | number): string => {
   return value.toString();
 };
 
-export const createDatabaseSchema = (dbName: string) => {
-  const schema: ChiselSchema = { dbName, entities: [] };
-
-  const addEntity = (
-    name: string,
-    columns: { [key: string]: ColumnOptions },
-  ) => {
-    schema.entities.push({ name, columns });
-    return { addEntity, addEntities, build };
-  };
-
-  const addEntities = (
-    entities: { name: string; columns: { [key: string]: ColumnOptions } }[],
-  ) => {
-    entities.forEach((entity) => schema.entities.push(entity));
-    return { addEntity, addEntities, build };
-  };
-
-  const build = () => {
-    return schema;
-  };
-
-  return { addEntity, addEntities, build };
-};
-
-const buildColumnDefinition = (
+export const buildColumnDefinition = (
   columnName: string,
   options: ColumnOptions,
 ): string => {
@@ -92,7 +68,7 @@ const buildColumnDefinition = (
   return definition;
 };
 
-const generateCreateTableSQL = (entity: TableOptions): string => {
+export const generateCreateTableSQL = (entity: TableOptions): string => {
   if (
     !entity.compositePrimaryKeys &&
     Object.values(entity.columns).every((it) => !it.primaryKey)
@@ -106,14 +82,14 @@ const generateCreateTableSQL = (entity: TableOptions): string => {
   if (entity.indexes)
     Object.entries(entity.indexes).forEach(([field, indexName]) =>
       columnsSQL.push(
-        `CREATE INDEX ${escapeIdentifier(indexName)} ON ${escapeIdentifier(entity.name)} ( ${escapeIdentifier(
+        `CREATE INDEX ${escapeIdentifier(indexName)} ON ${escapeIdentifier(entity.name)} (${escapeIdentifier(
           field,
-        )} );`,
+        )});`,
       ),
     );
   if (entity.compositePrimaryKeys)
     columnsSQL.push(
-      `PRIMARY KEY ( ${entity.compositePrimaryKeys.map((it) => ` ${escapeIdentifier(it)}`).join(",")} )`,
+      `PRIMARY KEY (${entity.compositePrimaryKeys.map((it) => ` ${escapeIdentifier(it)}`).join(",")} )`,
     );
   if (entity.uniqueConstraints)
     columnsSQL.push(
@@ -129,11 +105,16 @@ const generateCreateTableSQL = (entity: TableOptions): string => {
         ),
     );
 
-  return `CREATE TABLE IF NOT EXISTS ${escapeIdentifier(entity.name)} (\n\t${columnsSQL.join(",\n\t")}\n);\n`;
+  return `CREATE TABLE IF NOT EXISTS ${escapeIdentifier(entity.name)}
+            (
+                ${columnsSQL.join(",\n\t")}
+            );  `;
 };
 
-export const generateDatabaseSQL = (schema: ChiselSchema): string[] => {
-  return schema.entities.map(generateCreateTableSQL);
+export const generateDatabaseSQL = (
+  entities: TableOptions[] = [],
+): string[] => {
+  return entities.map(generateCreateTableSQL);
 };
 
 export const generateJournal = (scriptName: string): JournalType => ({
@@ -149,33 +130,14 @@ export const generateJournal = (scriptName: string): JournalType => ({
 });
 
 export const generateSnapshot = (
-  schema: ChiselSchema,
+  dbName: string,
+  entities: TableOptions[],
+  version?: string,
   prevId?: string,
 ): SnapshotType => ({
-  version: "1",
-  name: schema.dbName,
+  version: version ?? "0000",
+  name: dbName,
   id: uuidv4(),
   prevId: prevId ? prevId : UUID_ZERO,
-  tables: schema.entities
-    .map(
-      (entity): Record<string, SnapShotTableType> => ({
-        [entity.name]: {
-          columns: Object.entries(entity.columns)
-            .map(([name, opts]) => ({
-              [name]: {
-                type: opts.type,
-                primaryKey: opts.primaryKey,
-                notNull: opts.notNull,
-                autoIncrement: opts.autoIncrement,
-              },
-            }))
-            .reduce((acc, obj) => ({ ...acc, ...obj }), {}),
-          indexes: entity.indexes,
-          foreignKeys: entity.foreignKeys,
-          compositePrimaryKeys: entity.compositePrimaryKeys,
-          uniqueConstraints: entity.uniqueConstraints,
-        },
-      }),
-    )
-    .reduce((acc, obj) => ({ ...acc, ...obj }), {}),
+  entities: entities,
 });

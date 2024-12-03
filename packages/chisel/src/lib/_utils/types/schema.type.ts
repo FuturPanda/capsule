@@ -21,5 +21,6 @@ export type TableOptions = {
 
 export type ChiselSchema = {
   dbName: string;
+  version: string;
   entities: TableOptions[];
 };
