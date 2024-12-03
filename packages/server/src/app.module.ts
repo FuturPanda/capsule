@@ -10,6 +10,10 @@ import { BootstrapModule } from './bootstrap/bootstrap.module';
 import { ChiselModule } from './chisel/chisel.module';
 import { FilesModule } from './files/files.module';
 import { UsersModule } from './users/users.module';
+import { SurrealModule } from './surreal/surreal.module';
+import { EventsModule } from './events/events.module';
+import { QueueModule } from './queue/queue.module';
+import { ResourcesModule } from './resources/resources.module';
 
 @Module({
   imports: [
@@ -17,7 +21,7 @@ import { UsersModule } from './users/users.module';
     ChiselModule.forRootAsync({
       uri: './databases',
       dbName: 'root',
-      schema: rootSchema,
+      entities: rootSchema.entities,
       generateTypes: true,
       typesDir: './src/models',
     }),
@@ -25,6 +29,16 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     FilesModule,
     BootstrapModule,
+    SurrealModule.forRoot({
+      path: 'surrealkv://surrealdb',
+      namespace: 'my_namespace',
+      database: 'my_database',
+      username: 'root',
+      password: 'root',
+    }),
+    EventsModule,
+    QueueModule,
+    ResourcesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

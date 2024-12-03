@@ -1,11 +1,11 @@
-import { ChiselSchema } from "./schema.type";
+import { TableOptions } from "./schema.type";
 
 export type ClassType<T> = new (...args: any[]) => T;
 
 export interface IFactoryOpts {
   uri: string;
   dbName: string;
-  schema?: ChiselSchema;
+  entities?: TableOptions[];
   generateTypes?: boolean;
   typesDir?: string;
 }
@@ -13,11 +13,6 @@ export interface IFactoryOpts {
 export interface IChiselDbParams {
   filePath?: string;
 }
-
-export type InsertOptions = {
-  tableName: string;
-  data: { [column: string]: any };
-};
 
 export type Condition<T> = T | QuerySelector<T>;
 
@@ -88,11 +83,6 @@ export type RootQuerySelector<T> = {
 };
 export type OrderByQuery<T> = { [P in keyof T]?: "DESC" | "ASC" };
 //SELECT name, salary FROM employees ORDER BY salary DESC
-
-export type AnyKeys<T> = { [P in keyof T]?: T[P] | any };
-export interface AnyObject {
-  [k: string]: any;
-}
 
 export type ExecParams = {
   returning?: boolean;

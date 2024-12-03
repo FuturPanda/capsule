@@ -20,8 +20,11 @@ build/
 .DS_Store
 Thumbs.db
 
+
 # npm debug logs
 npm-debug.log*
 
 # yarn error logs
 yarn-error.log
+/packages/server/surrealdb/
+/packages/chisel/coverage/

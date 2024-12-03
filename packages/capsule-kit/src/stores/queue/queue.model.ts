@@ -2,7 +2,6 @@ import { Caplet, CapletContent } from "@/stores/caplets/caplet.model.ts";
 
 export enum OperationType {
   CAPLET_CREATE = "CAPLET_CREATE",
-
   CONTENT_UPDATE = "CONTENT_UPDATE",
   CAPLET_CONTENT_ADD = "CAPLET_CONTENT_ADD",
   CAPLET_CONTENT_REMOVE = "CAPLET_CONTENT_REMOVE",

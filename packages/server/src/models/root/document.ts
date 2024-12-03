@@ -1,4 +1,5 @@
 export class Document {
+  id: number;
   resource_id: number;
-  value: string;
+  content: string;
 }

@@ -1,26 +1,19 @@
-import { ChiselDb, ChiselSchema } from '@capsule/chisel';
+import { ChiselDb, IFactoryOpts } from '@capsule/chisel';
 import { DynamicModule, Global, Inject, Module } from '@nestjs/common';
 import { ClassType } from 'src/_utils/_types/generics';
 
-export interface ChiselConfig {
-  uri: string;
-  dbName: string;
-  schema?: ChiselSchema;
-  generateTypes?: boolean;
-  typesDir?: string;
-}
-
 @Module({})
 export class ChiselModule {
-  static forRootAsync(opts: ChiselConfig): DynamicModule {
+  static forRootAsync(opts: IFactoryOpts): DynamicModule {
     return {
       module: ChiselModule,
       imports: [ChiselCoreModule.forRootAsync(opts)],
     };
   }
 
-  static forFeature<T>(...models: ClassType<T>[]): DynamicModule {
+  static forFeature(...models: ClassType<any>[]): DynamicModule {
     const providers = createChiselProviders(...models);
+    console.log(providers);
     return {
       module: ChiselModule,
       providers: providers,
@@ -32,7 +25,7 @@ export class ChiselModule {
 @Global()
 @Module({})
 export class ChiselCoreModule {
-  static forRootAsync(opts: ChiselConfig): DynamicModule {
+  static forRootAsync(opts: IFactoryOpts): DynamicModule {
     const connectionProvider = {
       provide: 'DbConnectionToken',
       useFactory: (): ChiselDb => ChiselDb.provideConnection(opts),

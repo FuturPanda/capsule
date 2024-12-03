@@ -2,16 +2,17 @@ import Database from "better-sqlite3";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import pino from "pino";
-import { generateTypes, generateTypesSync } from "./_utils/flint";
 import { IChiselDbParams, IFactoryOpts } from "./_utils/types/queries.type";
 import { ChiselQuerable } from "./chisel.querable";
 import {
-  createDatabaseSchema,
   generateDatabaseSQL,
   generateJournal,
   generateSnapshot,
   generateUniqueFilename,
 } from "./schemas";
+import { compareSchemas, handleSchemaChanges } from "./migrations";
+import { generateTypesSync } from "./type-generation";
+import { SnapshotType } from "./_utils/types/snapshot.type";
 
 export class ChiselDb extends ChiselQuerable {
   private readonly logger = pino();
@@ -25,58 +26,90 @@ export class ChiselDb extends ChiselQuerable {
 
   static SchemaFactory(opts: IFactoryOpts): any {
     const logger = pino();
+    logger.info("inside schema factory");
     const dirPath = path.join(opts.uri, opts.dbName.toLowerCase());
     const filepath = path.join(dirPath, `${opts.dbName.toLowerCase()}.capsule`);
     const exists = fs.existsSync(filepath);
+    let migrationsPath: string = path.join(dirPath, "migrations");
+    let journalFilePath: string = path.join(dirPath, `_journal.json`);
+    let metaDirectoryPath: string = path.join(migrationsPath, "_meta");
+    let snapshotPath: string = path.join(
+      metaDirectoryPath,
+      "_snapshot_0000.json",
+    );
+    let schemaFilePath: string = "";
 
-    const generateMetas = () => {
-      const sqlSchema = createDatabaseSchema(opts.schema.dbName)
-        .addEntities(opts.schema.entities)
-        .build();
-      const sqlScripts = generateDatabaseSQL(sqlSchema);
+    const generateMetas = (isHandlingChange: boolean = false) => {
+      pino().info(`generate metas : ${opts.entities}`);
+      const sqlScripts = generateDatabaseSQL(opts.entities);
 
       const fileName = generateUniqueFilename();
       const journal = generateJournal(fileName);
-      const snapshot = generateSnapshot(opts.schema);
+      const snapshot = generateSnapshot(opts.dbName, opts.entities);
 
-      const migrationsPath = path.join(dirPath, "migrations");
-      const journalFilePath = path.join(dirPath, `_journal.json`);
-      const metaDirectoryPath = path.join(migrationsPath, "_meta");
-      const schemaFilePath = path.join(migrationsPath, `${fileName}.sql`);
-      const snapshotPath = path.join(metaDirectoryPath, "_snapshot_0000.json");
+      schemaFilePath = path.join(migrationsPath, `${fileName}.sql`);
       return {
         sqlScripts,
-        metaDirectoryPath,
-        snapshotPath,
         snapshot,
         journal,
-        journalFilePath,
-        schemaFilePath,
       };
     };
 
     const fromSchemaSync = () => {
-      if (fs.existsSync(filepath)) {
+      if (exists) {
         logger.info(
-          `Cannot create Database, db already exists at ${filepath}, using ${opts.dbName}`,
+          `Cannot create Database, db already exists at ${filepath}, using ${opts.dbName}, journalPath : ${journalFilePath}, snapshotPath : ${snapshotPath}, dirPath :${dirPath}`,
         );
-        return new ChiselDb(filepath);
+        if (fs.existsSync(snapshotPath)) {
+          const snapshot = JSON.parse(
+            fs.readFileSync(snapshotPath, "utf8"),
+          ) as SnapshotType;
+          logger.info(`Snapshot : ${snapshot.entities}`);
+          const diff = compareSchemas(
+            {
+              dbName: snapshot.name,
+              version: snapshot.version,
+              entities: snapshot.entities,
+            },
+            {
+              dbName: opts.dbName,
+              version: snapshot.version + 1,
+              entities: opts.entities,
+            },
+          );
+          logger.error(`Diff : ${JSON.stringify(diff)}`);
+          const res = handleSchemaChanges(
+            diff,
+            {
+              dbName: opts.dbName,
+              version: snapshot.version + 1,
+              entities: opts.entities,
+            },
+            {
+              journalPath: journalFilePath,
+              snapshotPath: snapshotPath,
+              dirPath: dirPath,
+            },
+          );
+          if (!res) return new ChiselDb(filepath);
+          else {
+            const db = new ChiselDb(filepath);
+            db.runSqlCommands(res.sqlCommands);
+          }
+        }
       }
+      return writeChiselFiles();
+    };
+
+    const writeChiselFiles = () => {
+      const logger = pino();
       logger.info(
         `Database doesn't exists at ${filepath}, creating ${opts.dbName}`,
       );
       fs.mkdirSync(dirPath, { recursive: true });
       const db = new Database(filepath);
 
-      const {
-        sqlScripts,
-        metaDirectoryPath,
-        snapshotPath,
-        snapshot,
-        journal,
-        journalFilePath,
-        schemaFilePath,
-      } = generateMetas();
+      const { sqlScripts, snapshot, journal } = generateMetas();
       db.exec(sqlScripts.join("\n"));
 
       fs.mkdirSync(metaDirectoryPath, { recursive: true });
@@ -101,61 +134,7 @@ export class ChiselDb extends ChiselQuerable {
       );
       return new ChiselDb(filepath);
     };
-
-    const fromSchema = async (): Promise<ChiselDb> => {
-      if (fs.existsSync(filepath)) {
-        logger.info(
-          `Cannot create Database, db already exists at ${filepath}, using ${opts.dbName}`,
-        );
-        return new ChiselDb(filepath);
-      }
-      logger.info(
-        `Database doesn't exists at ${filepath}, creating ${opts.dbName}`,
-      );
-      await fs.promises.mkdir(dirPath, { recursive: true });
-      const db = new Database(filepath);
-
-      const {
-        sqlScripts,
-        metaDirectoryPath,
-        snapshotPath,
-        snapshot,
-        journal,
-        journalFilePath,
-        schemaFilePath,
-      } = generateMetas();
-      db.exec(sqlScripts.join("\n"));
-
-      await fs.promises.mkdir(metaDirectoryPath, { recursive: true });
-      await Promise.all([
-        fs.promises.writeFile(
-          snapshotPath,
-          JSON.stringify(snapshot, null, 2),
-          "utf8",
-        ),
-        fs.promises.writeFile(
-          journalFilePath,
-          JSON.stringify(journal, null, 2),
-          "utf8",
-        ),
-        fs.promises.writeFile(schemaFilePath, sqlScripts.join("\n"), "utf8"),
-      ]);
-      if (opts.generateTypes) {
-        logger.info(`Generating types...`);
-
-        const data = JSON.parse(
-          await fs.promises.readFile(snapshotPath, "utf8"),
-        );
-        await generateTypes(data, { dir: opts.typesDir });
-        if (!db) throw new Error("Error during database creation ");
-      }
-      logger.info(
-        `Connection with SQLite Dabatase "${filepath}" has been established`,
-      );
-      return new ChiselDb(filepath);
-    };
-
-    return { fromSchema, fromSchemaSync };
+    return { fromSchemaSync };
   }
 
   static provideConnection(opts: IFactoryOpts): ChiselDb {

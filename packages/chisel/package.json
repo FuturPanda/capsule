@@ -12,6 +12,7 @@
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test": "jest",
+    "test:cov": "jest --coverage",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{js,ts}'",
     "prepublishOnly": "npm run build"
@@ -54,5 +55,13 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
   }
 }
