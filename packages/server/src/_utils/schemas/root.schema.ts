@@ -1,11 +1,14 @@
 import { ChiselSchema } from '@capsule/chisel';
-import { TestEnum } from '../../bootstrap/bootstrap.service';
-import { ResourceTypeEnum } from '../../resources/resources.controller';
 
 export enum UserTypeEnum {
   OWNER = 'OWNER',
   USER = 'USER',
   CLIENT = 'CLIENT',
+}
+
+export enum PermissionTypeEnum {
+  DATABASE_LEVEL_PERMISSION = 'DATABASE_LEVEL_PERMISSION',
+  ACTION_LEVEL_PERMISSION = 'ACTION_LEVEL_PERMISSION',
 }
 
 export const rootSchema: ChiselSchema = {
@@ -23,20 +26,38 @@ export const rootSchema: ChiselSchema = {
         },
         email: { type: 'text', notNull: true, unique: true },
         password: { type: 'text' },
-        api_key: { type: 'text' },
         siret: { type: 'text' },
-        schema: { type: 'text', mode: 'json' },
         type: { type: 'text', notNull: true, enum: UserTypeEnum },
       },
     },
     {
-      name: 'user_resource_permission',
+      name: 'api_key',
       columns: {
-        client_id: { type: 'integer', notNull: true },
-        permission_id: { type: 'integer', notNull: true },
-        resource_id: { type: 'integer', notNull: true },
+        value: {
+          type: 'text',
+          notNull: true,
+          primaryKey: true,
+        },
+        user_id: {
+          type: 'integer',
+          notNull: true,
+        },
       },
-      compositePrimaryKeys: ['client_id', 'permission_id', 'resource_id'],
+      foreignKeys: {
+        user_id: { foreignTable: 'user', foreignKey: 'id' },
+      },
+    },
+    {
+      name: 'api_key_permission',
+      columns: {
+        api_key_id: { type: 'text', notNull: true },
+        permission_id: { type: 'integer', notNull: true },
+      },
+      compositePrimaryKeys: ['api_key_id', 'permission_id'],
+      foreignKeys: {
+        api_key_id: { foreignTable: 'api_key', foreignKey: 'value' },
+        permission_id: { foreignTable: 'permission', foreignKey: 'id' },
+      },
     },
     {
       name: 'permission',
@@ -47,23 +68,8 @@ export const rootSchema: ChiselSchema = {
           notNull: true,
           primaryKey: true,
         },
-        name: { type: 'text', notNull: true, enum: TestEnum },
-      },
-    },
-    {
-      name: 'resource',
-      columns: {
-        id: {
-          type: 'integer',
-          notNull: true,
-          unique: true,
-          primaryKey: true,
-          autoIncrement: true,
-        },
         name: { type: 'text', notNull: true },
-        created_at: { type: 'text' },
-        updated_at: { type: 'text' },
-        type: { type: 'text', notNull: true, enum: ResourceTypeEnum },
+        type: { type: 'text' },
       },
     },
     {
@@ -75,10 +81,19 @@ export const rootSchema: ChiselSchema = {
           primaryKey: true,
           autoIncrement: true,
         },
-        resources_id: { type: 'integer', notNull: true },
+        name: { type: 'text', notNull: true, unique: true },
       },
+    },
+    {
+      name: 'database_permission',
+      columns: {
+        database_id: { type: 'integer', notNull: true },
+        permission_id: { type: 'integer', notNull: true },
+      },
+      compositePrimaryKeys: ['database_id', 'permission_id'],
       foreignKeys: {
-        resource_id: { foreignTable: 'resource', foreignKey: 'id' },
+        database_id: { foreignTable: 'database', foreignKey: 'id' },
+        permission_id: { foreignTable: 'permission', foreignKey: 'id' },
       },
     },
     {
@@ -115,52 +130,11 @@ export const rootSchema: ChiselSchema = {
         },
         name: { type: 'text', notNull: true },
         type: { type: 'text', notNull: true },
-        is_required: { type: 'text', notNull: true },
-        is_primary_key: { type: 'text', notNull: true },
+        is_required: { type: 'integer', notNull: true },
+        is_primary_key: { type: 'integer', notNull: true },
       },
       foreignKeys: {
         entity_id: { foreignTable: 'entity', foreignKey: 'id' },
-      },
-    },
-    {
-      name: 'kv',
-      columns: {
-        id: {
-          type: 'integer',
-          notNull: true,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        resource_id: { type: 'integer', notNull: true },
-        key: { type: 'text', notNull: true },
-        value: { type: 'text', notNull: true },
-      },
-      foreignKeys: {
-        resource_id: { foreignTable: 'resource', foreignKey: 'id' },
-      },
-    },
-    {
-      name: 'document',
-      columns: {
-        id: {
-          type: 'integer',
-          notNull: true,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        resource_id: { type: 'integer', notNull: true },
-        content: { type: 'text', notNull: true, mode: 'json' },
-      },
-      foreignKeys: {
-        resource_id: { foreignTable: 'resource', foreignKey: 'id' },
-      },
-    },
-    {
-      name: 'log',
-      columns: {
-        time: { type: 'integer', notNull: true, primaryKey: true },
-        type: { type: 'text', notNull: true },
-        value: { type: 'text', notNull: true, mode: 'json' },
       },
     },
   ],

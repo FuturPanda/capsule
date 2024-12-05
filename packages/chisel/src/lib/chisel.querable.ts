@@ -24,4 +24,8 @@ export class ChiselQuerable implements ChiselQueries {
       stmt.run();
     }
   }
+
+  close() {
+    this.db.close();
+  }
 }

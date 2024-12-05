@@ -1,6 +1,7 @@
 import { ChiselDb, IFactoryOpts } from '@capsule/chisel';
 import { DynamicModule, Global, Inject, Module } from '@nestjs/common';
 import { ClassType } from 'src/_utils/_types/generics';
+import { ChiselService } from './chisel.service';
 
 @Module({})
 export class ChiselModule {
@@ -13,7 +14,6 @@ export class ChiselModule {
 
   static forFeature(...models: ClassType<any>[]): DynamicModule {
     const providers = createChiselProviders(...models);
-    console.log(providers);
     return {
       module: ChiselModule,
       providers: providers,
@@ -32,8 +32,8 @@ export class ChiselCoreModule {
     };
     return {
       module: ChiselCoreModule,
-      providers: [connectionProvider],
-      exports: [connectionProvider],
+      providers: [connectionProvider, ChiselService],
+      exports: [connectionProvider, ChiselService],
     };
   }
 }

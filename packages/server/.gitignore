@@ -3,7 +3,7 @@
 /node_modules
 /build
 /databases
-/surrealdb
+/_surrealdb
 
 # Logs
 logs
