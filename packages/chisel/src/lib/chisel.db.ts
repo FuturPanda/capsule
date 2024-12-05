@@ -55,7 +55,7 @@ export class ChiselDb extends ChiselQuerable {
       };
     };
 
-    const fromSchemaSync = () => {
+    const fromSchema = () => {
       if (exists) {
         logger.info(
           `Cannot create Database, db already exists at ${filepath}, using ${opts.dbName}, journalPath : ${journalFilePath}, snapshotPath : ${snapshotPath}, dirPath :${dirPath}`,
@@ -134,12 +134,20 @@ export class ChiselDb extends ChiselQuerable {
       );
       return new ChiselDb(filepath);
     };
-    return { fromSchemaSync };
+    return { fromSchema };
+  }
+
+  static getConnectionFromPath(path: string) {
+    try {
+      return new ChiselDb(path);
+    } catch (error: any) {
+      throw new Error(`Failed to get database connection: ${error.message}`);
+    }
   }
 
   static provideConnection(opts: IFactoryOpts): ChiselDb {
     try {
-      return ChiselDb.SchemaFactory(opts).fromSchemaSync();
+      return ChiselDb.SchemaFactory(opts).fromSchema();
     } catch (error: any) {
       console.error("Error occurred while providing connection:", error);
       throw new Error(

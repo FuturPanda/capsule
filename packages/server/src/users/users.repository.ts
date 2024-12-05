@@ -1,9 +1,9 @@
 import { ChiselModel } from '@capsule/chisel';
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/models/root/user';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
 import { InjectModel } from '../chisel/chisel.module';
 import { CreateUserDto } from './_utils/dto/request/create-user.dto';
+import { User } from '../_utils/models/root/user';
 
 @Injectable()
 export class UsersRepository {
@@ -16,9 +16,7 @@ export class UsersRepository {
       {
         email: createUserDto.email,
         password: createUserDto.password,
-        api_key: createUserDto.apiKey,
         siret: createUserDto.siret,
-        schema: createUserDto.schema,
         type: type,
       },
       { ignoreExisting: true },

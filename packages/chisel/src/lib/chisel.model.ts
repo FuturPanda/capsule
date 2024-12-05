@@ -1,6 +1,7 @@
 import {Database} from "better-sqlite3";
 import console from "node:console";
 import {ClassType, ExecParams, FilterQuery, QuerySelector,} from "./_utils/types/queries.type";
+import {fromClassTypeToSnakeCase} from "./_utils/functions/string-converter.function";
 
 /**
  * Main Class for the NestJs Module.
@@ -15,7 +16,7 @@ export class ChiselModel<T> {
   constructor(db: Database, model: ClassType<T>) {
     this.db = db;
     this.model = model;
-    this.modelName = model.name.toLowerCase();
+    this.modelName = fromClassTypeToSnakeCase(model);
   }
 
   insert(
@@ -47,21 +48,61 @@ export class ChiselModel<T> {
     return output;
   }
 
-  select(params?: (keyof T)[]) {
-    let query = `SELECT ${params ? Object.values(params).join(", ") : "*"}
+  /**
+   * Basic function to select from tables.
+   * The output is dependent on the dto param.
+   * !! the star selector isn't yet implemented.
+   * No dto means that everything will be selected, meaning some collision might happen
+   * during joins.
+   * @param dto
+   */
+  select(dto?: Record<string, `${string}.${string}`>) {
+    let query: string = `SELECT *
+                             FROM ${this.modelName} `;
+    if (dto) {
+      const aliases = [];
+      const attributes = Object.keys(dto);
+      for (const [index, param] of Object.values(dto).entries()) {
+        const [tableName, tableField] = param.split(".");
+        if (tableField === "*") {
+        } else {
+          aliases.push(`${param} AS ${attributes[index]}`);
+        }
+      }
+      query = `SELECT ${aliases.length > 0 ? aliases.join(", ") : "*"}
                      FROM ${this.modelName} `;
+    }
+
+    const join = <Local, Foreign>(
+      fromTable: ClassType<Local>,
+      toTable: ClassType<Foreign>,
+      localKey: keyof Local & string,
+      foreignKey: keyof Foreign & string,
+      type: "INNER" | "LEFT" | "RIGHT" = "INNER",
+    ) => {
+      query += ` ${type} JOIN ${fromClassTypeToSnakeCase(toTable)} ON ${fromClassTypeToSnakeCase(fromTable)}.${localKey} = ${fromClassTypeToSnakeCase(toTable)}.${foreignKey}`;
+
+      return { where, orderBy, exec, limit, join };
+    };
 
     const where = (params: FilterQuery<T>) => {
+      let isFirstCondition = true;
+
       for (const field in params) {
         const conditions = params[field];
         if (conditions && typeof conditions === "object") {
           for (const conditionKey in conditions) {
             const conditionValue = conditions[conditionKey];
+            const fieldParts = field.split(".");
+            const fieldName =
+              fieldParts.length > 1 ? field : `${this.modelName}.${field}`;
             query += this.generateFilterQuery(
-              field,
+              fieldName,
               conditionValue,
               conditionKey as keyof QuerySelector<T>,
+              isFirstCondition,
             );
+            isFirstCondition = false;
           }
         }
       }
@@ -92,10 +133,11 @@ export class ChiselModel<T> {
         else return res;
       } catch (error) {
         console.error("Error writing to the database:", error);
+        throw error;
       }
     };
 
-    return { where, orderBy, exec, limit };
+    return { where, orderBy, exec, limit, join };
   }
 
   update(params: { [P in keyof T]?: T[P] }) {
@@ -141,7 +183,9 @@ export class ChiselModel<T> {
       try {
         query += ";";
         const stmt = this.db.prepare(
-          "UPDATE client SET email = ? WHERE id = 6;",
+          `UPDATE client
+                     SET email = ?
+                     WHERE id = 6;`,
         );
         stmt.run(["Bonjuorno"]);
       } catch (error) {
@@ -190,6 +234,7 @@ export class ChiselModel<T> {
     field: string,
     conditionValue: T,
     conditionKey: K,
+    isFirstCondition: boolean = true,
   ) {
     let conditionOutput = "";
     switch (conditionKey) {
@@ -232,6 +277,6 @@ export class ChiselModel<T> {
           `Field ${field}: Unknown condition \'${conditionValue[1]}\'`,
         );
     }
-    return `WHERE ${conditionOutput}`;
+    return `${isFirstCondition ? "WHERE" : "AND"} ${conditionOutput}`;
   }
 }
