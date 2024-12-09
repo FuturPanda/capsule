@@ -3,20 +3,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FC, ReactNode, useCallback } from "react";
 import { AuthContext } from "./contexts/AuthContext";
 import { useBoundStore } from "@/stores/global.store.ts";
+import { ApiKey } from "@/stores/users/user.model.ts";
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const accessToken = useBoundStore.getState().access_token;
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
-      return userRequests.login(email, password);
+    mutationFn: async (encodedApiKey: string) => {
+      const apiKey: ApiKey = JSON.parse(atob(encodedApiKey));
+      useBoundStore.setState({ base_url: apiKey.baseUrl });
+      return userRequests.login(apiKey.email, apiKey.password);
     },
     onSuccess: (data) => {
       const { access_token, user, refresh_token } = data;
@@ -26,9 +23,11 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         refresh_token: refresh_token,
       });
       queryClient.setQueryData(["user"], user);
+      return true;
     },
     onError: (error) => {
       console.error("Login failed", error);
+      return false;
     },
   });
 
@@ -43,8 +42,8 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   });
 
   const login = useCallback(
-    async (email: string, password: string) => {
-      await loginMutation.mutateAsync({ email, password });
+    async (encodedApiKey: string) => {
+      return loginMutation.mutateAsync(encodedApiKey);
     },
     [loginMutation],
   );

@@ -21,3 +21,9 @@ export interface GetUserDto {
 export interface RefreshDto {
   access_token: string;
 }
+
+export interface ApiKey {
+  baseUrl: string;
+  email: string;
+  password: string;
+}

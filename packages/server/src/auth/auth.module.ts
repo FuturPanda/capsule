@@ -6,6 +6,7 @@ import { jwtConstants } from './_utils/constants/jwt.constants';
 import { JwtStrategy } from './_utils/guards/jwt.strategy';
 import { RefreshTokenStrategy } from './_utils/guards/refresh-token.strategy';
 import { AuthService } from './auth.service';
+import { ApiKeysModule } from '../api-keys/api-keys.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthService } from './auth.service';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '15m' },
     }),
+    ApiKeysModule,
   ],
   providers: [AuthService, JwtStrategy, RefreshTokenStrategy],
   exports: [AuthService],

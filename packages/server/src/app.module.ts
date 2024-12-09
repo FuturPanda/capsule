@@ -12,6 +12,7 @@ import { UsersModule } from './users/users.module';
 import { SurrealModule } from './surreal/surreal.module';
 import { DatabasesModule } from './databases/databases.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ApiKeysModule } from './api-keys/api-keys.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       password: 'root',
     }),
     DatabasesModule,
+    ApiKeysModule,
   ],
   controllers: [AppController],
   providers: [AppService],

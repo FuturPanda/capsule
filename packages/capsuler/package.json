@@ -1,0 +1,72 @@
+{
+  "name": "@capsule/capsuler",
+  "version": "0.0.1",
+  "description": "CLI to spin a capsule ",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/bin.ts --format cjs,esm --dts",
+    "dev": "tsup src/bin.ts --format cjs,esm --dts --watch",
+    "test": "jest",
+    "test:cov": "jest --coverage",
+    "lint": "eslint 'src/**/*.{js,ts}'",
+    "format": "prettier --write 'src/**/*.{js,ts}'",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "docker",
+    "cli",
+    "self-hosted",
+    "baas",
+    "backend-as-service",
+    "api-key",
+    "instance-manager",
+    "container-management",
+    "deployment",
+    "devops",
+    "infrastructure",
+    "automation",
+    "nodejs",
+    "typescript",
+    "monorepo",
+    "capsule"
+  ],
+  "author": "futur_panda",
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.2.0",
+    "dockerode": "^4.0.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.32",
+    "@types/jest": "^29.5.3",
+    "@types/node": "^20.4.5",
+    "@typescript-eslint/eslint-plugin": "^6.2.0",
+    "@typescript-eslint/parser": "^6.2.0",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.1",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.1",
+    "tsup": "^7.1.0",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  },
+  "bin": {
+    "capsuler": "./dist/bin.js"
+  }
+}

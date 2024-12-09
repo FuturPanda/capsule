@@ -4,6 +4,7 @@ import { GetUserDto } from "./user.model";
 export interface UserSlice {
   access_token: string | null;
   refresh_token: string | null;
+  base_url: string | null;
   user: GetUserDto | null;
   login: (
     accessToken: string,
@@ -12,6 +13,7 @@ export interface UserSlice {
   ) => void;
   logout: () => void;
   updateUser: (updatedUser: Partial<GetUserDto>) => void;
+  setBaseUrl: (baseUrl: string) => void;
 }
 
 export const createUserSlice: StateCreator<
@@ -21,6 +23,7 @@ export const createUserSlice: StateCreator<
 > = (set) => ({
   access_token: null,
   refresh_token: null,
+  base_url: null,
   user: null,
   login: (accessToken: string, refreshToken: string, user: GetUserDto | null) =>
     set({ access_token: accessToken, refresh_token: refreshToken, user: user }),
@@ -34,4 +37,5 @@ export const createUserSlice: StateCreator<
           user: { ...state.user, ...updatedUser },
         };
     }),
+  setBaseUrl: (baseUrl: string) => set({ base_url: baseUrl }),
 });

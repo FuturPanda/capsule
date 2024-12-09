@@ -1,8 +1,9 @@
 // src/contexts/AuthContext.tsx
 import React from "react";
+import { LoginDto } from "@/stores/users/user.model.ts";
 
 export interface AuthContextType {
-  login: (username: string, password: string) => Promise<void>;
+  login: (apiKey: string) => Promise<LoginDto>;
   logout: () => void;
   isAuthenticated: boolean;
 }

@@ -10,7 +10,11 @@ export const CapsuleAxios = axios.create({
 
 CapsuleAxios.interceptors.request.use((config) => {
   const token = useBoundStore.getState().access_token;
+  const baseUrl = useBoundStore.getState().base_url;
   console.log("in interceptors before request");
+  if (baseUrl) {
+    config.baseURL = baseUrl;
+  }
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`;
   }

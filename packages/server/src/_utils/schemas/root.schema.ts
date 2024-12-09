@@ -1,4 +1,5 @@
 import { ChiselSchema } from '@capsule/chisel';
+import { ApiKeyTypeEnum } from '../../api-keys/_utils/enum/api-key-type.enum';
 
 export enum UserTypeEnum {
   OWNER = 'OWNER',
@@ -38,13 +39,11 @@ export const rootSchema: ChiselSchema = {
           notNull: true,
           primaryKey: true,
         },
-        user_id: {
-          type: 'integer',
+        type: {
+          type: 'text',
           notNull: true,
+          enum: ApiKeyTypeEnum,
         },
-      },
-      foreignKeys: {
-        user_id: { foreignTable: 'user', foreignKey: 'id' },
       },
     },
     {

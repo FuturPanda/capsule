@@ -75,7 +75,7 @@ export const DataSourceDashboard = () => {
                         {dataSource.name}
                       </h3>
                       <p className="text-xs text-zinc-500 mt-1">
-                        {dataSource.tables?.length ?? 0} tables • Updated{" "}
+                        {dataSource.entities?.length ?? 0} tables • Updated{" "}
                         {dataSource.lastUpdatedAt?.toString()}
                       </p>
                     </div>
