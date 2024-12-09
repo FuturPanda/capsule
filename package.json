@@ -12,6 +12,7 @@
     "test": "npm run test --workspaces --if-present",
     "server": "cd packages/server && npm run dev",
     "start:docker": "concurrently \"cd packages/server && npm run start:prod\" \"cd packages/capsule-kit && npm run preview\"",
+    "docker:build": "docker build -t futurpanda/capsule .",
     "capsule-kit": "cd packages/capsule-kit && npm run preview"
   },
   "keywords": [],

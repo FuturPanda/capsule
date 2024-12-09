@@ -1,10 +1,9 @@
 import axios, { AxiosInstance } from "axios";
-import { ApiConfig } from "./lib/types";
 
 export class ApiClient {
   private client: AxiosInstance;
 
-  constructor(config: ApiConfig) {
+  constructor(config: any) {
     this.client = axios.create({
       baseURL: config.baseURL,
       headers: {

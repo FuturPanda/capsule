@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator.tsx";
 import { ComponentProps } from "react";
 
 interface PopoverCardMenuProps extends ComponentProps<typeof Popover> {
+  id?: string;
   onDelete: (...params: never[]) => void;
 }
 

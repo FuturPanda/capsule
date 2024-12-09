@@ -16,14 +16,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  email: z.string().min(2).max(50),
-  password: z.string(),
+  api_key: z.string().min(2),
 });
 
 type LoginFormValues = z.infer<typeof formSchema>;
@@ -32,28 +31,25 @@ function LoginComponent() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      api_key: "",
     },
   });
 
   const auth = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [, setIsSubmitting] = useState(false);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     console.log("is submitting ");
     try {
-      const email = values.email;
-      const password = values.password;
-      if (!email || !password) return;
-      await auth!.login(email, password);
+      const apiKey = values.api_key;
+      if (!apiKey) return;
+      auth!.login(apiKey).then(() => router.navigate({ to: "/" }));
     } catch (error) {
       console.error("Error logging in: ", error);
     } finally {
       setIsSubmitting(false);
-      await navigate({ to: "/" });
     }
   }
 
@@ -63,7 +59,7 @@ function LoginComponent() {
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account blablablma
+            Enter your Capsule Api Key below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,24 +72,12 @@ function LoginComponent() {
                 >
                   <FormField
                     control={form.control}
-                    name="email"
+                    name="api_key"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Api Key</FormLabel>
                         <FormControl>
-                          <Input placeholder="@" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input placeholder="" {...field} />
+                          <Input placeholder="..." {...field} />
                         </FormControl>
                       </FormItem>
                     )}

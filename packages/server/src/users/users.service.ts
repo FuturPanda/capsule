@@ -15,6 +15,7 @@ export class UsersService {
       loginUserDto.email,
       loginUserDto.password,
     );
+    console.log('before auth : ', user);
     return this.authService.login(user);
   }
 
