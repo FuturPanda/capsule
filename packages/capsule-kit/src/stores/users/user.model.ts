@@ -26,4 +26,5 @@ export interface ApiKey {
   baseUrl: string;
   email: string;
   password: string;
+  clientId: string;
 }

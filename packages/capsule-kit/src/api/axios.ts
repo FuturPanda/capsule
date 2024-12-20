@@ -11,12 +11,15 @@ export const CapsuleAxios = axios.create({
 CapsuleAxios.interceptors.request.use((config) => {
   const token = useBoundStore.getState().access_token;
   const baseUrl = useBoundStore.getState().base_url;
-  console.log("in interceptors before request");
+  const clientId = useBoundStore.getState().client_id;
   if (baseUrl) {
     config.baseURL = baseUrl;
   }
   if (token) {
     config.headers["Authorization"] = `Bearer ${token}`;
+  }
+  if (clientId) {
+    config.headers["Client-Id"] = `${clientId}`;
   }
   return config;
 });
@@ -25,7 +28,6 @@ CapsuleAxios.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    console.log("in interceptors with response with an error : ", error);
 
     if (
       error.response?.status === 401 &&
@@ -44,7 +46,6 @@ CapsuleAxios.interceptors.response.use(
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         return CapsuleAxios(originalRequest);
       } catch (refreshError) {
-        console.error("Failed to refresh token:", refreshError);
         useBoundStore.getState().logout();
         return Promise.reject(refreshError);
       }

@@ -6,7 +6,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import { useBoundStore } from "@/stores/global.store.ts";
-import { EntityCapletContentValue } from "@/stores/caplets/caplet.model.ts";
 import { useState } from "react";
 import { Button } from "@/components/ui/button.tsx";
 import { ChevronDown, Database, Layout, Plus } from "lucide-react";
@@ -24,6 +23,7 @@ import { Switch } from "@/components/ui/switch.tsx";
 import { v4 as uuidv4 } from "uuid";
 import { Entity } from "@/stores/data-sources/data-source.model.ts";
 import { ColumnOptions } from "@capsule/chisel";
+import { EntityCapletContentValue } from "@/stores/caplets/caplet.interface.ts";
 
 interface TableContentProps extends React.ComponentProps<"div"> {
   capletId: string;

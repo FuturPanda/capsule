@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { FileSpreadsheet } from "lucide-react";
-import { DataSourceDashboard } from "@/components/data-sources/DataSourceDashboard.tsx";
+import { DataSourceDashboard } from "@/routes/_authenticated/data";
 
 export const DataSourceDialog = () => {
   return (

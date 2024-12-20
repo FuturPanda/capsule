@@ -12,7 +12,10 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const loginMutation = useMutation({
     mutationFn: async (encodedApiKey: string) => {
       const apiKey: ApiKey = JSON.parse(atob(encodedApiKey));
-      useBoundStore.setState({ base_url: apiKey.baseUrl });
+      useBoundStore.setState({
+        base_url: apiKey.baseUrl,
+        client_id: apiKey.clientId,
+      });
       return userRequests.login(apiKey.email, apiKey.password);
     },
     onSuccess: (data) => {

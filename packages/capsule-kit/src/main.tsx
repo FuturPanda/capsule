@@ -7,6 +7,8 @@ import { ThemeProvider } from "./_utils/providers/ThemeProvider";
 import { App } from "./App";
 import "./styles/index.css";
 import { ReactFlowProvider } from "@xyflow/react";
+import { FlintProvider } from "@/_utils/providers/FlintProvider.tsx";
+import { SyncProvider } from "@/_utils/providers/SyncProvider.tsx";
 
 register(`/service-worker.js`);
 
@@ -21,7 +23,11 @@ if (!rootElement.innerHTML) {
         <QueryClientProvider client={queryClient}>
           <ReactFlowProvider>
             <AuthProvider>
-              <App />
+              <FlintProvider>
+                <SyncProvider>
+                  <App />
+                </SyncProvider>
+              </FlintProvider>
             </AuthProvider>
           </ReactFlowProvider>
         </QueryClientProvider>

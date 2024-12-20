@@ -1,140 +1,47 @@
-import Database from "better-sqlite3";
-import * as fs from "node:fs";
-import * as path from "node:path";
-import pino from "pino";
-import { IChiselDbParams, IFactoryOpts } from "./_utils/types/queries.type";
 import { ChiselQuerable } from "./chisel.querable";
-import {
-  generateDatabaseSQL,
-  generateJournal,
-  generateSnapshot,
-  generateUniqueFilename,
-} from "./schemas";
-import { compareSchemas, handleSchemaChanges } from "./migrations";
-import { generateTypesSync } from "./type-generation";
-import { SnapshotType } from "./_utils/types/snapshot.type";
+import pino from "pino";
+import { IFactoryOpts } from "./_utils/types/queries.type";
+import Database from "better-sqlite3";
+import path from "node:path";
+import fs from "node:fs";
+import { generateSQLCommands } from "./migrations";
+import { Migration } from "./_utils/types/migrations.type";
+import crypto from "node:crypto";
+import { ColInfoType } from "./_utils/types/database.type";
 
 export class ChiselDb extends ChiselQuerable {
   private readonly logger = pino();
-  private filePath: string = "";
-  private dbName: string = "";
+  private readonly dirPath: string;
 
-  constructor(dbFilePath: string, params?: IChiselDbParams) {
+  constructor(
+    dbFilePath: string,
+    private opts?: IFactoryOpts,
+  ) {
     super(new Database(dbFilePath));
-    if (params?.filePath) this.filePath = params.filePath;
+
+    if (opts) {
+      this.dirPath = path.join(opts.uri, opts.dbName.toLowerCase());
+    }
   }
 
-  static SchemaFactory(opts: IFactoryOpts): any {
-    const logger = pino();
-    logger.info("inside schema factory");
-    const dirPath = path.join(opts.uri, opts.dbName.toLowerCase());
-    const filepath = path.join(dirPath, `${opts.dbName.toLowerCase()}.capsule`);
-    const exists = fs.existsSync(filepath);
-    let migrationsPath: string = path.join(dirPath, "migrations");
-    let journalFilePath: string = path.join(dirPath, `_journal.json`);
-    let metaDirectoryPath: string = path.join(migrationsPath, "_meta");
-    let snapshotPath: string = path.join(
-      metaDirectoryPath,
-      "_snapshot_0000.json",
-    );
-    let schemaFilePath: string = "";
-
-    const generateMetas = (isHandlingChange: boolean = false) => {
-      pino().info(`generate metas : ${opts.entities}`);
-      const sqlScripts = generateDatabaseSQL(opts.entities);
-
-      const fileName = generateUniqueFilename();
-      const journal = generateJournal(fileName);
-      const snapshot = generateSnapshot(opts.dbName, opts.entities);
-
-      schemaFilePath = path.join(migrationsPath, `${fileName}.sql`);
-      return {
-        sqlScripts,
-        snapshot,
-        journal,
-      };
-    };
-
-    const fromSchema = () => {
-      if (exists) {
-        logger.info(
-          `Cannot create Database, db already exists at ${filepath}, using ${opts.dbName}, journalPath : ${journalFilePath}, snapshotPath : ${snapshotPath}, dirPath :${dirPath}`,
-        );
-        if (fs.existsSync(snapshotPath)) {
-          const snapshot = JSON.parse(
-            fs.readFileSync(snapshotPath, "utf8"),
-          ) as SnapshotType;
-          logger.info(`Snapshot : ${snapshot.entities}`);
-          const diff = compareSchemas(
-            {
-              dbName: snapshot.name,
-              version: snapshot.version,
-              entities: snapshot.entities,
-            },
-            {
-              dbName: opts.dbName,
-              version: snapshot.version + 1,
-              entities: opts.entities,
-            },
-          );
-          logger.error(`Diff : ${JSON.stringify(diff)}`);
-          const res = handleSchemaChanges(
-            diff,
-            {
-              dbName: opts.dbName,
-              version: snapshot.version + 1,
-              entities: opts.entities,
-            },
-            {
-              journalPath: journalFilePath,
-              snapshotPath: snapshotPath,
-              dirPath: dirPath,
-            },
-          );
-          if (!res) return new ChiselDb(filepath);
-          else {
-            const db = new ChiselDb(filepath);
-            db.runSqlCommands(res.sqlCommands);
-          }
-        }
-      }
-      return writeChiselFiles();
-    };
-
-    const writeChiselFiles = () => {
-      const logger = pino();
-      logger.info(
-        `Database doesn't exists at ${filepath}, creating ${opts.dbName}`,
+  /**
+   * Main static entrypoint
+   * @param opts
+   */
+  static create(opts: IFactoryOpts): ChiselDb {
+    try {
+      const dirPath = path.join(opts.uri, opts.dbName.toLowerCase());
+      const filepath = path.join(
+        dirPath,
+        `${opts.dbName.toLowerCase()}.capsule`,
       );
-      fs.mkdirSync(dirPath, { recursive: true });
-      const db = new Database(filepath);
-
-      const { sqlScripts, snapshot, journal } = generateMetas();
-      db.exec(sqlScripts.join("\n"));
-
-      fs.mkdirSync(metaDirectoryPath, { recursive: true });
-      fs.writeFileSync(snapshotPath, JSON.stringify(snapshot, null, 2), {
-        encoding: "utf-8",
-      });
-      fs.writeFileSync(journalFilePath, JSON.stringify(journal, null, 2), {
-        encoding: "utf-8",
-      });
-      fs.writeFileSync(schemaFilePath, sqlScripts.join("\n"), {
-        encoding: "utf-8",
-      });
-      if (opts.generateTypes) {
-        logger.info(`Generating types... in ${opts.typesDir}`);
-        const data = JSON.parse(fs.readFileSync(snapshotPath, "utf8"));
-        generateTypesSync(data, { dir: opts.typesDir });
-        if (!db) throw new Error("Error during database creation ");
-      }
-
-      logger.info(
-        `Connection with SQLite Dabatase "${filepath}" has been established`,
-      );
-      return new ChiselDb(filepath);
-    };
-    return { fromSchema };
+      const exists = fs.existsSync(filepath);
+      if (!exists) fs.mkdirSync(dirPath, { recursive: true });
+      const db = new ChiselDb(filepath, opts);
+      return db.initializeFromMigrations();
+    } catch (e: any) {
+      throw new Error(`Failed to get database connection: ${e.message}`);
+    }
   }
 
   static getConnectionFromPath(path: string) {
@@ -145,14 +52,139 @@ export class ChiselDb extends ChiselQuerable {
     }
   }
 
-  static provideConnection(opts: IFactoryOpts): ChiselDb {
-    try {
-      return ChiselDb.SchemaFactory(opts).fromSchema();
-    } catch (error: any) {
-      console.error("Error occurred while providing connection:", error);
-      throw new Error(
-        `Failed to provide database connection: ${error.message}`,
-      );
+  initializeFromMigrations() {
+    if (!this.opts?.migrations) {
+      throw new Error("No migrations provided");
     }
+    for (const migration of this.opts.migrations) {
+      const hasChangelog = this.checkChangelogTable();
+      if (!hasChangelog) {
+        this.createChangelogTable();
+      }
+      const wasExecuted = this.checkMigrationExecuted(migration);
+
+      if (!wasExecuted) {
+        this.executeMigration(migration);
+      }
+    }
+    return this;
+  }
+
+  applyMigrations(migrations: Migration[]) {
+    let appliedMigrations = 0;
+    for (const migration of migrations) {
+      const hasChangelog = this.checkChangelogTable();
+      if (!hasChangelog) {
+        this.createChangelogTable();
+      }
+      const wasExecuted = this.checkMigrationExecuted(migration);
+      if (!wasExecuted) {
+        appliedMigrations++;
+        this.executeMigration(migration);
+      }
+    }
+    return appliedMigrations;
+  }
+
+  getTables = (): string[] =>
+    this.db
+      .prepare(
+        `
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table'
+              AND name NOT LIKE 'sqlite_%'
+        `,
+      )
+      .all()
+      .map((t: { name: string; [key: string]: string }) => t.name);
+
+  getTableInfo = (tableName: string): ColInfoType[] =>
+    this.db
+      .prepare("SELECT * FROM pragma_table_info(?)")
+      .all(tableName)
+      .map((col: any) => ({
+        name: col.name,
+        type: col.type,
+        notNull: col.notnull === 1,
+        primaryKey: col.pk === 1,
+      }));
+
+  getDbDefinition = () => {
+    const tables = this.getTables();
+    return tables.map((t) => ({
+      tableName: t,
+      columns: this.getTableInfo(t),
+    }));
+  };
+
+  private checkChangelogTable(): boolean {
+    const result = this.db
+      .prepare(
+        `
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table'
+              AND name = 'DATABASE_CHANGELOG'
+        `,
+      )
+      .get();
+
+    return !!result;
+  }
+
+  private createChangelogTable() {
+    this.db.exec(`
+        CREATE TABLE DATABASE_CHANGELOG
+        (
+            ID           TEXT     NOT NULL,
+            AUTHOR       TEXT     NOT NULL,
+            FILENAME     TEXT,
+            DATEEXECUTED datetime NOT NULL,
+            SHA256SUM    TEXT,
+            PRIMARY KEY (ID, AUTHOR)
+        )
+    `);
+  }
+
+  private checkMigrationExecuted(migration: Migration): boolean {
+    const result = this.db
+      .prepare(
+        `
+            SELECT ID
+            FROM DATABASE_CHANGELOG
+            WHERE ID = ?
+        `,
+      )
+      .get(migration.changeSetId);
+
+    return !!result;
+  }
+
+  private executeMigration(migration: Migration, filename: string = "opde") {
+    for (const operation of migration.operations) {
+      const commands = generateSQLCommands(operation);
+
+      this.db.transaction(() => {
+        for (const command of commands.flat()) {
+          this.db.exec(command);
+        }
+      })();
+    }
+
+    const hashedContent = crypto
+      .createHash("sha256")
+      .update(migration.operations.join(""))
+      .digest("hex");
+
+    this.db
+      .prepare(
+        `
+            INSERT INTO DATABASE_CHANGELOG
+                (ID, AUTHOR, FILENAME, DATEEXECUTED, SHA256SUM)
+            VALUES (?, ?, ?, datetime('now'), ?)
+        `,
+      )
+      .run(migration.changeSetId, migration.author, filename, hashedContent);
   }
 }

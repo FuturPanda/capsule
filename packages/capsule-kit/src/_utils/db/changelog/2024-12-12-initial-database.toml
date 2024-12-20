@@ -1,0 +1,34 @@
+version = "1.0.0"
+changeSetId = "20241214-01"
+author = "steevy"
+description = "Initial schema setup"
+database = "capsule-kit"
+
+
+[properties]
+now = "CURRENT_TIMESTAMP"
+autoIncrement = true
+
+[[operations]]
+type = "createTable"
+tableName = "caplet"
+columns = [
+    { name = "id", type = "text", constraints = { primaryKey = true, nullable = false } },
+    { name = "title", type = "text", constraints = { nullable = false } },
+    { name = "icon", type = "text" },
+]
+
+
+[[operations]]
+type = "createTable"
+tableName = "caplet_content"
+columns = [
+    { name = "id", type = "text", constraints = { primaryKey = true, nullable = false } },
+    { name = "content_type", type = "text" },
+    #    type = "ENUM", enumValues = ["TEXT", "SOURCE", "ENTITY"], constraints = { nullable = false } },
+    { name = "value", type = "text" },
+    { name = "caplet_id", type = "text" }
+]
+foreignKeys = [
+    { baseColumnName = "caplet_id", referencedTableName = "caplet", referencedColumnName = "id", constraintName = "fk_content_caplet_id_caplet_id" },
+]

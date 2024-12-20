@@ -1,25 +1,27 @@
 import dynamicIconImports from "lucide-react/dynamicIconImports";
+import {
+  CapletContentTypeEnum,
+  EntityCapletContentValue,
+} from "@/stores/caplets/caplet.interface.ts";
 
-export type Caplet = {
+export interface GetCapletDto {}
+
+export interface GetCapletContentDto {
   id: string;
+  content_type: CapletContentTypeEnum;
+  caplet_id: string;
+  value: string;
+}
+
+export interface CreateCapletDto {
   title: string;
   contentIds: string[];
   icon?: keyof typeof dynamicIconImports;
-};
+}
 
-export interface CapletContent {
+export interface CreateCapletContentDto {
   id: string;
-  type: CapletContentTypeEnum;
+  caplet_id: string;
+  content_type: CapletContentTypeEnum;
   value?: string | EntityCapletContentValue;
-}
-
-export interface EntityCapletContentValue {
-  dataSourceId: string;
-  entityId: string;
-}
-
-export enum CapletContentTypeEnum {
-  TEXT = "TEXT",
-  SOURCE = "SOURCE",
-  ENTITY = "ENTITY",
 }

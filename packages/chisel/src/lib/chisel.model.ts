@@ -1,233 +1,279 @@
-import {Database} from "better-sqlite3";
+import { Database } from "better-sqlite3";
 import console from "node:console";
-import {ClassType, ExecParams, FilterQuery, QuerySelector,} from "./_utils/types/queries.type";
-import {fromClassTypeToSnakeCase} from "./_utils/functions/string-converter.function";
+import {
+  ClassType,
+  ExecParams,
+  FilterQuery,
+  QuerySelector,
+} from "./_utils/types/queries.type";
+import { fromClassTypeToSnakeCase } from "./_utils/functions/string-converter.function";
 
-/**
- * Main Class for the NestJs Module.
- * To use when the model is known.
- */
+type WriteOutput = {
+  success: boolean;
+  id: number | bigint | null;
+  changes: number;
+};
+
+type QueryBuilder = {
+  where: (params: FilterQuery<any>) => any;
+  orderBy?: (column: any, order: "DESC" | "ASC") => any;
+  exec: (params?: ExecParams) => any;
+  limit?: (params: number) => any;
+  join?: any;
+};
 
 export class ChiselModel<T> {
   private readonly db: Database;
-  private readonly model: ClassType<T>;
   private readonly modelName: string;
 
   constructor(db: Database, model: ClassType<T>) {
     this.db = db;
-    this.model = model;
     this.modelName = fromClassTypeToSnakeCase(model);
   }
 
   insert(
     params: Partial<Pick<T, keyof T>> | Record<string, string>,
     opts?: { ignoreExisting: boolean },
-  ) {
-    let query: string = `INSERT
-        ${opts?.ignoreExisting ? "OR IGNORE " : ""}INTO
-        ${this.modelName}`;
+  ): WriteOutput {
+    const query = this.buildInsertQuery(
+      Object.keys(params),
+      opts?.ignoreExisting,
+    );
+    console.log("QUERYYYYY : ", query);
+    return this.executeWrite(query, Object.values(params));
+  }
+
+  upsert(
+    params: Partial<Pick<T, keyof T>> | Record<string, string>,
+    conflictColumns: (keyof T)[],
+    updateColumns?: (keyof T)[],
+  ): WriteOutput {
     const keys = Object.keys(params);
-    const placeholders = keys.map(() => "?").join(", ");
-    query += ` (${keys.join(", ")}) VALUES (${placeholders})`;
-    let output = {
-      success: false,
-      id: null,
-      changes: 0,
+    const baseInsert = this.buildInsertQuery(keys);
+    const conflictClause = this.buildConflictClause(
+      conflictColumns,
+      updateColumns || keys,
+    );
+    const query = `${baseInsert} ${conflictClause}`;
+    return this.executeWrite(query, Object.values(params));
+  }
+
+  insertMany(
+    rows: (Partial<Pick<T, keyof T>> | Record<string, string>)[],
+    opts?: { ignoreExisting: boolean },
+  ): WriteOutput {
+    if (rows.length === 0) {
+      return { success: false, id: null, changes: 0 };
+    }
+
+    const keys = Object.keys(rows[0]);
+    if (
+      !rows.every(
+        (row) =>
+          Object.keys(row).length === keys.length &&
+          Object.keys(row).every((key) => keys.includes(key)),
+      )
+    ) {
+      throw new Error("All rows must have the same structure");
+    }
+
+    const placeholders = rows
+      .map(() => `(${keys.map(() => "?").join(", ")})`)
+      .join(", ");
+
+    const query =
+      `INSERT
+      ${opts?.ignoreExisting ? "OR IGNORE " : ""}INTO
+      ${this.modelName} ` + `(${keys.join(", ")}) VALUES ${placeholders}`;
+
+    const values = rows.flatMap((row) => Object.values(row));
+
+    return this.executeWrite(query, values);
+  }
+
+  select(dto?: Record<string, `${string}.${string}`>): QueryBuilder {
+    let query = this.buildSelectQuery(dto);
+    const exec = (params?: ExecParams): T[] | T | undefined =>
+      this.executeSelect(query, params);
+
+    const queryBuilder: QueryBuilder = {
+      where: (params: FilterQuery<T>) => {
+        query += this.buildWhereClause(params);
+        return { ...queryBuilder, exec };
+      },
+      orderBy: (column: keyof T, order: "DESC" | "ASC") => {
+        query += " " + this.buildOrderByClause(column, order);
+        return { ...queryBuilder, exec };
+      },
+      limit: (params: number) => {
+        query += " " + this.buildLimitClause(params);
+        return { exec };
+      },
+      join: <Local, Foreign>(
+        fromTable: ClassType<Local>,
+        toTable: ClassType<Foreign>,
+        localKey: keyof Local & string,
+        foreignKey: keyof Foreign & string,
+        type: "INNER" | "LEFT" | "RIGHT" = "INNER",
+      ) => {
+        query += this.buildJoinClause(
+          fromTable,
+          toTable,
+          localKey,
+          foreignKey,
+          type,
+        );
+        return { ...queryBuilder };
+      },
+      exec,
     };
+
+    return queryBuilder;
+  }
+
+  update(params: { [P in keyof T]?: T[P] }): QueryBuilder {
+    const entries = Object.entries(params);
+    const values = entries.map(([key, value]) => `${key} = ${value}`);
+    let query = `UPDATE ${this.modelName}
+                 SET ${values.join(", ")} `;
+
+    const exec = () => this.executeWrite(query, []);
+
+    return {
+      where: (params: FilterQuery<T>) => {
+        query += this.buildWhereClause(params);
+        return { exec };
+      },
+      exec,
+    };
+  }
+
+  delete(): QueryBuilder {
+    let query = `DELETE
+                 FROM ${this.modelName} `;
+    const exec = () => this.executeWrite(query, []);
+
+    return {
+      where: (params: FilterQuery<T>) => {
+        query += this.buildWhereClause(params);
+        return { exec };
+      },
+      exec,
+    };
+  }
+
+  private buildInsertQuery(keys: string[], ignoreExisting = false): string {
+    const placeholders = keys.map(() => "?").join(", ");
+    return `INSERT
+    ${ignoreExisting ? "OR IGNORE " : ""}INTO
+    ${this.modelName}
+    (
+    ${keys.join(", ")}
+    )
+    VALUES (${placeholders})`;
+  }
+
+  private buildConflictClause(
+    conflictColumns: (keyof T)[],
+    updateColumns: (keyof T | string)[],
+  ): string {
+    if (conflictColumns.length === 0) return "";
+    const updates = updateColumns
+      .filter((col) => !conflictColumns.includes(col as keyof T))
+      .map((col) => `${String(col)} = excluded.${String(col)}`)
+      .join(", ");
+    return `ON CONFLICT(${conflictColumns.join(", ")}) DO UPDATE SET ${updates}`;
+  }
+
+  private executeWrite(query: string, values: unknown[]): WriteOutput {
     try {
       const stmt = this.db.prepare(query);
-      const res = stmt.run(Object.values(params));
-      output = {
+      const res = stmt.run(values);
+      return {
         success: res.changes > 0,
         id: res.lastInsertRowid,
         changes: res.changes,
       };
     } catch (error) {
       console.error("Error writing to the database:", error);
+      return { success: false, id: null, changes: 0 };
     }
-    return output;
   }
 
-  /**
-   * Basic function to select from tables.
-   * The output is dependent on the dto param.
-   * !! the star selector isn't yet implemented.
-   * No dto means that everything will be selected, meaning some collision might happen
-   * during joins.
-   * @param dto
-   */
-  select(dto?: Record<string, `${string}.${string}`>) {
-    let query: string = `SELECT *
-                             FROM ${this.modelName} `;
-    if (dto) {
-      const aliases = [];
-      const attributes = Object.keys(dto);
-      for (const [index, param] of Object.values(dto).entries()) {
-        const [tableName, tableField] = param.split(".");
-        if (tableField === "*") {
-        } else {
-          aliases.push(`${param} AS ${attributes[index]}`);
+  private buildWhereClause(params: FilterQuery<T>, tableName?: string): string {
+    let query = "";
+    let isFirstCondition = true;
+
+    for (const field in params) {
+      const conditions = params[field];
+      if (conditions && typeof conditions === "object") {
+        for (const conditionKey in conditions) {
+          const conditionValue = conditions[conditionKey];
+          const fieldParts = field.split(".");
+          const fieldName =
+            fieldParts.length > 1
+              ? field
+              : `${tableName || this.modelName}.${field}`;
+          query += this.generateFilterQuery(
+            fieldName,
+            conditionValue,
+            conditionKey as keyof QuerySelector<T>,
+            isFirstCondition,
+          );
+          isFirstCondition = false;
         }
       }
-      query = `SELECT ${aliases.length > 0 ? aliases.join(", ") : "*"}
-                     FROM ${this.modelName} `;
     }
-
-    const join = <Local, Foreign>(
-      fromTable: ClassType<Local>,
-      toTable: ClassType<Foreign>,
-      localKey: keyof Local & string,
-      foreignKey: keyof Foreign & string,
-      type: "INNER" | "LEFT" | "RIGHT" = "INNER",
-    ) => {
-      query += ` ${type} JOIN ${fromClassTypeToSnakeCase(toTable)} ON ${fromClassTypeToSnakeCase(fromTable)}.${localKey} = ${fromClassTypeToSnakeCase(toTable)}.${foreignKey}`;
-
-      return { where, orderBy, exec, limit, join };
-    };
-
-    const where = (params: FilterQuery<T>) => {
-      let isFirstCondition = true;
-
-      for (const field in params) {
-        const conditions = params[field];
-        if (conditions && typeof conditions === "object") {
-          for (const conditionKey in conditions) {
-            const conditionValue = conditions[conditionKey];
-            const fieldParts = field.split(".");
-            const fieldName =
-              fieldParts.length > 1 ? field : `${this.modelName}.${field}`;
-            query += this.generateFilterQuery(
-              fieldName,
-              conditionValue,
-              conditionKey as keyof QuerySelector<T>,
-              isFirstCondition,
-            );
-            isFirstCondition = false;
-          }
-        }
-      }
-      return { exec, limit, orderBy };
-    };
-
-    const orderBy = (column: keyof T, params: "DESC" | "ASC") => {
-      query += `ORDER BY ${String(column)} ${params === "DESC" ? "DESC" : "ASC"}`;
-      return {
-        exec,
-        limit,
-      };
-    };
-
-    //function groupBy(params: OrderByQuery) {}
-    function limit(params: number) {
-      query += `LIMIT ${params}`;
-      return { exec };
-    }
-
-    const exec = (params?: ExecParams): T[] | T | undefined => {
-      try {
-        console.log("before exec ", query);
-        const stmt = this.db.prepare(query);
-        const res = stmt.all() as T[];
-        if (params?.one && res.length > 0) return res[0];
-        else if (res.length === 0) return undefined;
-        else return res;
-      } catch (error) {
-        console.error("Error writing to the database:", error);
-        throw error;
-      }
-    };
-
-    return { where, orderBy, exec, limit, join };
+    return query;
   }
 
-  update(params: { [P in keyof T]?: T[P] }) {
-    if (!this) throw new Error("Database not initialized");
-    let query: string = `UPDATE ${this.modelName} `;
-
-    let entries = Object.entries(params);
-    const values = entries.map(([key, value]) => `${key} = ${value}`);
-    query += `SET ${values.join(", ")} `;
-
-    const where = (params: FilterQuery<T>) => {
-      for (const field in params) {
-        const conditions = params[field];
-        if (conditions && typeof conditions === "object") {
-          for (const conditionKey in conditions) {
-            const conditionValue = conditions[conditionKey];
-
-            query += this.generateFilterQuery(
-              field,
-              conditionValue,
-              conditionKey as keyof QuerySelector<T>,
-            );
-          }
-        }
-      }
-      return { exec, limit, orderBy };
-    };
-
-    const orderBy = (column: keyof T, params: "DESC" | "ASC") => {
-      query += `ORDER BY ${String(column)} ${params === "DESC" ? "DESC" : "ASC"}`;
-      return {
-        exec,
-        limit,
-      };
-    };
-    //function groupBy(params: OrderByQuery) {}
-    const limit = (params: number) => {
-      query += `LIMIT ${params}`;
-      return { exec };
-    };
-
-    const exec = () => {
-      try {
-        query += ";";
-        const stmt = this.db.prepare(
-          `UPDATE client
-                     SET email = ?
-                     WHERE id = 6;`,
-        );
-        stmt.run(["Bonjuorno"]);
-      } catch (error) {
-        console.error("Error writing to the database:", error);
-      }
-    };
-
-    return { where, orderBy, exec, limit };
+  private buildOrderByClause(column: keyof T, order: "DESC" | "ASC"): string {
+    return `ORDER BY ${String(column)} ${order}`;
   }
 
-  delete() {
-    if (!this) throw new Error("Database not initialized");
-    let query: string = `DELETE
-                             FROM ${this.model} `;
+  private buildLimitClause(limit: number): string {
+    return `LIMIT ${limit}`;
+  }
 
-    const where = (params: FilterQuery<T>) => {
-      for (const field in params) {
-        const conditions = params[field];
-        if (conditions && typeof conditions === "object") {
-          for (const conditionKey in conditions) {
-            const conditionValue = conditions[conditionKey];
-            query += this.generateFilterQuery(
-              field,
-              conditionValue,
-              conditionKey as keyof QuerySelector<T>,
-            );
-          }
-        }
-      }
-      return { exec };
-    };
+  private buildSelectQuery(
+    dto?: Record<string, `${string}.${string}`>,
+  ): string {
+    if (!dto)
+      return `SELECT *
+              FROM ${this.modelName} `;
 
-    const exec = () => {
-      try {
-        const stmt = this.db.prepare(query);
-        stmt.run();
-      } catch (error) {
-        console.error("Error writing to the database:", error);
-      }
-    };
+    const aliases = Object.entries(dto)
+      .filter(([_, param]) => param.split(".")[1] !== "*")
+      .map(([alias, param]) => `${param} AS ${alias}`);
 
-    return { where };
+    return `SELECT ${aliases.length > 0 ? aliases.join(", ") : "*"}
+            FROM ${this.modelName} `;
+  }
+
+  private buildJoinClause<Local, Foreign>(
+    fromTable: ClassType<Local>,
+    toTable: ClassType<Foreign>,
+    localKey: keyof Local & string,
+    foreignKey: keyof Foreign & string,
+    type: "INNER" | "LEFT" | "RIGHT",
+  ): string {
+    return ` ${type} JOIN ${fromClassTypeToSnakeCase(toTable)} ON ${fromClassTypeToSnakeCase(fromTable)}.${localKey} = ${fromClassTypeToSnakeCase(toTable)}.${foreignKey}`;
+  }
+
+  private executeSelect(
+    query: string,
+    params?: ExecParams,
+  ): T[] | T | undefined {
+    try {
+      console.log("before exec ", query);
+      const stmt = this.db.prepare(query);
+      const res = stmt.all() as T[];
+      if (params?.one && res.length > 0) return res[0];
+      return res.length === 0 ? undefined : res;
+    } catch (error) {
+      console.error("Error reading from the database:", error);
+      throw error;
+    }
   }
 
   private generateFilterQuery<T extends T[], K extends keyof QuerySelector<T>>(
@@ -235,48 +281,30 @@ export class ChiselModel<T> {
     conditionValue: T,
     conditionKey: K,
     isFirstCondition: boolean = true,
-  ) {
-    let conditionOutput = "";
-    switch (conditionKey) {
-      case "$eq":
-        conditionOutput += `${field} = \'${conditionValue}\'`;
-        break;
-      case "$ne":
-        conditionOutput += `${field} != \'${conditionValue}\'`;
-        break;
-      case "$gt":
-        conditionOutput += `${field} > \'${conditionValue}\'}`;
-        break;
-      case "$lt":
-        conditionOutput += `${field} < \'${conditionValue}\'`;
-        break;
-      case "$gte":
-        conditionOutput += `${field} >= \'${conditionValue}\'`;
-        break;
-      case "$lte":
-        console.log(`Field ${field}: Less than \'${conditionValue}\'`);
-        conditionOutput += `${field} <= \'${conditionValue}\'`;
-        break;
-      case "$btw":
-        conditionOutput += `${field} BETWEEN \'${conditionValue[0]}\' AND \'${conditionValue[1]}\'`;
-        break;
-      case "$in":
-        conditionOutput += `${field} IN (${conditionValue.map((value) => `'${value}'`).join(", ")})`;
-        break;
-      case "$nin":
-        conditionOutput += `${field} NOT IN (${conditionValue.map((value) => `'${value}'`).join(", ")})`;
-        break;
-      case "$like":
-        conditionOutput += `${field} LIKE \'${conditionValue[1]}\'`;
-        break;
-      case "$ilike":
-        conditionOutput += `${field} LIKE \'${conditionValue[1]}\' COLLATE NOCASE`;
-        break;
-      default:
-        console.log(
-          `Field ${field}: Unknown condition \'${conditionValue[1]}\'`,
-        );
+  ): string {
+    const conditions = {
+      $eq: () => `${field} = '${conditionValue}'`,
+      $ne: () => `${field} != '${conditionValue}'`,
+      $gt: () => `${field} > '${conditionValue}'`,
+      $lt: () => `${field} < '${conditionValue}'`,
+      $gte: () => `${field} >= '${conditionValue}'`,
+      $lte: () => `${field} <= '${conditionValue}'`,
+      $btw: () =>
+        `${field} BETWEEN '${conditionValue[0]}' AND '${conditionValue[1]}'`,
+      $in: () =>
+        `${field} IN (${conditionValue.map((value) => `'${value}'`).join(", ")})`,
+      $nin: () =>
+        `${field} NOT IN (${conditionValue.map((value) => `'${value}'`).join(", ")})`,
+      $like: () => `${field} LIKE '${conditionValue[1]}'`,
+      $ilike: () => `${field} LIKE '${conditionValue[1]}' COLLATE NOCASE`,
+    };
+
+    const condition = conditions[conditionKey as keyof typeof conditions];
+    if (!condition) {
+      console.log(`Field ${field}: Unknown condition '${conditionValue[1]}'`);
+      return "";
     }
-    return `${isFirstCondition ? "WHERE" : "AND"} ${conditionOutput}`;
+
+    return `${isFirstCondition ? "WHERE" : "AND"} ${condition()}`;
   }
 }

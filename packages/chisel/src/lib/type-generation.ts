@@ -8,7 +8,7 @@ export interface IFlintParams {
 }
 
 const typeMapping: Record<string, string> = {
-  integer: "number",
+  integer: "number | bigint",
   text: "string",
   /**
    * TODO :

@@ -1,26 +1,35 @@
-import { useBoundStore } from "@/stores/global.store.ts";
 import Tiptap, { TiptapEditorRef } from "@/components/tiptap/Tiptap.tsx";
 import React, { useCallback, useRef } from "react";
 import { PopoverCardMenu } from "@/components/popovers/PopoverCardMenu.tsx";
+import { useDebouncedCallback } from "use-debounce";
+import { GetCapletContentDto } from "@/stores/caplets/caplet.model.ts";
+import { useMutation } from "@tanstack/react-query";
+import { capletRequest } from "@/stores/caplets/caplet.request.ts";
 
 export interface TextContentProps {
-  capletId: string;
-  contentId: string;
+  content: GetCapletContentDto;
 }
 
-export const TextContent = ({ capletId, contentId }: TextContentProps) => {
+export const TextContent = ({ content }: TextContentProps) => {
   const editorRef = useRef<TiptapEditorRef>(null);
 
-  const content = useBoundStore((state) => state.findContent(contentId));
-  const updateContent = useBoundStore((state) => state.updateContent);
-  const removeContent = useBoundStore((state) => state.removeContentFromCaplet);
+  const removeContent = () => {};
+
+  const mutation = useMutation({
+    mutationFn: (newValue: string) =>
+      capletRequest.updateCapletContent(content.id, newValue),
+  });
+
+  const debouncedCallback = useDebouncedCallback((value: string) => {
+    mutation.mutate(value);
+  }, 1000);
 
   const onChange = useCallback(
     (value: string) => {
-      updateContent(content!.id, { value: value });
+      debouncedCallback(value);
       console.log(value);
     },
-    [content, updateContent],
+    [debouncedCallback],
   );
 
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -46,7 +55,7 @@ export const TextContent = ({ capletId, contentId }: TextContentProps) => {
       </div>
 
       <div className="absolute top-2 right-2 flex gap-2 pointer-events-auto opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-all duration-300 z-50 bg-background">
-        <PopoverCardMenu onDelete={() => removeContent(capletId, contentId)} />
+        <PopoverCardMenu onDelete={() => removeContent()} />
       </div>
     </div>
   );

@@ -22,8 +22,6 @@ export class AuthService {
       this.apiKeysService.decrypt(password),
       user.password,
     );
-    console.log(user);
-    console.log(isMatch);
     if (isMatch) {
       const { password, ...result } = user;
       return result;

@@ -1,4 +1,4 @@
-import { CapletContentTypeEnum } from "@/stores/caplets/caplet.model.ts";
+import { CapletContentTypeEnum } from "@/stores/caplets/caplet.interface.ts";
 
 export const OnboardingCaplets = [
   {
@@ -17,15 +17,25 @@ export const OnboardingCaplets = [
   },
 ];
 
+export interface ContentType {
+  id: string;
+  content_type: CapletContentTypeEnum;
+  value: string;
+}
+
+export interface ContentPool {
+  [key: string]: ContentType;
+}
+
 export const OnboardingContentPool = {
   a: {
     id: "a",
-    type: CapletContentTypeEnum.TEXT,
+    content_type: CapletContentTypeEnum.TEXT,
     value: "This is a text content with id a",
   },
   b: {
     id: "b",
-    type: CapletContentTypeEnum.TEXT,
+    content_type: CapletContentTypeEnum.TEXT,
     value: "This is a text content with id b",
   },
 };
