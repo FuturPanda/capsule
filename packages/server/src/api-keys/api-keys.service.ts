@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiKeysRepository } from './api-keys.repository';
 import { ApiKeyTypeEnum } from './_utils/enum/api-key-type.enum';
 import * as crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ApiKeysService {
@@ -59,16 +60,30 @@ export class ApiKeysService {
       baseUrl,
       email: ownerEmail,
       password: this.encrypt(password),
+      clientId: uuidv4(),
     };
     const existingApiKey = this.apiKeysRepository.getApiKeyByType(
       ApiKeyTypeEnum.OWNER_UI,
     );
+    console.log('Existing APIKEY ;: ', existingApiKey);
     if (!existingApiKey) {
       const apiKey = this.encode(apiContent);
       this.logger.log(`API Key: ${apiKey}`);
       this.apiKeysRepository.createApiKey(apiKey, ApiKeyTypeEnum.OWNER_UI);
+      console.log('APIKEYCREATED');
       return apiKey;
     }
+
     return existingApiKey;
   }
+
+  // generateFingerprint(req: express.Request): string {
+  //   const factors = [
+  //     req.headers['user-agent'],
+  //     req.headers['accept-language'],
+  //     req.ip,
+  //   ];
+  //
+  //   return crypto.createHash('sha256').update(factors.join('|')).digest('hex');
+  // }
 }

@@ -1,10 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateDatabaseDto } from './_utils/dto/request/create-database.dto';
-import { UpdateDatabaseDto } from './_utils/dto/request/update-database.dto';
-import { ChiselDb } from '@capsule/chisel';
 import { DatabasesRepository } from './databases.repository';
-import { DEFAULT_DB_PATH } from '../_utils/constants/database.constant';
 import { ChiselService } from '../chisel/chisel.service';
+import { TableInfoType } from '@capsule/chisel';
 
 @Injectable()
 export class DatabasesService {
@@ -14,71 +12,92 @@ export class DatabasesService {
   ) {}
 
   async createDatabase(createDatabaseDto: CreateDatabaseDto) {
-    const newDatabase = await ChiselDb.SchemaFactory({
-      uri: DEFAULT_DB_PATH,
-      dbName: createDatabaseDto.name,
-      entities: createDatabaseDto.entities,
-    }).fromSchema();
-    if (!newDatabase)
-      throw new InternalServerErrorException('Error during Database Creation');
-
-    const res = this.databasesRepository.createDatabase(createDatabaseDto.name);
-    if (createDatabaseDto.entities.length > 0) {
-      createDatabaseDto.entities.map((entity) => {
-        const result = this.databasesRepository.createEntity(
-          entity.name,
-          res.id,
-        );
-        Object.entries(entity.columns).map(([key, value]) => {
-          this.databasesRepository.createEntityAttribute(
-            key,
-            result.id,
-            value.type,
-            value.notNull === true ? 0 : 1,
-            value.primaryKey === true ? 0 : 1,
-          );
+    /*    const newDatabase = ChiselDb.create({
+          uri: DEFAULT_DB_PATH,
+          dbName: createDatabaseDto.name,
         });
-      });
-    }
+        if (!newDatabase)
+          throw new InternalServerErrorException('Error during Database Creation');
 
-    return res;
+        const res = this.databasesRepository.createDatabase(createDatabaseDto.name);
+        if (createDatabaseDto.entities.length > 0) {
+          createDatabaseDto.entities.map((entity) => {
+            const result = this.databasesRepository.createEntity(
+              entity.name,
+              res.id,
+            );
+            Object.entries(entity.columns).map(([key, value]) => {
+              this.databasesRepository.createEntityAttribute(
+                key,
+                result.id,
+                value.type,
+                value.notNull === true ? 0 : 1,
+                value.primaryKey === true ? 0 : 1,
+              );
+            });
+          });
+        }
+
+        return res;*/
   }
 
   getAllDatabases() {
     const res = this.databasesRepository.findAllDatabase();
-    console.log(res);
-    const transformed = res.reduce((acc, curr) => {
-      if (!acc[curr.dbId]) {
-        acc[curr.dbId] = {
-          id: curr.dbId,
-          name: curr.dbName,
-          entities: {},
-        };
-      }
 
-      if (!acc[curr.dbId].entities[curr.entityId]) {
-        acc[curr.dbId].entities[curr.entityId] = {
-          id: curr.entityId,
-          name: curr.entityName,
-          attributes: [],
-        };
-      }
+    if (res && res.length > 0) {
+      const transformed = [];
 
-      acc[curr.dbId].entities[curr.entityId].attributes.push({
-        id: curr.attributeId,
-        name: curr.attributeName,
-        type: curr.attributeType,
-        isRequired: curr.isRequired,
-        isPrimaryKey: curr.isPrimaryKey,
+      res.forEach((curr) => {
+        let db = transformed.find((d) => d.id === curr.dbId);
+        if (!db) {
+          db = {
+            id: curr.dbId,
+            name: curr.dbName,
+            entities: [],
+          };
+          transformed.push(db);
+        }
+
+        let entity = db.entities.find((e) => e.id === curr.entityId);
+        if (!entity) {
+          entity = {
+            id: curr.entityId,
+            name: curr.entityName,
+            attributes: [],
+          };
+          db.entities.push(entity);
+        }
+
+        entity.attributes.push({
+          id: curr.attributeId,
+          name: curr.attributeName,
+          type: curr.attributeType,
+          isRequired: curr.isRequired,
+          isPrimaryKey: curr.isPrimaryKey,
+        });
       });
 
-      return acc;
-    }, {});
-
-    return transformed;
+      console.log(transformed);
+      return transformed;
+    }
   }
 
-  updateDatabase(dbId: string, updateDatabaseDto: UpdateDatabaseDto) {}
-
-  deleteDatabase(dbId: string) {}
+  saveDatabaseInfo(dbName: string, tableInfos: TableInfoType[]) {
+    const { id: databaseId } = this.databasesRepository.createDatabase(dbName);
+    for (const info of tableInfos) {
+      const { id: entityId } = this.databasesRepository.createDatabaseEntity(
+        info.tableName,
+        databaseId,
+      );
+      for (const entity of info.columns) {
+        this.databasesRepository.createEntityAttribute(
+          entityId,
+          entity.name,
+          entity.type,
+          entity.notNull ? 1 : 0,
+          entity.primaryKey ? 1 : 0,
+        );
+      }
+    }
+  }
 }

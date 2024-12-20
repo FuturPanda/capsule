@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import ToolBar from "@/components/caplets/ToolBar.tsx";
 import { ContentRenderer } from "@/components/content/ContentRenderer.tsx";
-import { BoundStore, useBoundStore } from "@/stores/global.store.ts";
 import { useEffect, useMemo, useRef } from "react";
 import { useAutoScroll } from "@/components/caplets/utils/hooks/auto-scroll.tsx";
+import { BoundStore, useBoundStore } from "@/stores/global.store.ts";
+import { useQuery } from "@tanstack/react-query";
+import { capletRequest } from "@/stores/caplets/caplet.request.ts";
 
 export default function CapletComponent() {
   const { capletId } = Route.useParams();
@@ -14,8 +16,12 @@ export default function CapletComponent() {
     () => (state: BoundStore) => state.findCaplet(capletId),
     [capletId],
   );
-
+  const query = useQuery({
+    queryKey: ["caplet"],
+    queryFn: () => capletRequest.getCapletContent(capletId),
+  });
   const caplet = useBoundStore(selectCaplet);
+  console.log(caplet?.contentIds);
   useEffect(() => {
     if (autoScrollEnabled && caplet?.contentIds?.length) {
       requestAnimationFrame(() => {
@@ -24,7 +30,7 @@ export default function CapletComponent() {
     }
   }, [caplet?.contentIds?.length, autoScrollEnabled, scrollToBottom]);
 
-  if (!caplet) return null;
+  if (!caplet?.contentIds) return null;
 
   return (
     <div className="flex-1 flex flex-col">
@@ -32,9 +38,7 @@ export default function CapletComponent() {
         ref={mainRef}
         className="flex-1 overflow-auto p-4 items-center pb-20 scroll-smooth"
       >
-        {caplet.contentIds?.map((id) => (
-          <ContentRenderer capletId={capletId} contentId={id} key={id} />
-        ))}
+        {query.data?.map((content) => <ContentRenderer content={content} />)}
 
         <ToolBar capletId={caplet.id} />
       </main>

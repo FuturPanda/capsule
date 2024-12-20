@@ -1,9 +1,13 @@
 import { StateCreator } from "zustand";
-import { Caplet } from "@/stores/caplets/caplet.model.ts";
 import { OnboardingCaplets } from "@/stores/caplets/_utils/data/onboarding.data.ts";
 import { ContentPoolSlice } from "@/stores/caplets/caplet-content.store.ts";
+import { Caplet } from "@/stores/caplets/caplet.interface.ts";
+import { capletRequest } from "@/stores/caplets/caplet.request.ts";
 
 export interface CapletSlice {
+  initializeCaplets: () => void;
+  hasChanged: boolean;
+  toggleHasChanged: () => void;
   caplets: Caplet[];
   findCaplet: (capletId: string) => Caplet | undefined;
   addCaplet: (caplet: Caplet) => void;
@@ -19,15 +23,29 @@ export const createCapletSlice: StateCreator<
   CapletSlice
 > = (set, get) => ({
   caplets: OnboardingCaplets,
+  initializeCaplets: async () => {
+    const fetchedCaplets = await capletRequest.getAllCaplets();
+    if (fetchedCaplets)
+      set({
+        caplets: fetchedCaplets.map((c) => ({
+          id: c.id,
+          title: c.title,
+          contentIds: [],
+        })),
+      });
+  },
 
-  findCaplet: (capletId: string) => {
+  hasChanged: true,
+  toggleHasChanged: () => set((state) => ({ hasChanged: !state.hasChanged })),
+
+  findCaplet: (capletId: string | number) => {
     const state = get();
-    return state.caplets.find((cap) => cap.id === capletId);
+    return state.caplets.find((cap) => cap.id == capletId); // TODO : properly cast ids
   },
 
   addCaplet: (caplet: Caplet) =>
     set((state) => ({
-      ...state, // Preserve all other state
+      ...state,
       caplets: [...state.caplets, caplet],
     })),
 
@@ -65,7 +83,7 @@ export const createCapletSlice: StateCreator<
       newContentIds.splice(targetIndex, 0, removed);
 
       return {
-        ...state, // Preserve all other state
+        ...state,
         caplets: state.caplets.map((c) =>
           c.id === capletId ? { ...c, contentIds: newContentIds } : c,
         ),

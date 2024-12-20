@@ -8,7 +8,7 @@ import {
 import { DiamondPlus, Type } from "lucide-react";
 import { useBoundStore } from "@/stores/global.store.ts";
 import { DataSourceDialog } from "@/components/data-sources/DataSourceDialog.tsx";
-import { CapletContentTypeEnum } from "@/stores/caplets/caplet.model.ts";
+import { CapletContentTypeEnum } from "@/stores/caplets/caplet.interface.ts";
 
 export interface ToolbarProps {
   capletId: string;

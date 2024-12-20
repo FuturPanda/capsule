@@ -1,17 +1,39 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
   ],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "target": "ES2022",
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    "emitDecoratorMetadata": true
-  }
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "bundler",
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/_utils/types"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.toml",
+    "src/_utils/types/*.d.ts"
+  ]
 }

@@ -16,6 +16,16 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/_utils/_types"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.toml",
+    "src/_utils/_types/*.d.ts"
+  ]
 }

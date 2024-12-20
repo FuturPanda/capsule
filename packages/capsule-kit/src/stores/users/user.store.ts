@@ -5,6 +5,7 @@ export interface UserSlice {
   access_token: string | null;
   refresh_token: string | null;
   base_url: string | null;
+  client_id: string | null;
   user: GetUserDto | null;
   login: (
     accessToken: string,
@@ -24,6 +25,7 @@ export const createUserSlice: StateCreator<
   access_token: null,
   refresh_token: null,
   base_url: null,
+  client_id: null,
   user: null,
   login: (accessToken: string, refreshToken: string, user: GetUserDto | null) =>
     set({ access_token: accessToken, refresh_token: refreshToken, user: user }),

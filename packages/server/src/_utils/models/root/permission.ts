@@ -1,5 +1,5 @@
 export class Permission {
-  id: number;
+  id: number | bigint;
   name: string;
   type?: string;
 }

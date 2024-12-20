@@ -1,4 +1,4 @@
 export class Database {
-  id: number;
+  id: number | bigint;
   name: string;
 }

@@ -10,6 +10,7 @@ import { UserTypeEnum } from '../_utils/schemas/root.schema';
 import { UsersRepository } from '../users/users.repository';
 import { ChiselService } from '../chisel/chisel.service';
 import { ApiKeysService } from '../api-keys/api-keys.service';
+import { PermissionsRepository } from '../permissions/permissions.repository';
 
 export enum TestEnum {
   ONE = 'ONE',
@@ -26,11 +27,10 @@ export class BootstrapService
     private readonly usersRepository: UsersRepository,
     private readonly chiselService: ChiselService,
     private readonly apiKeysService: ApiKeysService,
+    private readonly permissionRepository: PermissionsRepository,
   ) {}
 
   async onApplicationBootstrap(): Promise<any> {
-    this.logger.debug('In bootstrap');
-    this.logger.debug(this.configService.get('OWNER_EMAIL'));
     const ownerEmail = this.configService.get('OWNER_EMAIL');
     const password = this.configService.get('OWNER_PASSWORD');
     const hashedPassword = bcrypt.hashSync(password, 10);
@@ -41,7 +41,12 @@ export class BootstrapService
       },
       UserTypeEnum.OWNER,
     );
-    this.apiKeysService.createApiKeyIfNotExists(ownerEmail, password);
+    const apiKey = this.apiKeysService.createApiKeyIfNotExists(
+      ownerEmail,
+      password,
+    );
+
+    // await this.permissionRepository.createPermissions();
   }
 
   onApplicationShutdown(signal?: string): any {

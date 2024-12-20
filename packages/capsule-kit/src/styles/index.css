@@ -399,7 +399,7 @@ table {
 
 /* Overlay scrollbar - only visible on hover */
 .overflow-overlay {
-    overflow: overlay !important;
+    overflow: hidden !important;
 }
 
 /* Smooth transition for scrollbar appearance */

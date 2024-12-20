@@ -12,6 +12,11 @@ export class UsersController {
     return this.usersService.loginUser(loginUserDto);
   }
 
+  // @Post()
+  // registerUser(@Body() registerUserDto: RegisterUserDto) {
+  //   return this.usersService.registerUser(registerUserDto);
+  // }
+
   @Post('/refresh')
   refreshToken(@Body() body: { refreshToken: string }) {
     return this.usersService.validateUserConnection(body.refreshToken);
