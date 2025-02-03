@@ -1,6 +1,6 @@
 {
   "name": "@capsule/chisel",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "A lightweight and efficient ORM for SQLite",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
