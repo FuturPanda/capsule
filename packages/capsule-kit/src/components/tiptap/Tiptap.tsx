@@ -3,8 +3,8 @@ import StarterKit from "@tiptap/starter-kit";
 import { Typography } from "@tiptap/extension-typography";
 import { forwardRef, useImperativeHandle } from "react";
 import { cn } from "@/lib/utils.ts";
-
-const extensions = [StarterKit, Typography];
+import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { common, createLowlight } from "lowlight";
 
 interface TiptapEditorProps {
   content: string;
@@ -19,12 +19,22 @@ export interface TiptapEditorRef {
   getHTML: () => string;
 }
 
+const lowlight = createLowlight(common);
+
+const extensions = [
+  StarterKit.configure({ codeBlock: false }),
+  Typography,
+  CodeBlockLowlight.configure({
+    lowlight,
+  }),
+];
+
 export const Tiptap = forwardRef<TiptapEditorRef, TiptapEditorProps>(
   ({ content, onChange, className, ...props }, ref) => {
     const editor = useEditor({
       extensions,
       onUpdate: (e) => {
-        onChange(e.editor.getHTML());
+        console.log(e.editor.getHTML());
       },
       content: content,
       editorProps: {
@@ -33,6 +43,7 @@ export const Tiptap = forwardRef<TiptapEditorRef, TiptapEditorProps>(
             "tiptap prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none",
         },
       },
+      autofocus: "end",
       ...props,
     });
 

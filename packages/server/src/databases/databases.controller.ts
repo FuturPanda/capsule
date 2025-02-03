@@ -16,15 +16,15 @@ export class DatabasesController {
   }
 
   /* @Put('database/:dbId')
-   updateDatabase(
-     @Param('dbId') dbId: string,
-     @Body() updateDatabaseDto: UpdateDatabaseDto,
-   ) {
-     return this.databasesService.updateDatabase(dbId, updateDatabaseDto);
-   }
+	 updateDatabase(
+		 @Param('dbId') dbId: string,
+		 @Body() updateDatabaseDto: UpdateDatabaseDto,
+	 ) {
+		 return this.databasesService.updateDatabase(dbId, updateDatabaseDto);
+	 }
  
-   @Delete('database')
-   deleteDatabase(@Param('dbId') dbId: string) {
-     return this.databasesService.deleteDatabase(dbId);
-   }*/
+	 @Delete('database')
+	 deleteDatabase(@Param('dbId') dbId: string) {
+		 return this.databasesService.deleteDatabase(dbId);
+	 }*/
 }

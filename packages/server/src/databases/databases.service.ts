@@ -13,36 +13,37 @@ export class DatabasesService {
 
   async createDatabase(createDatabaseDto: CreateDatabaseDto) {
     /*    const newDatabase = ChiselDb.create({
-          uri: DEFAULT_DB_PATH,
-          dbName: createDatabaseDto.name,
-        });
-        if (!newDatabase)
-          throw new InternalServerErrorException('Error during Database Creation');
+					uri: DEFAULT_DB_PATH,
+					dbName: createDatabaseDto.name,
+				});
+				if (!newDatabase)
+					throw new InternalServerErrorException('Error during Database Creation');
 
-        const res = this.databasesRepository.createDatabase(createDatabaseDto.name);
-        if (createDatabaseDto.entities.length > 0) {
-          createDatabaseDto.entities.map((entity) => {
-            const result = this.databasesRepository.createEntity(
-              entity.name,
-              res.id,
-            );
-            Object.entries(entity.columns).map(([key, value]) => {
-              this.databasesRepository.createEntityAttribute(
-                key,
-                result.id,
-                value.type,
-                value.notNull === true ? 0 : 1,
-                value.primaryKey === true ? 0 : 1,
-              );
-            });
-          });
-        }
+				const res = this.databasesRepository.createDatabase(createDatabaseDto.name);
+				if (createDatabaseDto.entities.length > 0) {
+					createDatabaseDto.entities.map((entity) => {
+						const result = this.databasesRepository.createEntity(
+							entity.name,
+							res.id,
+						);
+						Object.entries(entity.columns).map(([key, value]) => {
+							this.databasesRepository.createEntityAttribute(
+								key,
+								result.id,
+								value.type,
+								value.notNull === true ? 0 : 1,
+								value.primaryKey === true ? 0 : 1,
+							);
+						});
+					});
+				}
 
-        return res;*/
+				return res;*/
   }
 
   getAllDatabases() {
     const res = this.databasesRepository.findAllDatabase();
+    console.log('After find all ', res);
 
     if (res && res.length > 0) {
       const transformed = [];
@@ -83,6 +84,7 @@ export class DatabasesService {
   }
 
   saveDatabaseInfo(dbName: string, tableInfos: TableInfoType[]) {
+    console.log('Before savedb info');
     const { id: databaseId } = this.databasesRepository.createDatabase(dbName);
     for (const info of tableInfos) {
       const { id: entityId } = this.databasesRepository.createDatabaseEntity(

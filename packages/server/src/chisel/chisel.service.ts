@@ -109,6 +109,22 @@ export class ChiselService {
     return true;
   }
 
+  async validateDatabase(clientId: string, dbName: string) {
+    const client = true;
+    if (!client) {
+      throw new UnauthorizedException(`Client unauthorized`);
+    }
+    const isDatabaseExisting = this.isExisting(clientId, dbName);
+    this.logger.debug(
+      `DbName : ${dbName} -- clientId : ${clientId}  -- isExisting : ${isDatabaseExisting}`,
+    );
+
+    if (!isDatabaseExisting) {
+      throw new NotFoundException(`Database "${dbName}" does not exist`);
+    }
+    return true;
+  }
+
   private createConnection(clientId: string, dbName: string) {
     const dirPath = path.join(DEFAULT_DB_PATH, `${clientId}`);
     const exists = fs.existsSync(dirPath);

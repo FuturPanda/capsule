@@ -1,21 +1,30 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils.ts";
 import { ComponentProps } from "react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb.tsx";
+import { Slash } from "lucide-react";
+import { useBoundStore } from "@/stores/global.store.ts";
+import { ComboboxDatabase } from "@/components/ComboBoxDatabase.tsx";
 
-type TopbarComponentProps = ComponentProps<"header"> & { isOnline: boolean };
+type TopbarComponentProps = ComponentProps<"header">;
 
-export function Topbar({
-  className,
-  isOnline,
-  ...props
-}: TopbarComponentProps) {
-  const isProcessing = true;
-  const queue = { length: 15 };
-
+export function Topbar({ className, ...props }: TopbarComponentProps) {
+  const path = useBoundStore((state) => state.breadcrumbsPath);
+  const databases = useBoundStore((state) => state.databases);
+  const selectedDatabaseId = useBoundStore((state) => state.selectedDatabaseId);
+  const setSelectedDatabaseId = useBoundStore(
+    (state) => state.setSelectedDatabaseId,
+  );
   return (
     <header
       className={cn(
-        "h-[var(--topbar-height)] border-b border-zinc-800 flex items-center justify-between px-4",
+        "h-[var(--topbar-height)] flex items-center justify-between px-4",
         className,
       )}
       {...props}
@@ -27,26 +36,33 @@ export function Topbar({
         >
           <div>CAPSULE</div>
         </Link>
-      </div>
-      <div className="flex items-center justify-end gap-2 text-sm text-zinc-400">
-        <div className="text-xs text-zinc-500 opacity-0 hover:opacity-100 transition-opacity">
-          {isProcessing ? "Syncing..." : `${queue.length} pending`}
-        </div>
-        <div
-          className={cn(
-            "h-2 w-2 rounded-full",
-            isProcessing ? "bg-blue-500 animate-pulse" : "bg-green-500",
-          )}
-        />
-        <div className="text-xs text-zinc-500 ">
-          {isOnline ? "Online" : "Offline"}
-        </div>
-        <div
-          className={cn(
-            "h-2 w-2 rounded-full",
-            !isOnline ? "bg-orange-400  animate-pulse" : "bg-green-500",
-          )}
-        />
+        <div className="w-8"></div>
+        <Breadcrumb>
+          <BreadcrumbList>
+            {path.map((pathName, index) => {
+              return pathName !== "DATABASES" ? (
+                <>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href={pathName}>{pathName}</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  {index === path.length - 1 ? (
+                    <></>
+                  ) : (
+                    <BreadcrumbSeparator>
+                      <Slash />
+                    </BreadcrumbSeparator>
+                  )}
+                </>
+              ) : (
+                <ComboboxDatabase
+                  databases={databases}
+                  setSelectedDb={setSelectedDatabaseId}
+                  selectedDb={selectedDatabaseId}
+                />
+              );
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
     </header>
   );

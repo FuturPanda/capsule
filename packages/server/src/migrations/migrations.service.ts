@@ -30,6 +30,7 @@ export class MigrationsService {
       const tableInfos = tables.map((t) =>
         this.databaseMapper.toTableDefinition(t, db.getTableInfo(t)),
       );
+      console.log('TABLE INFOS AFTER MIGRATIONS BEFORE SAVE : ', tableInfos);
       this.databasesService.saveDatabaseInfo(migration.database, tableInfos);
       return { dbName: migration.database, tableInfos: tableInfos };
     }

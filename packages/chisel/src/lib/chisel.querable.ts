@@ -9,7 +9,7 @@ import {
   QueryOptions,
   RelationOptions,
   SelectOptions,
-  WhereOptions,
+  WhereOptions
 } from './_utils/interfaces/query-option.interface';
 import { InsertOptions } from './_utils/interfaces/insert-option.interface';
 import { UpdateOptions } from './_utils/interfaces/update-option.interface';
@@ -157,6 +157,11 @@ export class ChiselQuerable {
     const { finalQuery, params } = this.buildOpts(options, query);
 
     return this.execute(finalQuery, params, options.returning);
+  }
+
+  rawQuery(sqliteString: string) {
+    const stmt = this.db.prepare(sqliteString);
+    return stmt.run();
   }
 
   private buildOpts(
@@ -364,13 +369,11 @@ export class ChiselQuerable {
       }
 
       const result = stmt.run(params);
-      console.log("IOJIFOEJO", result);
       return {
         success: result.changes > 0,
         changes: result.changes,
       };
     } catch (error) {
-      console.error("Error executing delete query:", error);
       throw error;
     }
   }

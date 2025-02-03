@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { FileSpreadsheet } from "lucide-react";
-import { DataSourceDashboard } from "@/routes/_authenticated/data";
 
 export const DataSourceDialog = () => {
   return (
@@ -25,7 +24,7 @@ export const DataSourceDialog = () => {
       <DialogTitle />
       <DialogDescription />
       <DialogContent className="max-w-[95vw] w-[95vw] h-[95vh] max-h-[95vh] p-0 gap-0">
-        <DataSourceDashboard />
+        {/*<DataSourceDashboard />*/}
       </DialogContent>
     </Dialog>
   );

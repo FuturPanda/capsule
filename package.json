@@ -13,13 +13,15 @@
     "server": "cd packages/server && npm run dev",
     "start:docker": "concurrently \"cd packages/server && npm run start:prod\" \"cd packages/capsule-kit && npm run preview\"",
     "docker:build": "docker build -t futurpanda/capsule .",
-    "capsule-kit": "cd packages/capsule-kit && npm run preview"
+    "capsule-kit": "cd packages/capsule-kit && npm run preview",
+    "dep": "npx depcruise ./packages --output-type dot | dot -T png > dependency-graph.png"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "concurrently": "^9.0.1"
+    "concurrently": "^9.0.1",
+    "dependency-cruiser": "^16.9.0"
   }
 }
