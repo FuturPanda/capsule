@@ -1,6 +1,6 @@
 name: Deploy hero website to Fly
 on:
-  merge:
+  push:
     branches: [ "main" ]
 
 env:
