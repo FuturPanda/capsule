@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for www-dry-waterfall-4531 on 2025-02-03T09:48:18+01:00
+# fly.toml app configuration file generated for www-dev on 2025-02-03T18:38:21+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'www-dry-waterfall-4531'
+app = 'www-dev'
 primary_region = 'cdg'
 
 [build]
@@ -20,5 +20,3 @@ processes = ['app']
 memory = '1gb'
 cpu_kind = 'shared'
 cpus = 1
-
-
