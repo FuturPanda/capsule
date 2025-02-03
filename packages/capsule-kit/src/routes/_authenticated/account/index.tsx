@@ -17,6 +17,8 @@ import { Textarea } from "@/components/ui/textarea.tsx";
 import { Database } from "lucide-react";
 import { useBoundStore } from "@/stores/global.store.ts";
 import { useMemo } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { userRequests } from "@/stores/users/user.request.ts";
 
 const profileFormSchema = z.object({
   username: z
@@ -32,8 +34,8 @@ const profileFormSchema = z.object({
       required_error: "Please select an email to display.",
     })
     .email(),
-  avatar: z.string().optional(),
-  bio: z.string().max(160).optional(),
+  avatarUrl: z.string().optional(),
+  description: z.string().max(160).optional(),
 });
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -41,15 +43,31 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export const Profile = () => {
   const user = useBoundStore((state) => state.user);
   const updateUser = useBoundStore((state) => state.updateUser);
+  const queryClient = useQueryClient();
+  const updateAccountMutation = useMutation({
+    mutationFn: async (values: ProfileFormValues) => {
+      updateUser(values);
+      return userRequests.updateUserProfile(values);
+    },
+    onSuccess: (data) => {
+      console.log("on success user = ", user, data);
+      queryClient.setQueryData(["user"], user);
+      return true;
+    },
+    onError: (error) => {
+      console.error("Login failed", error);
+      return false;
+    },
+  });
 
   const defaultValues: Partial<ProfileFormValues> = useMemo(
     () => ({
       username: user?.username || "",
       email: user?.email || "",
-      avatar: user?.avatar || "",
-      bio: user?.bio || "",
+      avatarUrl: user?.avatarUrl || "",
+      description: user?.description || "",
     }),
-    [user?.email, user?.username, user?.bio, user?.avatar],
+    [user?.email, user?.username, user?.description, user?.avatarUrl],
   );
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -58,7 +76,7 @@ export const Profile = () => {
   });
 
   function onSubmit(data: ProfileFormValues) {
-    updateUser(data);
+    updateAccountMutation.mutate(data);
   }
 
   return (
@@ -120,7 +138,7 @@ export const Profile = () => {
             />
             <FormField
               control={form.control}
-              name="avatar"
+              name="avatarUrl"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xl font-normal">Avatar</FormLabel>
@@ -139,7 +157,7 @@ export const Profile = () => {
             />
             <FormField
               control={form.control}
-              name="bio"
+              name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xl font-normal">Bio</FormLabel>

@@ -133,16 +133,22 @@ export class ChiselModel<T> {
 
   update(params: { [P in keyof T]?: T[P] }): QueryBuilder {
     const entries = Object.entries(params);
-    const values = entries.map(([key, value]) => `${key} = ${value}`);
-    let query = `UPDATE ${this.modelName}
-                 SET ${values.join(", ")} `;
+    const placeholders = entries.map(([key]) => `${key} = ?`);
+    const values = entries.map(([_, value]) => value);
 
-    const exec = () => this.executeWrite(query, []);
+    let query = `UPDATE ${this.modelName}
+                 SET ${placeholders.join(", ")} `;
+
+    const exec = () => this.executeWrite(query, values);
 
     return {
       where: (params: FilterQuery<T>) => {
-        query += this.buildWhereClause(params);
-        return { exec };
+        const { whereQuery, whereValues } =
+          this.buildWhereClauseWithParams(params);
+        query += whereQuery;
+        return {
+          exec: () => this.executeWrite(query, [...values, ...whereValues]),
+        };
       },
       exec,
     };
@@ -186,6 +192,7 @@ export class ChiselModel<T> {
   }
 
   private executeWrite(query: string, values: unknown[]): WriteOutput {
+    console.log("BEFORE EXE = ", query);
     try {
       const stmt = this.db.prepare(query);
       const res = stmt.run(values);
@@ -225,6 +232,45 @@ export class ChiselModel<T> {
       }
     }
     return query;
+  }
+
+  private buildWhereClauseWithParams(
+    params: FilterQuery<T>,
+    tableName?: string,
+  ): {
+    whereQuery: string;
+    whereValues: unknown[];
+  } {
+    let whereQuery = "";
+    let isFirstCondition = true;
+    const whereValues: unknown[] = [];
+
+    for (const field in params) {
+      const conditions = params[field];
+      if (conditions && typeof conditions === "object") {
+        for (const conditionKey in conditions) {
+          const conditionValue = conditions[conditionKey];
+          const fieldParts = field.split(".");
+          const fieldName =
+            fieldParts.length > 1
+              ? field
+              : `${tableName || this.modelName}.${field}`;
+
+          const { clause, values } = this.generateFilterQueryWithParams(
+            fieldName,
+            conditionValue,
+            conditionKey as keyof QuerySelector<T>,
+            isFirstCondition,
+          );
+
+          whereQuery += clause;
+          whereValues.push(...values);
+          isFirstCondition = false;
+        }
+      }
+    }
+
+    return { whereQuery, whereValues };
   }
 
   private buildOrderByClause(column: keyof T, order: "DESC" | "ASC"): string {
@@ -306,5 +352,77 @@ export class ChiselModel<T> {
     }
 
     return `${isFirstCondition ? "WHERE" : "AND"} ${condition()}`;
+  }
+
+  private generateFilterQueryWithParams<
+    T extends T[],
+    K extends keyof QuerySelector<T>,
+  >(
+    field: string,
+    conditionValue: T,
+    conditionKey: K,
+    isFirstCondition: boolean = true,
+  ): { clause: string; values: unknown[] } {
+    const conditions: Record<
+      string,
+      () => { clause: string; values: unknown[] }
+    > = {
+      $eq: () => ({
+        clause: `${field} = ?`,
+        values: [conditionValue],
+      }),
+      $ne: () => ({
+        clause: `${field} != ?`,
+        values: [conditionValue],
+      }),
+      $gt: () => ({
+        clause: `${field} > ?`,
+        values: [conditionValue],
+      }),
+      $lt: () => ({
+        clause: `${field} < ?`,
+        values: [conditionValue],
+      }),
+      $gte: () => ({
+        clause: `${field} >= ?`,
+        values: [conditionValue],
+      }),
+      $lte: () => ({
+        clause: `${field} <= ?`,
+        values: [conditionValue],
+      }),
+      $btw: () => ({
+        clause: `${field} BETWEEN ? AND ?`,
+        values: [conditionValue[0], conditionValue[1]],
+      }),
+      $in: () => ({
+        clause: `${field} IN (${Array(conditionValue.length).fill("?").join(", ")})`,
+        values: [...conditionValue],
+      }),
+      $nin: () => ({
+        clause: `${field} NOT IN (${Array(conditionValue.length).fill("?").join(", ")})`,
+        values: [...conditionValue],
+      }),
+      $like: () => ({
+        clause: `${field} LIKE ?`,
+        values: [conditionValue[1]],
+      }),
+      $ilike: () => ({
+        clause: `${field} LIKE ? COLLATE NOCASE`,
+        values: [conditionValue[1]],
+      }),
+    };
+
+    const condition = conditions[conditionKey as keyof typeof conditions];
+    if (!condition) {
+      console.log(`Field ${field}: Unknown condition '${conditionValue[1]}'`);
+      return { clause: "", values: [] };
+    }
+
+    const { clause, values } = condition();
+    return {
+      clause: `${isFirstCondition ? "WHERE" : "AND"} ${clause}`,
+      values,
+    };
   }
 }

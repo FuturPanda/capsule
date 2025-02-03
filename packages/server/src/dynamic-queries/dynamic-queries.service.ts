@@ -5,6 +5,7 @@ import { QueryOptionsDto } from './_utils/dto/request/query-options.dto';
 import { DeleteOptionsDto } from './_utils/dto/request/delete-options.dto';
 import { UpdateOptionsDto } from './_utils/dto/request/update-options.dto';
 import { QueryParams } from './_utils/types/params.type';
+import { SafeSqlStatement } from './_utils/dto/request/safe-sql-statement.dto';
 
 @Injectable()
 export class DynamicQueriesService {
@@ -40,5 +41,14 @@ export class DynamicQueriesService {
   ) {
     const db = this.chiselService.getConnection(clientId, dbName);
     return db.update(tableName, updateOptions);
+  }
+
+  executeRawSqlQuery(
+    { dbName, clientId }: { dbName: string; clientId: string },
+    { statement }: SafeSqlStatement,
+  ) {
+    const db = this.chiselService.getConnection(clientId, dbName);
+    const res = db.rawQuery(statement);
+    return res;
   }
 }

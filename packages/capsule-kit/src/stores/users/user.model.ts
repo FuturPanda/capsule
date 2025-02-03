@@ -13,9 +13,9 @@ export interface RegisterDto {
 export interface GetUserDto {
   id: string;
   username: string;
-  avatar: string;
+  avatarUrl: string;
   email: string;
-  bio: string;
+  description: string;
 }
 
 export interface RefreshDto {

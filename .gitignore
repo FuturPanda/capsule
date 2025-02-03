@@ -29,3 +29,5 @@ yarn-error.log
 /packages/server/_databases/
 /packages/server/_surrealdb/
 /packages/chisel/coverage/
+!/packages/www/.svelte-kit/
+!/packages/www/build/

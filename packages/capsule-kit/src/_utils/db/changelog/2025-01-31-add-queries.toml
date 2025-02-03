@@ -1,0 +1,15 @@
+version = "1.0.0"
+changeSetId = "20250131-01"
+author = "steevy"
+description = "add queries"
+database = "capsule-kit"
+
+[[operations]]
+type = "createTable"
+tableName = "query"
+columns = [
+    { name = "id", type = "text", constraints = { primaryKey = true, nullable = false } },
+    { name = "name", type = "text", constraints = { nullable = false } },
+    { name = "content", type = "text" },
+    { name = "database_id", type = "text" },
+]

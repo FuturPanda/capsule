@@ -38,54 +38,85 @@
     }
 
     .dark {
-        /* Main background and text colors */
-        --background: 240 10% 4%; /* zinc-950 */
-        --foreground: 0 0% 100%; /* White text */
+        --background: 220 10% 8%;
+        --foreground: 220 10% 98%;
 
-        /* Card and content areas */
-        --card: 240 10% 4%; /* zinc-950 */
-        --card-foreground: 0 0% 100%;
+        --card: 220 10% 10%;
+        --card-foreground: 220 10% 98%;
 
-        /* SQL editor specific */
-        --accent: 140 70% 45%; /* Green for SQL syntax */
-        --accent-foreground: 0 0% 100%;
+        --sidebar-background: 220 10% 8%;
+        --sidebar-foreground: 220 10% 80%;
+        --sidebar-primary: 220 10% 98%;
+        --sidebar-primary-foreground: 220 10% 12%;
+        --sidebar-accent: 220 10% 15%;
+        --sidebar-accent-foreground: 220 10% 80%;
+        --sidebar-border: 220 10% 8%;
+        --sidebar-ring: 220 10% 80%;
 
-        /* Table elements */
-        --muted: 240 10% 8%; /* Slightly lighter zinc */
-        --muted-foreground: 240 5% 65%;
+        --primary: 220 10% 98%;
+        --primary-foreground: 220 10% 12%;
 
-        /* Interactive elements */
-        --primary: 217 91% 60%; /* Blue for buttons/links */
-        --primary-foreground: 0 0% 100%;
+        --secondary: 220 10% 15%;
+        --secondary-foreground: 220 10% 80%;
 
-        /* Secondary elements */
-        --secondary: 240 10% 4%; /* zinc-950 */
-        --secondary-foreground: 240 5% 65%;
+        --muted: 220 10% 15%;
+        --muted-foreground: 220 10% 60%;
 
-        /* Popover/Modal elements */
-        --popover: 240 10% 4%; /* zinc-950 */
-        --popover-foreground: 0 0% 100%;
+        --accent: 220 10% 15%;
+        --accent-foreground: 220 10% 98%;
 
-        /* Utility colors */
-        --border: 240 10% 8%; /* Slightly lighter zinc */
-        --input: 240 10% 8%;
-        --ring: 240 10% 4%;
-        --destructive: 0 63% 31%;
-        --destructive-foreground: 0 0% 100%;
+        --border: 220 10% 15%;
+        --input: 220 10% 15%;
+        --ring: 220 10% 80%;
+
+        --popover: 220 10% 12%;
+        --popover-foreground: 220 10% 98%;
+
+        --destructive: 0 62% 30%;
+        --destructive-foreground: 220 10% 98%;
+
         --radius: 0.5rem;
-
-        /* Sidebar specific colors */
-        --sidebar-background: 240 10% 4%; /* zinc-950 */
-        --sidebar-foreground: 0 0% 100%;
-        --sidebar-primary: 217 91% 60%;
-        --sidebar-primary-foreground: 0 0% 100%;
-        --sidebar-accent: 240 10% 8%;
-        --sidebar-accent-foreground: 240 5% 65%;
-        --sidebar-border: 240 10% 8%;
-        --sidebar-ring: 217 91% 60%;
     }
 
-
+    /*.dark {*/
+    /*    !* Main background and text colors *!*/
+    /*    --background: 240 10% 4%; !* zinc-950 *!*/
+    /*    --foreground: 0 0% 100%; !* White text *!*/
+    /*    !* Card and content areas *!*/
+    /*    --card: 240 10% 4%; !* zinc-950 *!*/
+    /*    --card-foreground: 0 0% 100%;*/
+    /*    !* SQL editor specific *!*/
+    /*    --accent: 140 70% 45%; !* Green for SQL syntax *!*/
+    /*    --accent-foreground: 0 0% 100%;*/
+    /*    !* Table elements *!*/
+    /*    --muted: 240 10% 8%; !* Slightly lighter zinc *!*/
+    /*    --muted-foreground: 240 5% 65%;*/
+    /*    !* Interactive elements *!*/
+    /*    --primary: 217 91% 60%; !* Blue for buttons/links *!*/
+    /*    --primary-foreground: 0 0% 100%;*/
+    /*    !* Secondary elements *!*/
+    /*    --secondary: 240 10% 4%; !* zinc-950 *!*/
+    /*    --secondary-foreground: 240 5% 65%;*/
+    /*    !* Popover/Modal elements *!*/
+    /*    --popover: 240 10% 4%; !* zinc-950 *!*/
+    /*    --popover-foreground: 0 0% 100%;*/
+    /*    !* Utility colors *!*/
+    /*    --border: 240 10% 8%; !* Slightly lighter zinc *!*/
+    /*    --input: 240 10% 8%;*/
+    /*    --ring: 240 10% 4%;*/
+    /*    --destructive: 0 63% 31%;*/
+    /*    --destructive-foreground: 0 0% 100%;*/
+    /*    --radius: 0.5rem;*/
+    /*    !* Sidebar specific colors *!*/
+    /*    --sidebar-background: 240 10% 4%; !* zinc-950 *!*/
+    /*    --sidebar-foreground: 0 0% 100%;*/
+    /*    --sidebar-primary: 217 91% 60%;*/
+    /*    --sidebar-primary-foreground: 0 0% 100%;*/
+    /*    --sidebar-accent: 240 10% 8%;*/
+    /*    --sidebar-accent-foreground: 240 5% 65%;*/
+    /*    --sidebar-border: 240 10% 8%;*/
+    /*    --sidebar-ring: 217 91% 60%;*/
+    /*}*/
 }
 
 
@@ -410,4 +441,111 @@ table {
 /* Optional: Add momentum-based scrolling for Safari */
 .scroll-smooth {
     -webkit-overflow-scrolling: touch;
+}
+
+.tiptap {
+    :first-child {
+        margin-top: 0;
+    }
+
+    pre {
+        background: var(--black);
+        border-radius: 0.5rem;
+        color: var(--white);
+        font-family: 'JetBrainsMono', monospace;
+        margin: 1.5rem 0;
+        padding: 0.75rem 1rem;
+
+        code {
+            background: none;
+            color: inherit;
+            font-size: 0.8rem;
+            padding: 0;
+        }
+
+        /* Code styling */
+
+        .hljs-comment,
+        .hljs-quote {
+            color: #616161;
+        }
+
+        .hljs-variable,
+        .hljs-template-variable,
+        .hljs-attribute,
+        .hljs-tag,
+        .hljs-name,
+        .hljs-regexp,
+        .hljs-link,
+        .hljs-name,
+        .hljs-selector-id,
+        .hljs-selector-class {
+            color: #f98181;
+        }
+
+        .hljs-number,
+        .hljs-meta,
+        .hljs-built_in,
+        .hljs-builtin-name,
+        .hljs-literal,
+        .hljs-type,
+        .hljs-params {
+            color: #fbbc88;
+        }
+
+        .hljs-string,
+        .hljs-symbol,
+        .hljs-bullet {
+            color: #b9f18d;
+        }
+
+        .hljs-title,
+        .hljs-section {
+            color: #faf594;
+        }
+
+        .hljs-keyword,
+        .hljs-selector-tag {
+            color: #70cff8;
+        }
+
+        .hljs-emphasis {
+            font-style: italic;
+        }
+
+        .hljs-strong {
+            font-weight: 700;
+        }
+    }
+}
+
+.sql-editor-wrapper {
+    background: #1e1e1e;
+    color: #fff;
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: 'Fira Code', monospace;
+}
+
+.sql-editor {
+    white-space: pre;
+    overflow-x: auto;
+}
+
+/* More elaborate version */
+.is-empty::before {
+    content: attr(data-placeholder);
+    position: absolute;
+    color: #666;
+    pointer-events: none;
+    opacity: 0.6;
+    white-space: pre;
+    transition: all 0.2s ease; /* transition all properties */
+    transform: translateY(0); /* for subtle movement effect */
+}
+
+.is-empty:hover::before {
+    opacity: 0.8;
+    transform: translateY(-1px); /* slight upward movement on hover */
+    color: #888; /* slightly lighter color on hover */
 }
