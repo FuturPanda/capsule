@@ -6,6 +6,10 @@ on:
       - main
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+permissions:
+  contents: write
+  pull-requests: write 
+  packages: write     
 
 jobs:
   release:
