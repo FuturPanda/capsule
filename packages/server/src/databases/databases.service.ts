@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDatabaseDto } from './_utils/dto/request/create-database.dto';
 import { DatabasesRepository } from './databases.repository';
 import { ChiselService } from '../chisel/chisel.service';
-import { TableInfoType } from '@capsule/chisel';
+import { TableInfoType } from '@capsulesh/chisel';
 
 @Injectable()
 export class DatabasesService {

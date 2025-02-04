@@ -9,7 +9,7 @@ import { Optional } from 'class-validator-extended';
 import { Transform } from 'class-transformer';
 import { WhereConditionDto } from './query-options/where-option.dto';
 import { BadRequestException } from '@nestjs/common';
-import { UpdateOptions } from '@capsule/chisel';
+import { UpdateOptions } from '@capsulesh/chisel';
 
 export class UpdateOptionsDto implements UpdateOptions {
   @IsObject()

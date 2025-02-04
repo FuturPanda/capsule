@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '../chisel/chisel.module';
 import { Permission } from '../_utils/models/root/permission';
-import { ChiselModel } from '@capsule/chisel';
+import { ChiselModel } from '@capsulesh/chisel';
 import { ApiKeyPermission } from '../_utils/models/root/api_key_permission';
 import { DatabasePermission } from '../_utils/models/root/database_permission';
 

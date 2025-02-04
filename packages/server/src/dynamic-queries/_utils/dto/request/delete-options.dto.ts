@@ -8,7 +8,7 @@ import { Optional } from 'class-validator-extended';
 import { Transform } from 'class-transformer';
 import { WhereConditionDto } from './query-options/where-option.dto';
 import { BadRequestException } from '@nestjs/common';
-import { DeleteOptions } from '@capsule/chisel';
+import { DeleteOptions } from '@capsulesh/chisel';
 
 export class DeleteOptionsDto implements DeleteOptions {
   @Optional()

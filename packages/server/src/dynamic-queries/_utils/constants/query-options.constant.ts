@@ -4,7 +4,7 @@ import {
   T_OrderOpts,
   T_SqlFunction,
   T_WhereOperator,
-} from '@capsule/chisel';
+} from '@capsulesh/chisel';
 
 export const SQL_FUNCTIONS: T_SqlFunction[] = [
   'COUNT',

@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsBoolean, ValidateNested } from 'class-validator';
-import { QueryOptions } from '@capsule/chisel';
+import { QueryOptions } from '@capsulesh/chisel';
 import { SelectOptionsDto } from './query-options/select-options.dto';
 import { WhereConditionDto } from './query-options/where-option.dto';
 import { OrderByOptionsDto } from './query-options/order-by-options.dto';

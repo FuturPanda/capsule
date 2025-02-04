@@ -1,4 +1,4 @@
-import { ChiselId } from '@capsule/chisel';
+import { ChiselId } from '@capsulesh/chisel';
 
 export class GetUserProfileDto {
   id: ChiselId;

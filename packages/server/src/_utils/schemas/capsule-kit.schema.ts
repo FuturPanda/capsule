@@ -1,4 +1,4 @@
-import { ChiselSchema } from '@capsule/chisel';
+import { ChiselSchema } from '@capsulesh/chisel';
 
 export const capsuleKitSchema: ChiselSchema = {
   dbName: 'capsule-kit',

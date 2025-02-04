@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ChiselService } from '../chisel/chisel.service';
-import { InsertOptions } from '@capsule/chisel';
+import { InsertOptions } from '@capsulesh/chisel';
 import { QueryOptionsDto } from './_utils/dto/request/query-options.dto';
 import { DeleteOptionsDto } from './_utils/dto/request/delete-options.dto';
 import { UpdateOptionsDto } from './_utils/dto/request/update-options.dto';

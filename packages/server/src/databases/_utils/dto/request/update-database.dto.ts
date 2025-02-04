@@ -1,4 +1,4 @@
-import { TableOptions } from '@capsule/chisel';
+import { TableOptions } from '@capsulesh/chisel';
 
 export class UpdateDatabaseDto {
   dbName: string;
