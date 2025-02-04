@@ -4,9 +4,14 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { EnvironmentVariables } from './_utils/config/env.config';
 import { AppModule } from './app.module';
+import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  Sentry.init({
+    dsn: 'https://fbed917e42b3f3e7094d483f83a3216c@o4508760491163648.ingest.us.sentry.io/4508760491491328',
+  });
 
   app
     .setGlobalPrefix('api/v1/')
