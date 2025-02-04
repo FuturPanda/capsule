@@ -31,8 +31,10 @@ export class BootstrapService
   ) {}
 
   async onApplicationBootstrap(): Promise<any> {
+    this.logger.debug(`In Application Bootstrap`);
     const ownerEmail = this.configService.get('OWNER_EMAIL');
     const password = this.configService.get('OWNER_PASSWORD');
+    this.logger.log(ownerEmail, password);
     const hashedPassword = bcrypt.hashSync(password, 10);
     this.usersRepository.createUserIfNotExists(
       {
