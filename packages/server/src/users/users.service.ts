@@ -18,6 +18,7 @@ export class UsersService {
       loginUserDto.email,
       loginUserDto.password,
     );
+    console.log(user);
     return this.authService.login(user);
   }
 
