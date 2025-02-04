@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster.tsx";
 import { Suspense } from "react";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
-interface MyRouterContext {
+export interface MyRouterContext {
   auth: AuthContextType;
 }
 

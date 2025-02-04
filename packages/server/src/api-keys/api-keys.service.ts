@@ -55,11 +55,7 @@ export class ApiKeysService {
   };
 
   createApiKeyIfNotExists(ownerEmail: string, password: string) {
-    const baseUrl = this.configService.get('BASE_URL');
     const apiContent = {
-      baseUrl,
-      email: ownerEmail,
-      password: this.encrypt(password),
       clientId: uuidv4(),
     };
     const existingApiKey = this.apiKeysRepository.getApiKeyByType(
@@ -71,6 +67,7 @@ export class ApiKeysService {
       this.logger.log(`API Key: ${apiKey}`);
       this.apiKeysRepository.createApiKey(apiKey, ApiKeyTypeEnum.OWNER_UI);
       console.log('APIKEYCREATED');
+
       return apiKey;
     }
 

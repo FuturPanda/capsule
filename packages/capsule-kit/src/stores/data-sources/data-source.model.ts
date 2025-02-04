@@ -1,4 +1,4 @@
-import { ColumnOptions, TableOptions } from "@capsule/chisel";
+import { ColumnOptions, TableOptions } from "@capsulesh/chisel";
 
 export type DataSource = {
   id: string;

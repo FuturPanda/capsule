@@ -3,7 +3,7 @@ import axios from "axios";
 import { useBoundStore } from "@/stores/global.store.ts";
 
 export const CapsuleAxios = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  baseURL: import.meta.env.BASE_URL ?? "http://localhost:3000/api/v1",
   timeout: 1000,
   headers: { "X-Custom-Header": "foobar" },
 });
