@@ -1,6 +1,6 @@
 {
   "name": "flint",
-  "version": "0.0.1",
+  "version": "0.0.0",
   "description": "SDK for capsule backend",
   "main": "index.js",
   "files": [

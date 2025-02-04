@@ -1,6 +1,6 @@
 {
-  "name": "@capsule/chisel",
-  "version": "0.0.1",
+  "name": "@capsulesh/chisel",
+  "version": "0.0.0",
   "description": "A lightweight and efficient ORM for SQLite",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -26,14 +26,7 @@
   ],
   "author": "futur_panda",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/chisel-orm.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/chisel-orm/issues"
-  },
-  "homepage": "https://github.com/yourusername/chisel-orm#readme",
+  "homepage": "https://capsule.sh",
   "dependencies": {
     "better-sqlite3": "^11.3.0",
     "pino": "^9.4.0",
@@ -63,5 +56,8 @@
       "ts",
       "js"
     ]
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
