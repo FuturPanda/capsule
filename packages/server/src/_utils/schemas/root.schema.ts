@@ -1,4 +1,4 @@
-import { ChiselSchema } from '@capsule/chisel';
+import { ChiselSchema } from '@capsulesh/chisel';
 import { ApiKeyTypeEnum } from '../../api-keys/_utils/enum/api-key-type.enum';
 
 export enum UserTypeEnum {

@@ -3,7 +3,7 @@ import {
   HavingOptions,
   T_ComparisonOperator,
   T_HavingFunction,
-} from '@capsule/chisel';
+} from '@capsulesh/chisel';
 import { Type } from 'class-transformer';
 import { IsIn } from 'class-validator';
 import {

@@ -1,4 +1,4 @@
-import { TableInfoType } from '@capsule/chisel';
+import { TableInfoType } from '@capsulesh/chisel';
 
 export interface DatabaseDefinition {
   dbName: string;

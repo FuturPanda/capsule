@@ -1,4 +1,4 @@
-import { ChiselId, ChiselModel } from '@capsule/chisel';
+import { ChiselId, ChiselModel } from '@capsulesh/chisel';
 import { Injectable } from '@nestjs/common';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
 import { InjectModel } from '../chisel/chisel.module';

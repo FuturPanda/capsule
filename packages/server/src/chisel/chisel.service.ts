@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ChiselDb } from '@capsule/chisel';
+import { ChiselDb } from '@capsulesh/chisel';
 import { DEFAULT_DB_PATH } from '../_utils/constants/database.constant';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import * as path from 'node:path';

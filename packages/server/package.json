@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@capsule/chisel": "file:../chisel",
+    "@capsulesh/chisel": "^0.0.0",
     "@iarna/toml": "^2.2.5",
     "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/common": "^10.0.0",

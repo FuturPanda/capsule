@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '../chisel/chisel.module';
-import { ChiselId, ChiselModel } from '@capsule/chisel';
+import { ChiselId, ChiselModel } from '@capsulesh/chisel';
 import { Database } from '../_utils/models/root/database';
 import { EntityAttribute } from '../_utils/models/root/entity_attribute';
 import { DatabaseEntity } from '../_utils/models/root/entity';
