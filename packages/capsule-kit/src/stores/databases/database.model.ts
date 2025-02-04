@@ -1,4 +1,4 @@
-import { ColumnOptions } from "@capsule/chisel";
+import { ColumnOptions } from "@capsulesh/chisel";
 
 export type Database = {
   id: string;

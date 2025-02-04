@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for server-quiet-sea-9611 on 2025-02-03T22:00:33+01:00
+# fly.toml app configuration file generated for futurpanda-capsule-prod on 2025-02-04T11:51:17+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'server-quiet-sea-9611'
+app = 'futurpanda-capsule-prod'
 primary_region = 'cdg'
 
 [build]
@@ -21,5 +21,7 @@ memory = '1gb'
 cpu_kind = 'shared'
 cpus = 1
 
-[build.args]
-ROOT_DATABASE_URL = 'var/databases/root.db'
+
+[mounts]
+source = "fp_capsule_prod_volume"
+destination = "/app/_databases"

@@ -11,13 +11,10 @@ export class ApiKeysRepository {
   ) {}
 
   createApiKey = (apiKey: string, type: ApiKeyTypeEnum) =>
-    this.model.insert(
-      {
-        value: apiKey,
-        type: type,
-      },
-      { ignoreExisting: true },
-    );
+    this.model.insert({
+      value: apiKey,
+      type: type,
+    });
 
   getApiKeyByType = (type: ApiKeyTypeEnum) =>
     this.model

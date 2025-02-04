@@ -22,7 +22,7 @@ import {
 import { Switch } from "@/components/ui/switch.tsx";
 import { v4 as uuidv4 } from "uuid";
 import { Entity } from "@/stores/data-sources/data-source.model.ts";
-import { ColumnOptions } from "@capsule/chisel";
+import { ColumnOptions } from "@capsulesh/chisel";
 import { EntityCapletContentValue } from "@/stores/caplets/caplet.interface.ts";
 
 interface TableContentProps extends React.ComponentProps<"div"> {

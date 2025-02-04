@@ -2,7 +2,13 @@ import React from "react";
 import { LoginDto } from "@/stores/users/user.model.ts";
 
 export interface AuthContextType {
-  login: (apiKey: string) => Promise<LoginDto>;
+  // login2: (apiKey: string) => Promise<LoginDto>;
+  login: (
+    email: string,
+    password: string,
+    url: string,
+    apiKey: string,
+  ) => Promise<LoginDto>;
   logout: () => void;
   isAuthenticated: boolean;
 }

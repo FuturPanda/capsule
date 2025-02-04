@@ -22,7 +22,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const formSchema = z.object({
-  api_key: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(8),
+  url: z.string().url(),
+  encodedApiKey: z.string().base64(),
 });
 
 type LoginFormValues = z.infer<typeof formSchema>;
@@ -31,7 +34,10 @@ function LoginComponent() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      api_key: "",
+      email: "",
+      password: "",
+      url: "",
+      encodedApiKey: "",
     },
   });
 
@@ -43,9 +49,9 @@ function LoginComponent() {
     setIsSubmitting(true);
     console.log("is submitting ");
     try {
-      const apiKey = values.api_key;
-      if (!apiKey) return;
-      auth!.login(apiKey).then(() => router.navigate({ to: "/" }));
+      auth!
+        .login(values.email, values.password, values.url, values.encodedApiKey)
+        .then(() => router.navigate({ to: "/" }));
     } catch (error) {
       console.error("Error logging in: ", error);
     } finally {
@@ -72,17 +78,69 @@ function LoginComponent() {
                 >
                   <FormField
                     control={form.control}
-                    name="api_key"
+                    name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Api Key</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="..." {...field} />
+                          <Input
+                            placeholder="Your email"
+                            type={"email"}
+                            {...field}
+                          />
                         </FormControl>
                       </FormItem>
                     )}
                   />
-                  <Button type="submit">Submit</Button>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="..."
+                            type={"password"}
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Capsule Instance Url</FormLabel>
+                        <FormControl>
+                          <Input placeholder="..." {...field} type={"url"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="encodedApiKey"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Api Key</FormLabel>
+                        <FormControl>
+                          <Input placeholder="..." {...field} type={"text"} />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <div className="w-full flex items-end justify-end">
+                    <Button
+                      type="submit"
+                      variant={"outline"}
+                      className="bg-green-800"
+                    >
+                      Submit
+                    </Button>
+                  </div>
                 </form>
               </Form>
             </div>
