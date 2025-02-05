@@ -12,15 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: ['hero', 'capsule', 'capsule-kit']
+        service: ['www-dev', 'futurpanda-capsule-dev', 'capsule-kit-dev']
         include:
-          - service: hero
+          - service: www-dev
             path: ./packages/www
             config: -c fly.dev.toml
-          - service: capsule
+          - service: futurpanda-capsule-dev
             path: ./packages/server
             config: -c fly.dev.toml
-          - service: capsule-kit
+          - service: capsule-kit-dev
             path: ./packages/capsule-kit
             config: -c fly.dev.toml
       fail-fast: false
@@ -35,4 +35,4 @@ jobs:
         run: flyctl deploy ${{ matrix.path }} ${{ matrix.config }}
 
       - name: Verify deployment
-        run: flyctl status ${{ matrix.path }} ${{ matrix.config }}
+        run: flyctl status --app ${{ matrix.service }}
