@@ -31,4 +31,17 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy 
-        run: flyctl deploy ./packages/server -c fly.dev.toml
+        run: flyctl deploy ./packages/server -c fly.toml
+        
+  deploy_capsule_kit:
+    name: Deploy Prod CapsuleKit To Fly
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy 
+        run: flyctl deploy ./packages/capsule-kit -c fly.toml
