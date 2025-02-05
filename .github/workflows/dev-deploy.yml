@@ -16,7 +16,7 @@ jobs:
         include:
           - service: hero
             path: ./packages/www
-            config: ''
+            config: -c fly.dev.toml
           - service: capsule
             path: ./packages/server
             config: -c fly.dev.toml
@@ -24,9 +24,6 @@ jobs:
             path: ./packages/capsule-kit
             config: -c fly.dev.toml
       fail-fast: false
-    concurrency:
-      group: production-${{ matrix.service.name }}
-      cancel-in-progress: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,4 +35,4 @@ jobs:
         run: flyctl deploy ${{ matrix.path }} ${{ matrix.config }}
 
       - name: Verify deployment
-        run: flyctl status --app ${{ matrix.service.name }}
+        run: flyctl status ${{ matrix.path }} ${{ matrix.config }}
