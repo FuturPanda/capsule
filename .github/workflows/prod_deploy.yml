@@ -1,47 +1,38 @@
-name: Deploy Prod
+name: Deploy PROD
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
 
 env:
   FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
 
 jobs:
-  deploy_hero:
-    name: Deploy Prod Hero Website to Fly
+  deploy:
+    name: Deploy Production Services to Fly
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ['www-prod-hero', 'futurpanda-capsule-prod', 'capsule-kit-prod']
+        include:
+          - service: www-prod-hero
+            path: ./packages/www
+            config: -c fly.toml
+          - service: futurpanda-capsule-prod
+            path: ./packages/server
+            config: -c fly.toml
+          - service: capsule-kit-prod
+            path: ./packages/capsule-kit
+            config: -c fly.toml
+      fail-fast: false
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-        
+        uses: actions/checkout@v3
+
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Deploy
-        run: flyctl deploy ./packages/www
-        
-  deploy_capsule:
-    name: Deploy Prod Capsule To Fly
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
-      - name: Setup flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy ${{ matrix.service }}
+        run: flyctl deploy ${{ matrix.path }} ${{ matrix.config }}
 
-      - name: Deploy 
-        run: flyctl deploy ./packages/server -c fly.toml
-        
-  deploy_capsule_kit:
-    name: Deploy Prod CapsuleKit To Fly
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        
-      - name: Setup flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy 
-        run: flyctl deploy ./packages/capsule-kit -c fly.toml
+      - name: Verify deployment
+        run: flyctl status --app ${{ matrix.service }}
