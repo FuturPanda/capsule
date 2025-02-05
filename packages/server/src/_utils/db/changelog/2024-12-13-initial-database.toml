@@ -23,7 +23,7 @@ type = "createTable"
 tableName = "api_key"
 columns = [
     { name = "value", type = "text", constraints = { primaryKey = true, nullable = false } },
-    { name = "type", type = "text", constraints = { nullable = false }, enumValues = ["PUBLIC", "PRIVATE"] }
+    { name = "type", type = "text", constraints = { nullable = false }, enumValues = ["PUBLIC", "PRIVATE", "OWNER_UI"] }
 ]
 
 # Permission table

@@ -1,5 +1,5 @@
 import { IsBoolean, IsIn, IsString } from 'class-validator';
-import { T_WhereOperator } from '@capsule/chisel';
+import { T_WhereOperator } from '@capsulesh/chisel';
 import { WHERE_OPERATORS } from '../../../constants/query-options.constant';
 import { Optional } from 'class-validator-extended';
 

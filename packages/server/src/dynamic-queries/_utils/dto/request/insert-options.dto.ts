@@ -1,4 +1,4 @@
-import { InsertOptions } from '@capsule/chisel';
+import { InsertOptions } from '@capsulesh/chisel';
 import {
   ArrayMinSize,
   IsArray,

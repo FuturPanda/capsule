@@ -2,7 +2,6 @@ import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig, Plugin } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
 import * as fs from "node:fs";
 import { parse } from "smol-toml";
 
@@ -58,10 +57,12 @@ export default defineConfig({
         ],
       },
     }),
-    VitePWA({
+    /*VitePWA({
       registerType: "autoUpdate",
-      workbox: { globPatterns: ["**/*{js, ts, css, html, ico, png, svg}"] },
-    }),
+      workbox: {
+        globPatterns: ["**!/!*{js, ts,jsx, tsx, css, html, ico, png, svg}"],
+      },
+    }),*/
     TanStackRouterVite(),
     typeDeclarations(),
     tomlPlugin(),

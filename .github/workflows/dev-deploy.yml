@@ -1,0 +1,38 @@
+name: Deploy DEV 
+on:
+  push:
+    branches: [ dev ]
+
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
+
+jobs:
+  deploy:
+    name: Deploy Dev Services to Fly
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ['www-dev', 'futurpanda-capsule-dev', 'capsule-kit-dev']
+        include:
+          - service: www-dev
+            path: ./packages/www
+            config: -c fly.dev.toml
+          - service: futurpanda-capsule-dev
+            path: ./packages/server
+            config: -c fly.dev.toml
+          - service: capsule-kit-dev
+            path: ./packages/capsule-kit
+            config: -c fly.dev.toml
+      fail-fast: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy ${{ matrix.service }}
+        run: flyctl deploy ${{ matrix.path }} ${{ matrix.config }}
+
+      - name: Verify deployment
+        run: flyctl status --app ${{ matrix.service }}

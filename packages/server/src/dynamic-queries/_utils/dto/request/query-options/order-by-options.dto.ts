@@ -1,5 +1,5 @@
 import { BaseRecordDto } from './base-record.dto';
-import { T_OrderOpts } from '@capsule/chisel';
+import { T_OrderOpts } from '@capsulesh/chisel';
 import { IsIn } from 'class-validator';
 import { ORDER_OPTIONS } from '../../../constants/query-options.constant';
 

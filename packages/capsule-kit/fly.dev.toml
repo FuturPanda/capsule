@@ -1,15 +1,15 @@
-# fly.toml app configuration file generated for www-prod-hero on 2025-02-04T12:11:55+01:00
+# fly.toml app configuration file generated for capsule-kit-dev on 2025-02-04T16:03:25+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'www-prod-hero'
+app = 'capsule-kit-dev'
 primary_region = 'cdg'
 
 [build]
 
 [http_service]
-  internal_port = 3000
+  internal_port = 80
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true

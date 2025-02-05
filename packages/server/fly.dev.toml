@@ -1,12 +1,16 @@
-# fly.toml app configuration file generated for futurpanda-capsule-prod on 2025-02-04T11:51:17+01:00
+# fly.toml app configuration file generated for futurpanda-capsule-dev on 2025-02-04T15:41:56+01:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'futurpanda-capsule-prod'
+app = 'futurpanda-capsule-dev'
 primary_region = 'cdg'
 
 [build]
+
+[[mounts]]
+source = 'fp_capsule_dev_volume'
+destination = '/app/_databases'
 
 [http_service]
 internal_port = 3000
@@ -20,8 +24,3 @@ processes = ['app']
 memory = '1gb'
 cpu_kind = 'shared'
 cpus = 1
-
-
-[mounts]
-source = "fp_capsule_prod_volume"
-destination = "/app/_databases"

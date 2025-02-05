@@ -22,10 +22,15 @@ import {
   BreadcrumbsSlice,
   createBreadcrumbsSlice,
 } from "@/stores/breadcrumbs/breacrumbs.store.ts";
+import {
+  createDataSourceSlice,
+  DataSourceSlice,
+} from "@/stores/data-sources/data-source.store.ts";
 
 export type BoundStore = UserSlice &
   CapletSlice &
   ContentPoolSlice &
+  DataSourceSlice &
   DatabaseSlice &
   NetworkSlice &
   BreadcrumbsSlice &
@@ -40,6 +45,7 @@ export const useBoundStore = create<BoundStore>()(
         ...createCapletSlice(...a),
         ...createContentPoolSlice(...a),
         ...createDatabaseSlice(...a),
+        ...createDataSourceSlice(...a),
         ...createNetworkSlice(...a),
         ...createQueueSlice(...a),
       }),

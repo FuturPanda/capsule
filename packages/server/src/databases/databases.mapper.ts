@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ColInfoType, TableInfoType } from '@capsule/chisel';
+import { ColInfoType, TableInfoType } from '@capsulesh/chisel';
 
 @Injectable()
 export class DatabasesMapper {

@@ -17,10 +17,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config test/e2e/jest-e2e.json"
+    "test:e2e": "jest --config test/e2e/jest-e2e.json",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org hoareausteevy --project server-quiet-sea-9611 ./dist && sentry-cli sourcemaps upload --org hoareausteevy --project server-quiet-sea-9611 ./dist"
   },
   "dependencies": {
-    "@capsule/chisel": "file:../chisel",
+    "@capsulesh/chisel": "^0.1.0",
     "@iarna/toml": "^2.2.5",
     "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/common": "^10.0.0",
@@ -31,6 +32,8 @@
     "@nestjs/platform-express": "^10.4.4",
     "@nestjs/schedule": "^4.1.1",
     "@nestjs/swagger": "^7.4.0",
+    "@sentry/cli": "^2.41.1",
+    "@sentry/node": "^8.54.0",
     "@surrealdb/node": "^1.0.0-beta.2",
     "bcrypt": "^5.1.1",
     "cache-manager": "^5.7.6",

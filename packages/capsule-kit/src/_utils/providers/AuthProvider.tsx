@@ -10,13 +10,23 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
-    mutationFn: async (encodedApiKey: string) => {
+    mutationFn: async ({
+      email,
+      password,
+      url,
+      encodedApiKey,
+    }: {
+      email: string;
+      password: string;
+      url: string;
+      encodedApiKey: string;
+    }) => {
       const apiKey: ApiKey = JSON.parse(atob(encodedApiKey));
       useBoundStore.setState({
-        base_url: apiKey.baseUrl,
+        base_url: url,
         client_id: apiKey.clientId,
       });
-      return userRequests.login(apiKey.email, apiKey.password);
+      return userRequests.login(email, password);
     },
     onSuccess: (data) => {
       const { access_token, user, refresh_token } = data;
@@ -44,13 +54,23 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     },
   });
 
+  // const login2 = useCallback(
+  //   async (encodedApiKey: string) => {
+  //     return loginMutation.mutateAsync(encodedApiKey);
+  //   },
+  //   [loginMutation],
+  // );
   const login = useCallback(
-    async (encodedApiKey: string) => {
-      return loginMutation.mutateAsync(encodedApiKey);
+    async (
+      email: string,
+      password: string,
+      url: string,
+      encodedApiKey: string,
+    ) => {
+      return loginMutation.mutateAsync({ email, password, url, encodedApiKey });
     },
     [loginMutation],
   );
-
   const logout = useCallback(() => {
     logoutMutation.mutate();
   }, [logoutMutation]);

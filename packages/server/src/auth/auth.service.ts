@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersRepository } from 'src/users/users.repository';
@@ -8,6 +8,8 @@ import { UsersMapper } from '../users/users.mapper';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
@@ -20,11 +22,9 @@ export class AuthService {
     if (!user) {
       return null;
     }
-    const isMatch = await bcrypt.compare(
-      this.apiKeysService.decrypt(password),
-      user.password,
-    );
+    const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
+      this.logger.log(`User ${email} has been found`);
       return this.usersMapper.toPublicProfile(user);
     }
     return null;
