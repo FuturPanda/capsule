@@ -1,0 +1,17 @@
+FROM sonarqube:community
+
+USER root
+
+RUN echo "root soft nofile 65536" >> /etc/security/limits.conf && \
+    echo "root hard nofile 65536" >> /etc/security/limits.conf && \
+    echo "sonarqube soft nofile 65536" >> /etc/security/limits.conf && \
+    echo "sonarqube hard nofile 65536" >> /etc/security/limits.conf
+
+RUN echo '#!/bin/bash' > /start-sonarqube.sh && \
+    echo 'ulimit -n 65536' >> /start-sonarqube.sh && \
+    echo 'su sonarqube -c "/opt/sonarqube/docker/entrypoint.sh "' >> /start-sonarqube.sh && \
+    chmod +x /start-sonarqube.sh
+
+USER root
+
+ENTRYPOINT ["/start-sonarqube.sh"]
