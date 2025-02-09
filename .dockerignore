@@ -1,0 +1,140 @@
+# flyctl launch added from .gitignore
+# Dependencies
+**/node_modules
+
+# Build outputs
+**/dist
+**/build
+
+# Logs
+**/*.log
+
+# Environment variables
+**/.env
+**/.env.local
+
+# IDE files
+**/.vscode
+**/.idea
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+
+# npm debug logs
+**/npm-debug.log*
+
+# yarn error logs
+**/yarn-error.log
+packages/server/_databases
+packages/server/_surrealdb
+packages/chisel/coverage
+!packages/www/.svelte-kit
+!packages/www/build
+
+# flyctl launch added from .idea/.gitignore
+# Default ignored files
+.idea/shelf
+.idea/workspace.xml
+# Editor-based HTTP Client requests
+.idea/httpRequests
+# Datasource local storage ignored files
+.idea/dataSources
+.idea/dataSources.local.xml
+
+# flyctl launch added from packages/capsule-kit/.gitignore
+# Logs
+packages/capsule-kit/**/logs
+packages/capsule-kit/**/*.log
+packages/capsule-kit/**/npm-debug.log*
+packages/capsule-kit/**/yarn-debug.log*
+packages/capsule-kit/**/yarn-error.log*
+packages/capsule-kit/**/pnpm-debug.log*
+packages/capsule-kit/**/lerna-debug.log*
+
+packages/capsule-kit/**/node_modules
+packages/capsule-kit/**/dist
+packages/capsule-kit/**/dist-ssr
+packages/capsule-kit/**/*.local
+
+# Editor directories and files
+packages/capsule-kit/**/.vscode/*
+!packages/capsule-kit/**/.vscode/extensions.json
+packages/capsule-kit/**/.idea
+packages/capsule-kit/**/.DS_Store
+packages/capsule-kit/**/*.suo
+packages/capsule-kit/**/*.ntvs*
+packages/capsule-kit/**/*.njsproj
+packages/capsule-kit/**/*.sln
+packages/capsule-kit/**/*.sw?
+
+# flyctl launch added from packages/server/.gitignore
+# compiled output
+packages/server/dist
+packages/server/node_modules
+packages/server/build
+packages/server/databases
+packages/server/_surrealdb
+
+# Logs
+packages/server/**/logs
+packages/server/**/*.log
+packages/server/**/npm-debug.log*
+packages/server/**/pnpm-debug.log*
+packages/server/**/yarn-debug.log*
+packages/server/**/yarn-error.log*
+packages/server/**/lerna-debug.log*
+
+# OS
+packages/server/**/.DS_Store
+
+# Tests
+packages/server/coverage
+packages/server/.nyc_output
+
+# IDEs and editors
+packages/server/.idea
+packages/server/**/.project
+packages/server/**/.classpath
+packages/server/**/.c9
+packages/server/**/*.launch
+packages/server/**/.settings
+packages/server/**/*.sublime-workspace
+
+# IDE - VSCode
+packages/server/**/.vscode/*
+!packages/server/**/.vscode/settings.json
+!packages/server/**/.vscode/tasks.json
+!packages/server/**/.vscode/launch.json
+!packages/server/**/.vscode/extensions.json
+
+# dotenv environment variable files
+packages/server/**/.env
+packages/server/**/.env.development.local
+packages/server/**/.env.test.local
+packages/server/**/.env.production.local
+packages/server/**/.env.local
+
+# temp directory
+packages/server/**/.temp
+packages/server/**/.tmp
+
+# Runtime data
+packages/server/**/pids
+packages/server/**/*.pid
+packages/server/**/*.seed
+packages/server/**/*.pid.lock
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+packages/server/**/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Sentry Config File
+packages/server/**/.sentryclirc
+
+# flyctl launch added from packages/www/.gitignore
+packages/www/**/dist
+packages/www/**/node_modules
+packages/www/**/.svelte-kit
+packages/www/**/.build
+fly.toml
