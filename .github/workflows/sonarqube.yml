@@ -1,9 +1,9 @@
-name: Build
+name: Analyse Sonarqube 
 
 on:
-  push:
+  pull_request:
     branches:
-      - dev
+      - main
 
 jobs:
   build:
