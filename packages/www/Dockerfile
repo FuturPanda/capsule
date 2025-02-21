@@ -22,6 +22,8 @@ RUN apt-get update -qq && \
 
 # Install node modules
 COPY package-lock.json package.json ./
+RUN rm -f package-lock.json && \
+    npm install --package-lock-only --no-workspaces
 RUN npm ci --include=dev
 
 # Copy application code
