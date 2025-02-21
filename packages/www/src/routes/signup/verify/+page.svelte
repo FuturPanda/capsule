@@ -1,108 +1,51 @@
-<script lang="ts">
-  import { Spring } from 'svelte/motion';
+<script>
   import { onMount } from 'svelte';
-  import { cn } from '$lib/utils';
+  import { goto } from '$app/navigation';
 
-  const spring = new Spring(0,
-    {
-      stiffness: 0.03,
-      damping: 0.9,
-    });
+  let secondsLeft = $state(3);
+  onMount(() => {
+    console.log(secondsLeft);
+    const countdownInterval = setInterval(() => {
+      if (secondsLeft > 0) {
+        secondsLeft -= 1;
+      } else {
+        goto('/signup/create-capsule');
+      }
+    }, 1000);
 
-  onMount(async () => {
-    spring.target = 20;
-    await new Promise((r) => setTimeout(r, 1800));
-    spring.target = 40;
-    await new Promise((r) => setTimeout(r, 1600));
-    spring.target = 60;
-    await new Promise((r) => setTimeout(r, 1200));
-    spring.target = 80;
-    await new Promise((r) => setTimeout(r, 1200));
-    spring.target = 100;
+    return () => {
+      clearInterval(countdownInterval);
+    };
   });
-   let max: number = 100;
-   let value: number = 0;
-   let min: number = 0;
-  let gaugePrimaryColor="rgb(79 70 229)"
-  let gaugeSecondaryColor="rgba(0, 50, 100, 0.1)"
 
-  let className: string = $state("");
-  export { className as class };
-
-  let circumference = 2 * Math.PI * 45;
-  let percentPx = circumference / 100;
-  let currentPercent = $derived(((spring.current - min) / (max - min)) * 100)
-  console.log(value)
 </script>
 
-
-<input bind:value={spring.target} type="range" />
-<input bind:value={spring.current} disabled type="range" />
-<div class="flex justify-center items-center w-screen h-screen">
-  <div
-    class={cn("relative size-40 text-2xl font-semibold", className)}
-    style:--circle-size="100px"
-    style:--circumference={circumference}
-    style:--percent-to-px="{percentPx}px"
-    style:--gap-percent="5"
-    style:--offset-factor="0"
-    style:--transition-length="1s"
-    style:--transition-step="200ms"
-    style:--delay="0s"
-    style:--percent-to-deg="3.6deg"
-    style="transform: translateZ(0);"
-  >
-    <svg fill="none" class="size-full" stroke-width="2" viewBox="0 0 100 100">
-      {#if currentPercent <= 90 && currentPercent >= 0}
-        <circle
-          cx="50"
-          cy="50"
-          r="45"
-          stroke-width="10"
-          stroke-dashoffset="0"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="opacity-100"
-          style="
-        stroke:{gaugeSecondaryColor};
-        stroke-dasharray: calc(var(--stroke-percent) * var(--percent-to-px)) var(--circumference);
-        transform: rotate(calc(1turn - 90deg - (var(--gap-percent) * var(--percent-to-deg) * var(--offset-factor-secondary)))) scaleY(-1);
-        transition: all var(--transition-length) ease var(--delay);
-        transform-origin:calc(var(--circle-size) / 2) calc(var(--circle-size) / 2);
-        "
-          style:--stroke-percent={90 - currentPercent}
-          style:--offset-factor-secondary="calc(1 - var(--offset-factor))"
-        />
-      {/if}
-      <circle
-        cx="50"
-        cy="50"
-        r="45"
-        stroke-width="10"
-        stroke-dashoffset="0"
+<div class="min-h-screen flex items-center justify-center bg-[#020617] p-4">
+  <div class="text-center max-w-xl px-8">
+    <div class="mb-8">
+      <svg
+        class="h-16 w-16 mx-auto text-white"
+        fill="none"
+        stroke="currentColor"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="opacity-100"
-        style="
-        stroke:{gaugePrimaryColor};
-        stroke-dasharray:calc(var(--stroke-percent) * var(--percent-to-px)) var(--circumference);
-        transition:var(--transition-length) ease var(--delay),stroke var(--transition-length) ease var(--delay);
-        transition-property: stroke-dasharray,transform;
-        transform:rotate(calc(-90deg + var(--gap-percent) * var(--offset-factor) * var(--percent-to-deg)));
-          transform-origin:calc(var(--circle-size) / 2) calc(var(--circle-size) / 2);
-        "
-        style:--stroke-percent={currentPercent}
-      />
-    </svg>
-    <span
-      data-current-value={currentPercent}
-      class="duration-[var(--transition-length)] delay-[var(--delay)] absolute inset-0 m-auto size-fit ease-linear animate-in fade-in"
-    >
-      {#if Math.floor(currentPercent) < max }
-      {currentPercent.toFixed(0)}
-        {:else}
-        {max}
-        {/if}
-    </span>
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M22 12.5V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8.5" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+        <path d="M16 19h6" />
+        <path d="m19 16 3 3-3 3" />
+      </svg>
+    </div>
+
+    <h1 class="text-5xl font-semibold text-white mb-6">
+      Email Verified!
+    </h1>
+
+    <p class="text-xl text-slate-400 leading-relaxed">
+      Your email has been successfully verified. Your will be redirected to the creation capsule screen.
+    </p>
   </div>
 </div>

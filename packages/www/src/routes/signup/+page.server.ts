@@ -1,11 +1,11 @@
-import type { PageServerLoad } from './$types.js';
-import { fail, superValidate } from 'sveltekit-superforms';
-import { formSchema } from './schema';
-import { zod } from 'sveltekit-superforms/adapters';
-import { error } from '@sveltejs/kit';
-import { v4 as uuidv4 } from 'uuid';
-import Redis from 'ioredis';
 import { REDIS_URL } from '$env/static/private';
+import { error } from '@sveltejs/kit';
+import Redis from 'ioredis';
+import { fail, superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
+import { v4 as uuidv4 } from 'uuid';
+import type { PageServerLoad } from './$types.js';
+import { formSchema } from './schema';
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -15,6 +15,7 @@ export const load: PageServerLoad = async () => {
 
 export const actions = {
 	default: async ({ request, fetch }) => {
+		console.log('Form Action ');
 		const form = await superValidate(request, zod(formSchema));
 		console.log(form);
 		console.log('IN server page ');
