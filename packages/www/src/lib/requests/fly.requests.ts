@@ -1,6 +1,7 @@
-import { FLY_API_TOKEN } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
 import { v4 as uuidv4 } from 'uuid';
+
 const FLY_API_HOSTNAME = 'https://api.machines.dev';
 const FLY_GRAPHQL_HOSTNAME = 'https://api.fly.io/graphql';
 
@@ -39,7 +40,7 @@ export async function createFlyAppRequest(maxAttempts: number = 5, delayMs: numb
 			const response = await fetch(url, {
 				method: 'POST',
 				headers: {
-					Authorization: `Bearer ${FLY_API_TOKEN}`,
+					Authorization: `Bearer ${env.FLY_API_TOKEN}`,
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(data)
@@ -88,7 +89,7 @@ export const allocateIpAddressToFlyAppRequest = async (appName: string) => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				Authorization: `Bearer ${FLY_API_TOKEN}`
+				Authorization: `Bearer ${env.FLY_API_TOKEN}`
 			},
 			body: JSON.stringify({ query: makeQuery(appName, ipType) })
 		});
@@ -163,7 +164,7 @@ export const createFlyMachinesForFlyAppRequest = async (appName: string) => {
 	return await fetch(url, {
 		method: 'POST',
 		headers: {
-			Authorization: `Bearer ${FLY_API_TOKEN}`,
+			Authorization: `Bearer ${env.FLY_API_TOKEN}`,
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify(data)
