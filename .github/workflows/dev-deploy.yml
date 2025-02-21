@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: ['www-dev', 'futurpanda-capsule-dev', 'capsule-kit-dev']
+        service: ['www-dev', 'futurpanda-capsule-dev', 'capsule-kit-dev', 'docs-capsule']
         include:
           - service: www-dev
             path: ./packages/www
@@ -23,6 +23,9 @@ jobs:
           - service: capsule-kit-dev
             path: ./packages/capsule-kit
             config: -c fly.dev.toml
+          - service: docs-capsule
+            path: ./packages/docs
+            config: -c fly.toml
       fail-fast: false
     steps:
       - name: Checkout code
