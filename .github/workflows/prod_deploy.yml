@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: ['www-prod-hero', 'futurpanda-capsule-prod', 'capsule-kit-prod']
+        service: ['www-prod-hero', 'futurpanda-capsule-prod', 'capsule-kit-prod', 'docs-capsule']
         include:
           - service: www-prod-hero
             path: ./packages/www
@@ -22,6 +22,9 @@ jobs:
             config: -c fly.toml
           - service: capsule-kit-prod
             path: ./packages/capsule-kit
+            config: -c fly.toml
+          - service: docs-capsule
+            path: ./packages/docs
             config: -c fly.toml
       fail-fast: false
     steps:

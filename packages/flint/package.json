@@ -1,7 +1,7 @@
 {
-  "name": "flint",
+  "name": "capsule-client",
   "version": "0.0.0",
-  "description": "SDK for capsule backend",
+  "description": "SDK for capsule ",
   "main": "index.js",
   "files": [
     "dist"

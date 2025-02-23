@@ -3,8 +3,8 @@
 	import { ModeWatcher } from 'mode-watcher';
 </script>
 
-<div class="min-h-screen bg-background text-foreground">
+<div class="">
+	<!-- <LoadingAnimation /> -->
 	<ModeWatcher />
 	<slot />
 </div>
-
