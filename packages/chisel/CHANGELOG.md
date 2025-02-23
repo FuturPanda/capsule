@@ -1,5 +1,11 @@
 # @capsulesh/chisel
 
+## 0.2.0
+
+### Minor Changes
+
+- [#29](https://github.com/FuturPanda/capsule/pull/29) [`f4b80bd`](https://github.com/FuturPanda/capsule/commit/f4b80bdaea84b828b1cf62917f548b5ed9503ba3) Thanks [@FuturPanda](https://github.com/FuturPanda)! - ready for publishing
+
 ## 0.1.0
 
 ### Minor Changes
