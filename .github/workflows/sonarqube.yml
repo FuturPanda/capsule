@@ -3,7 +3,8 @@ name: Analyse Sonarqube
 on:
   pull_request:
     branches:
-      - main
+      - test # main
+      
 
 jobs:
   build:
