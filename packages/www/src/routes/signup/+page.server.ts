@@ -1,4 +1,4 @@
-import { REDIS_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import Redis from 'ioredis';
 import { fail, superValidate } from 'sveltekit-superforms';
@@ -34,7 +34,7 @@ export const actions = {
 		if (!outcome.success) error(400, 'Cloudflare challenge was not complete correctly');
 		else {
 			const uuid = uuidv4();
-			const redis = new Redis(REDIS_URL);
+			const redis = new Redis(env.REDIS_URL);
 			await redis.set(`${uuid}::email`, form.data.email);
 			await redis.set(`${uuid}::password`, form.data.password);
 			await redis.set(`${uuid}::isConfirmed`, 'false');
