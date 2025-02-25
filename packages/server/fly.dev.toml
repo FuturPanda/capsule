@@ -24,3 +24,6 @@ processes = ['app']
 memory = '1gb'
 cpu_kind = 'shared'
 cpus = 1
+
+[env]
+CLOUD_CAPSULE_CALLBACK_URL = "https://capsule-kit-dev.fly.dev/api/callback"

@@ -25,3 +25,6 @@ cpus = 1
 [mounts]
 source = "fp_capsule_prod_volume"
 destination = "/app/_databases"
+
+[env]
+CLOUD_CAPSULE_CALLBACK_URL = "https://capsule.sh/api/callback"

@@ -16,6 +16,9 @@ export class EnvironmentVariables {
 
   @IsString()
   IS_CLOUD_PROVIDED: string = 'false';
+
+  @IsString()
+  CLOUD_CAPSULE_CALLBACK_URL: string | null;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
