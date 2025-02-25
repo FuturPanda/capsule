@@ -110,7 +110,7 @@
 					{/if}
 					{#if showContent}
 						<div
-							class="absolute bottom-0 left-1/2 -translate-x-1/2"
+							class="absolute bottom-0 left-1/2 w-full -translate-x-1/2"
 							in:fly={{ y: 50, duration: 1000 }}
 						>
 							<Separator />

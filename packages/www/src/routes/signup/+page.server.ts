@@ -15,32 +15,37 @@ export const load: PageServerLoad = async () => {
 
 export const actions = {
 	default: async ({ request, fetch }) => {
-		console.log('Form Action ');
 		const form = await superValidate(request, zod(formSchema));
-		console.log(form);
-		console.log('IN server page ');
 		if (!form.valid) {
 			return fail(400, { form });
+		}
+		const redis = new Redis(env.REDIS_URL);
+		const email = await redis.get(`${form.data.email}`);
+		console.log(email);
+		if (email) {
+			return { success: false, error: ' Email already used' };
 		}
 		const token = form.data['cf-turnstile-response'];
 		const cfFormData = new FormData();
 		cfFormData.append('secret', '0x4AAAAAAA7oFoC9OTcRpfvUZGKOBacIgYw');
 		cfFormData.append('response', token);
+		console.log(cfFormData);
 		const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 		const result = await fetch(url, { body: cfFormData, method: 'POST' });
 
 		const outcome: { success: boolean } = await result.json();
-		console.log('Blabla outcome', outcome);
 		if (!outcome.success) error(400, 'Cloudflare challenge was not complete correctly');
 		else {
 			const uuid = uuidv4();
-			const redis = new Redis(env.REDIS_URL);
+			await redis.set(`${form.data.email}`, uuid);
 			await redis.set(`${uuid}::email`, form.data.email);
 			await redis.set(`${uuid}::password`, form.data.password);
 			await redis.set(`${uuid}::isConfirmed`, 'false');
+			await redis.set(`${uuid}::isCapsuleCreated`, 'false');
 			const email = await redis.get(`${uuid}::email`);
 			const isConfirmed = await redis.get(`${uuid}::isConfirmed`);
 			console.log('From Redis : ', email, isConfirmed);
+			await redis.quit();
 
 			const response = await fetch('/api/send', {
 				method: 'POST',

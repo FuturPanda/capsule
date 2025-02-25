@@ -7,14 +7,16 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
-import { UsersRepository } from '../users/users.repository';
-import { ChiselService } from '../chisel/chisel.service';
 import { ApiKeysService } from '../api-keys/api-keys.service';
+import { ChiselService } from '../chisel/chisel.service';
 import { PermissionsRepository } from '../permissions/permissions.repository';
+import { UsersRepository } from '../users/users.repository';
 
 export enum TestEnum {
   ONE = 'ONE',
 }
+
+export const CLOUD_CAPSULE_PROVIDER_URL = 'http://localhost:5173'; //'https://www.caspule.sh';
 
 @Injectable()
 export class BootstrapService
@@ -43,10 +45,18 @@ export class BootstrapService
       },
       UserTypeEnum.OWNER,
     );
-    const apiKey = this.apiKeysService.createApiKeyIfNotExists(
-      ownerEmail,
-      password,
-    );
+    const apiKey = this.apiKeysService.createApiKeyIfNotExists();
+    if (this.configService.get('IS_CLOUD_PROVIDED')) {
+      fetch(`${CLOUD_CAPSULE_PROVIDER_URL}/api/callback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          apiKey,
+        }),
+      });
+    }
 
     // await this.permissionRepository.createPermissions();
   }
