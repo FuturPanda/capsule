@@ -139,7 +139,8 @@ export const createFlyMachinesForFlyAppRequest = async (
 				OWNER_PASSWORD: owner_password,
 				OWNER_EMAIL: owner_email,
 				JWT_SECRET: generateSecureSecret(),
-				JWT_REFRESH_SECRET: generateSecureSecret()
+				JWT_REFRESH_SECRET: generateSecureSecret(),
+				IS_CLOUD_PROVIDED: true
 				// BASE_URL=http://localhost:3000/api/v1
 			},
 			services: [
