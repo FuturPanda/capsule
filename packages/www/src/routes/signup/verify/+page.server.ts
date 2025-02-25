@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from '../../../../.svelte-kit/types/src/routes/$types';
 import Redis from 'ioredis';
+import type { PageServerLoad } from '../$types';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('token');
@@ -12,8 +12,11 @@ export const load: PageServerLoad = async ({ url }) => {
 	if (!email) error(404, 'invalid link');
 	const isConfirmed = await redis.get(`${token}::isConfirmed`);
 	if (isConfirmed === 'true') error(401, 'The link has already been used');
+	await redis.set(`${token}::isConfirmed`, 'true');
+	await redis.set(`${token}::capsule`, 'false');
 	return {
 		isConfirmed,
-		email
+		email,
+		token
 	};
 };

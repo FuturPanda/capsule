@@ -13,6 +13,9 @@ export class EnvironmentVariables {
 
   @IsString()
   OWNER_PASSWORD: string;
+
+  @IsString()
+  IS_CLOUD_PROVIDED: string = 'false';
 }
 
 export function validateEnv(config: Record<string, unknown>) {

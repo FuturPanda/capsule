@@ -54,6 +54,7 @@
     "@fontsource/atkinson-hyperlegible": "^5.1.0",
     "@fontsource/jetbrains-mono": "^5.1.1",
     "@tailwindcss/typography": "^0.5.15",
+    "dexie": "^4.0.11",
     "ioredis": "^5.4.2",
     "mode-watcher": "^0.5.0",
     "open-props": "^1.7.7",
