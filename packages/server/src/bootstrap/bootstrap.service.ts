@@ -16,6 +16,8 @@ export enum TestEnum {
   ONE = 'ONE',
 }
 
+export const CLOUD_CAPSULE_PROVIDER_URL = 'http://localhost:5173'; //'https://www.caspule.sh';
+
 @Injectable()
 export class BootstrapService
   implements OnApplicationBootstrap, OnApplicationShutdown
@@ -44,6 +46,7 @@ export class BootstrapService
       UserTypeEnum.OWNER,
     );
     const apiKey = this.apiKeysService.createApiKeyIfNotExists();
+   
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
     if (isCloudProvided && callbackUrl) {
