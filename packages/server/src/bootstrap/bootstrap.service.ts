@@ -50,6 +50,7 @@ export class BootstrapService
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
     if (isCloudProvided === 'true' && callbackUrl) {
+      this.logger.debug('Sending callback to cloud provider --> ', apiKey);
       fetch(callbackUrl, {
         method: 'POST',
         headers: {
