@@ -95,7 +95,6 @@ export const allocateIpAddressToFlyAppRequest = async (appName: string) => {
 
 		const result = await response.json();
 
-		// GraphQL error handling
 		if (result.errors) {
 			throw new Error(`GraphQL Error: ${result.errors[0].message}`);
 		}
@@ -120,8 +119,8 @@ export const allocateIpAddressToFlyAppRequest = async (appName: string) => {
 
 export const createFlyMachinesForFlyAppRequest = async (
 	appName: string,
-	owner_password: string,
-	owner_email: string
+	owner_email: string,
+	owner_password: string
 ) => {
 	const data = {
 		name: appName,
