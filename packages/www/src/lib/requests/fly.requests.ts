@@ -140,7 +140,8 @@ export const createFlyMachinesForFlyAppRequest = async (
 				OWNER_EMAIL: owner_email,
 				JWT_SECRET: generateSecureSecret(),
 				JWT_REFRESH_SECRET: generateSecureSecret(),
-				IS_CLOUD_PROVIDED: true
+				IS_CLOUD_PROVIDED: 'true',
+				CLOUD_CAPSULE_CALLBACK_URL: 'https://capsule.sh/api/callback'
 				// BASE_URL=http://localhost:3000/api/v1
 			},
 			services: [

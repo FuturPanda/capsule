@@ -21,10 +21,10 @@ export const actions = {
 		}
 		const redis = new Redis(env.REDIS_URL);
 		const email = await redis.get(`${form.data.email}`);
-		console.log(email);
-		if (email) {
-			return { success: false, error: ' Email already used' };
-		}
+		// console.log(email);
+		// if (email) {
+		// 	return { success: false, error: ' Email already used' };
+		// }
 		const token = form.data['cf-turnstile-response'];
 		const cfFormData = new FormData();
 		cfFormData.append('secret', '0x4AAAAAAA7oFoC9OTcRpfvUZGKOBacIgYw');
@@ -52,11 +52,11 @@ export const actions = {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ uuid })
+				body: JSON.stringify({ uuid, email: form.data.email })
 			});
 
 			if (!response.ok) {
-				return { success: false, error: 'Failed to send email' };
+				return { success: false, error: 'Failed to send email', form };
 			}
 		}
 
