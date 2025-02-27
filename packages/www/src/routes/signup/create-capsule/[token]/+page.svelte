@@ -2,8 +2,8 @@
 	import { source } from 'sveltekit-sse';
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
-	import { goto } from '$app/navigation';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import { goto } from '$app/navigation';
 
 	let { data } = $props();
 	let progress = $state(0);
@@ -157,6 +157,7 @@
 				{apiKey}
 				<Button onclick={() => navigator.clipboard.writeText(apiKey)}>Copy</Button>
 			</div>
+			<Button onclick={() => goto('https://ui.capsule.sh')}>Go to Dashboard</Button>
 		{/if}
 	</div>
 </div>
