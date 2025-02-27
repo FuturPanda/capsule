@@ -1,19 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import type { PageProps } from './$types';
 
-	let secondsLeft = $state(3);
 	let { data } = $props();
 
 	onMount(() => {
-		console.log(secondsLeft);
-		const countdownInterval = setInterval(() => {
-			if (secondsLeft > 0) {
-				secondsLeft -= 1;
-			} else {
-				goto(`/signup/create-capsule/${data.token}`);
-			}
+		const countdownInterval = setTimeout(() => {
+			goto(`/signup/create-capsule/${data.token}`);
 		}, 1000);
 
 		return () => {

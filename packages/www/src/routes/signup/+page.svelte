@@ -16,7 +16,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { EyeClosedIcon, EyeIcon, Mail } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
@@ -34,7 +34,6 @@
 	const { form: formData, enhance, errors } = form;
 	let isLoading = $state(false);
 	let isSecondScreen = $state(false);
-	let turnstileLoaded = $state(false);
 	let mounted = $state(false);
 
 	let isOpen = $state(false);

@@ -46,10 +46,10 @@ export class BootstrapService
       UserTypeEnum.OWNER,
     );
     const apiKey = this.apiKeysService.createApiKeyIfNotExists();
-   
+
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
-    if (isCloudProvided && callbackUrl) {
+    if (isCloudProvided === 'true' && callbackUrl) {
       fetch(callbackUrl, {
         method: 'POST',
         headers: {

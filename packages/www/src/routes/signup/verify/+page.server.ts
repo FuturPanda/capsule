@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/private';
 import { error } from '@sveltejs/kit';
 import Redis from 'ioredis';
 import type { PageServerLoad } from '../$types';
@@ -5,7 +6,7 @@ import type { PageServerLoad } from '../$types';
 export const load: PageServerLoad = async ({ url }) => {
 	const token = url.searchParams.get('token');
 	console.log(token);
-	const redis = new Redis(6379);
+	const redis = new Redis(env.REDIS_URL);
 	if (!redis) error(500, 'Redis instance not working');
 	const email = await redis.get(`${token}::email`);
 	console.log(email);
