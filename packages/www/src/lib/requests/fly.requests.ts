@@ -126,7 +126,10 @@ export const createFlyMachinesForFlyAppRequest = async (
 	const data = {
 		name: appName,
 		config: {
-			image: 'docker.io/futurpanda/capsule-back:latest',
+			image:
+				env.ENV_VERSION === 'DEV'
+					? 'docker.io/futurpanda/capsule-back-dev:latest'
+					: 'docker.io/futurpanda/capsule-back:latest',
 			restart: {
 				policy: 'always'
 			},
@@ -141,7 +144,7 @@ export const createFlyMachinesForFlyAppRequest = async (
 				JWT_SECRET: generateSecureSecret(),
 				JWT_REFRESH_SECRET: generateSecureSecret(),
 				IS_CLOUD_PROVIDED: 'true',
-				CLOUD_CAPSULE_CALLBACK_URL: 'https://capsule.sh/api/callback'
+				CLOUD_CAPSULE_CALLBACK_URL: `${env.BASE_URL}/api/callback`
 				// BASE_URL=http://localhost:3000/api/v1
 			},
 			services: [
