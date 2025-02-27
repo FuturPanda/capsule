@@ -20,10 +20,21 @@ export const GET = async ({ url }) => {
 	const email = await redis.get(`${token}::email`);
 	const apiKey = await redis.get(`${email}::apiKey`);
 	await redis.quit();
-	return new Response(apiKey, {
-		status: 200,
-		headers: {
-			'Content-Type': 'text/plain'
-		}
-	});
+	if (apiKey === null || apiKey === '') {
+		const data = { error: 'Error while retreiving API Key' };
+		return new Response(JSON.stringify(data), {
+			status: 400,
+			headers: {
+				'Content-Type': 'text/plain'
+			}
+		});
+	} else {
+		const data = { apiKey: apiKey };
+		return new Response(JSON.stringify(data), {
+			status: 200,
+			headers: {
+				'Content-Type': 'text/plain'
+			}
+		});
+	}
 };
