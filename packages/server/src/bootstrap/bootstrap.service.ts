@@ -51,7 +51,7 @@ export class BootstrapService
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
     if (isCloudProvided === 'true' && callbackUrl) {
       this.logger.debug('Sending callback to cloud provider --> ', apiKey);
-      fetch(callbackUrl, {
+      const res = await fetch(callbackUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,6 +60,7 @@ export class BootstrapService
           apiKey,
         }),
       });
+      this.logger.debug('Application Bootstrap Completed, ', await res.json());
     }
 
     // await this.permissionRepository.createPermissions();
