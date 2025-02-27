@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/private';
 import { Resend } from 'resend';
 
-const resend = new Resend(env.RESEND_API_KEY);
+let resend: Resend;
 const generateEmail = (token: string) =>
 	`
 <head>
@@ -104,6 +104,9 @@ const generateEmail = (token: string) =>
 `;
 
 export const POST = async ({ request }) => {
+	if (resend == null) {
+		resend = new Resend(env.RESEND_API_KEY);
+	}
 	const { uuid: token, email } = await request.json();
 	console.log('TOKEN === ', token, 'EMAIL', email);
 	console.log('IN SEND EMAIL');
