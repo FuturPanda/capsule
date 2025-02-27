@@ -6,7 +6,7 @@ export const POST = async ({ request }: { request: Request }) => {
 	const redis = new Redis(env.REDIS_URL);
 	await redis.set(`${response.email}::apiKey`, `${response.apiKey}`);
 	await redis.quit();
-	return new Response('Hello World!', {
+	return new Response(null, {
 		status: 200,
 		headers: {
 			'Content-Type': 'text/plain'

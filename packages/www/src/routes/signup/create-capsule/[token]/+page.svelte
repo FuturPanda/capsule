@@ -68,22 +68,60 @@
 	}
 	onMount(() => {
 		startProgress();
-		const res = source(`../../api/capsule-creation?token=${data.token}`).select('message');
-		res.subscribe((message: string) => {
-			const data = JSON.parse(message);
-			if (data.progress !== undefined) {
-				handleServerProgress(data.progress);
-			}
+		const eventSource = source(`../../api/capsule-creation?token=${data.token}`).select('message');
 
-			if (data.content === 'END') {
-				setTimeout(() => {
-					const res = fetch(`/api/callback?token=${data.token}`);
-					showApiKey = true;
-				}, 1000);
-			} else {
-				addMessage(data.content);
+		eventSource.subscribe((message: string) => {
+			try {
+				const data = JSON.parse(message);
+
+				if (data.progress !== undefined) {
+					handleServerProgress(data.progress);
+				}
+
+				if (data.content === 'END') {
+					fetchApiKey();
+				} else {
+					addMessage(data.content);
+				}
+			} catch (error) {
+				console.error('Error processing message:', error);
+				addMessage('Error processing server message');
 			}
 		});
+
+		async function fetchApiKey() {
+			try {
+				let attempts = 0;
+				const maxAttempts = 10;
+
+				while (attempts < maxAttempts) {
+					attempts++;
+
+					const response = await fetch(`/api/callback?token=${data.token}`);
+					if (!response.ok) {
+						console.log(`Attempt ${attempts}: API key not ready (${response.status})`);
+						await new Promise((resolve) => setTimeout(resolve, 2000));
+						continue;
+					}
+
+					const apiKeyData = await response.json();
+					if (apiKeyData) {
+						apiKey = apiKeyData.apiKey;
+						setTimeout(() => {
+							showApiKey = true;
+						}, 1000);
+
+						return;
+					}
+				}
+
+				addMessage('Failed to retrieve API key after multiple attempts');
+			} catch (error) {
+				console.error('Error fetching API key:', error);
+				addMessage('Error retrieving API key');
+			}
+		}
+
 		return () => {
 			stopProgress();
 		};

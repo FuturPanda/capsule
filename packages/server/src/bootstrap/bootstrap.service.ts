@@ -16,8 +16,6 @@ export enum TestEnum {
   ONE = 'ONE',
 }
 
-export const CLOUD_CAPSULE_PROVIDER_URL = 'http://localhost:5173'; //'https://www.caspule.sh';
-
 @Injectable()
 export class BootstrapService
   implements OnApplicationBootstrap, OnApplicationShutdown
@@ -49,18 +47,24 @@ export class BootstrapService
 
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
+
     if (isCloudProvided === 'true' && callbackUrl) {
       this.logger.debug('Sending callback to cloud provider --> ', apiKey);
-      const res = await fetch(callbackUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          apiKey,
-        }),
-      });
-      this.logger.debug('Application Bootstrap Completed, ', await res.json());
+      try {
+        await fetch(callbackUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: ownerEmail,
+            apiKey,
+          }),
+        });
+      } catch (e: any) {
+        this.logger.error('Error sending callback to cloud provider', e);
+      }
+      this.logger.debug('Application Bootstrap Completed');
     }
 
     // await this.permissionRepository.createPermissions();
