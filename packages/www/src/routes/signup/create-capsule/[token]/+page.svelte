@@ -14,11 +14,10 @@
 	let initialSpeed = 50;
 	let acceleratedSpeed = $state(10);
 	let maxProgress = $state(100);
-	let progressInterval: NodeJS.Timeout | null = null;
+	let progressInterval = null;
 	let currentSpeed = initialSpeed;
-	let apiKey = $state('');
 
-	let showApiKey = $state(false);
+	let showEndMessage = $state(false);
 
 	function updateEstimatedProgress() {
 		if (estimatedProgress < maxProgress) {
@@ -41,7 +40,7 @@
 	}
 
 	function startProgress() {
-		stopProgress(); // Clear any existing interval
+		stopProgress();
 		progressInterval = setInterval(updateEstimatedProgress, currentSpeed);
 	}
 
@@ -79,7 +78,7 @@
 				}
 
 				if (data.content === 'END') {
-					fetchApiKey();
+					showEndMessage = true;
 				} else {
 					addMessage(data.content);
 				}
@@ -88,39 +87,6 @@
 				addMessage('Error processing server message');
 			}
 		});
-
-		async function fetchApiKey() {
-			try {
-				let attempts = 0;
-				const maxAttempts = 10;
-
-				while (attempts < maxAttempts) {
-					attempts++;
-
-					const response = await fetch(`/api/callback?token=${data.token}`);
-					if (!response.ok) {
-						console.log(`Attempt ${attempts}: API key not ready (${response.status})`);
-						await new Promise((resolve) => setTimeout(resolve, 2000));
-						continue;
-					}
-
-					const apiKeyData = await response.json();
-					if (apiKeyData) {
-						apiKey = apiKeyData.apiKey;
-						setTimeout(() => {
-							showApiKey = true;
-						}, 1000);
-
-						return;
-					}
-				}
-
-				addMessage('Failed to retrieve API key after multiple attempts');
-			} catch (error) {
-				console.error('Error fetching API key:', error);
-				addMessage('Error retrieving API key');
-			}
-		}
 
 		return () => {
 			stopProgress();
@@ -133,7 +99,7 @@
 		<div class="loader"></div>
 	</div>
 	<div class="absolute z-10 min-w-[300px] pt-6">
-		{#if !showApiKey}
+		{#if !showEndMessage}
 			<div class="mb-4 space-y-2">
 				{#each messages as message, i (message + i)}
 					<div
@@ -149,15 +115,9 @@
 				{progress}%
 			</div>
 		{:else}
-			<div>
-				Your capsule is ready ! Here's your apiKey. We don't store it, so please make sure to store
-				it securely.
-			</div>
-			<div>
-				{apiKey}
-				<Button onclick={() => navigator.clipboard.writeText(apiKey)}>Copy</Button>
-			</div>
-			<Button onclick={() => goto('https://ui.capsule.sh')}>Go to Dashboard</Button>
+			<div>Capsule is launching...</div>
+			<div>You will receive an email with the capsule details.</div>
+			<div>It can take a couple of minutes.</div>
 		{/if}
 	</div>
 </div>

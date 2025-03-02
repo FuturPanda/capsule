@@ -19,6 +19,9 @@ export class EnvironmentVariables {
 
   @IsString()
   CLOUD_CAPSULE_CALLBACK_URL: string | null;
+
+  @IsString()
+  CLOUD_CAPSULE_URL: string | null;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

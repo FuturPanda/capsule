@@ -47,6 +47,7 @@ export class BootstrapService
 
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
+    const capsuleUrl = this.configService.get('CLOUD_CAPSULE_URL');
 
     if (isCloudProvided === 'true' && callbackUrl) {
       this.logger.debug('Sending callback to cloud provider --> ', apiKey);
@@ -59,6 +60,7 @@ export class BootstrapService
           body: JSON.stringify({
             email: ownerEmail,
             apiKey,
+            capsuleUrl,
           }),
         });
       } catch (e: any) {
