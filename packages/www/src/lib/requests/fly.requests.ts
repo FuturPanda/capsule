@@ -19,7 +19,9 @@ function generateUniqueFlyAppName(): string {
 		separator: '-'
 	});
 
-	return `${randomName}-${Date.now()}`;
+	return env.ENV_VERSION === 'DEV'
+		? `dev-${randomName}-${Date.now()}`
+		: `${randomName}-${Date.now()}`;
 }
 
 export async function createFlyAppRequest(maxAttempts: number = 5, delayMs: number = 1000) {
@@ -143,7 +145,8 @@ export const createFlyMachinesForFlyAppRequest = async (
 				JWT_SECRET: generateSecureSecret(),
 				JWT_REFRESH_SECRET: generateSecureSecret(),
 				IS_CLOUD_PROVIDED: 'true',
-				CLOUD_CAPSULE_CALLBACK_URL: `${env.BASE_URL}/api/callback`
+				CLOUD_CAPSULE_CALLBACK_URL: `${env.BASE_URL}/api/callback`,
+				CLOUD_CAPSULE_URL: `https://${appName}.fly.dev`
 				// BASE_URL=http://localhost:3000/api/v1
 			},
 			services: [

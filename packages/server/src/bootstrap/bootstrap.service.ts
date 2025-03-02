@@ -36,20 +36,25 @@ export class BootstrapService
     const password = this.configService.get('OWNER_PASSWORD');
     this.logger.log(ownerEmail, password);
     const hashedPassword = bcrypt.hashSync(password, 10);
-    this.usersRepository.createUserIfNotExists(
-      {
-        email: ownerEmail,
-        password: hashedPassword,
-      },
-      UserTypeEnum.OWNER,
-    );
+    const user = this.usersRepository.findOneByEmail(ownerEmail);
+
     const apiKey = this.apiKeysService.createApiKeyIfNotExists();
+    if (!user) {
+      this.usersRepository.createUserIfNotExists(
+        {
+          email: ownerEmail,
+          password: hashedPassword,
+        },
+        UserTypeEnum.OWNER,
+      );
+      //TODO : store apikey
+    }
 
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
     const capsuleUrl = this.configService.get('CLOUD_CAPSULE_URL');
 
-    if (isCloudProvided === 'true' && callbackUrl) {
+    if (isCloudProvided === 'true' && callbackUrl && !user) {
       this.logger.debug('Sending callback to cloud provider --> ', apiKey);
       try {
         await fetch(callbackUrl, {
