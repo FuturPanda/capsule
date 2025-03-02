@@ -42,12 +42,12 @@ export const POST = async ({ url }) => {
 				emit('message', JSON.stringify({ content: `Email or password not found`, progress: 100 }));
 				return;
 			}
-			const res3 = await createFlyMachinesForFlyAppRequest(appName, email, password);
-			const result = await res3.json();
-			console.log(result);
+			const res3 = await creeateVolumeForFlyApp(appName);
+			console.log(res3);
 			emit('message', JSON.stringify({ content: `Physical instance created`, progress: 70 }));
 			emit('message', JSON.stringify({ content: `Mounting volumes ...`, progress: 75 }));
-			const res4 = await creeateVolumeForFlyApp(appName);
+			const res4 = await createFlyMachinesForFlyAppRequest(appName, email, password, res3.id);
+			const result = await res4.json();
 			emit('message', JSON.stringify({ content: `Volume Mounted`, progress: 85 }));
 			emit('message', JSON.stringify({ content: `Done. Your Capsule is ready`, progress: 90 }));
 			console.log('BEFORE SECOND REQUEST');

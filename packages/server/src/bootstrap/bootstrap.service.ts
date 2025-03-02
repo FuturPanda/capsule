@@ -37,6 +37,7 @@ export class BootstrapService
     this.logger.log(ownerEmail, password);
     const hashedPassword = bcrypt.hashSync(password, 10);
     const user = this.usersRepository.findOneByEmail(ownerEmail);
+    this.logger.debug(`user : ${user}`);
 
     const apiKey = this.apiKeysService.createApiKeyIfNotExists();
     if (!user) {
@@ -47,7 +48,6 @@ export class BootstrapService
         },
         UserTypeEnum.OWNER,
       );
-      //TODO : store apikey
     }
 
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');

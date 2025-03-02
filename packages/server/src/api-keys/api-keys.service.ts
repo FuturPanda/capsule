@@ -61,7 +61,7 @@ export class ApiKeysService {
     const existingApiKey = this.apiKeysRepository.getApiKeyByType(
       ApiKeyTypeEnum.OWNER_UI,
     );
-    console.log('Existing APIKEY ;: ', existingApiKey);
+    console.log('Existing APIKEY : ', existingApiKey);
     if (!existingApiKey) {
       const apiKey = this.encode(apiContent);
       this.logger.log(`API Key: ${apiKey}`);

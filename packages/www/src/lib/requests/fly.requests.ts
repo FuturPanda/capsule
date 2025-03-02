@@ -122,7 +122,8 @@ export const allocateIpAddressToFlyAppRequest = async (appName: string) => {
 export const createFlyMachinesForFlyAppRequest = async (
 	appName: string,
 	owner_email: string,
-	owner_password: string
+	owner_password: string,
+	volumeId: string
 ) => {
 	const data = {
 		name: appName,
@@ -149,6 +150,12 @@ export const createFlyMachinesForFlyAppRequest = async (
 				CLOUD_CAPSULE_URL: `https://${appName}.fly.dev`
 				// BASE_URL=http://localhost:3000/api/v1
 			},
+			mounts: [
+				{
+					volume: volumeId,
+					path: '/'
+				}
+			],
 			services: [
 				{
 					ports: [
@@ -203,7 +210,7 @@ export const creeateVolumeForFlyApp = async (appName: string) => {
 	}
 	console.log(result);
 
-	return result.data;
+	return result;
 };
 
 export const emmitSslCertificatesForFlyAppRequest = () => {};
