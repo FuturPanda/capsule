@@ -50,26 +50,27 @@ export function ComboboxDatabase({
           <CommandList>
             <CommandEmpty>No databases found.</CommandEmpty>
             <CommandGroup>
-              {databases.map((database) => (
-                <CommandItem
-                  key={database.name}
-                  value={database.name}
-                  onSelect={(currentValue) => {
-                    setSelectedDb(database.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedDb?.name === database.name
-                        ? "opacity-100"
-                        : "opacity-0",
-                    )}
-                  />
-                  {database.name}
-                </CommandItem>
-              ))}
+              {databases &&
+                databases.map((database) => (
+                  <CommandItem
+                    key={database.name}
+                    value={database.name}
+                    onSelect={(currentValue) => {
+                      setSelectedDb(database.id);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedDb?.name === database.name
+                          ? "opacity-100"
+                          : "opacity-0",
+                      )}
+                    />
+                    {database.name}
+                  </CommandItem>
+                ))}
             </CommandGroup>
           </CommandList>
         </Command>
