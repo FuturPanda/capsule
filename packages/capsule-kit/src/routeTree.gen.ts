@@ -23,7 +23,7 @@ import { Route as AuthenticatedDatabackupDataSourceIdImport } from './routes/_au
 import { Route as AuthenticatedDataDatabaseIdImport } from './routes/_authenticated/data/$databaseId'
 import { Route as AuthenticatedCapletsCapletIdImport } from './routes/_authenticated/caplets/$capletId'
 import { Route as AuthenticatedDataDatabaseIdQueryImport } from './routes/_authenticated/data/$databaseId.query'
-import { Route as AuthenticatedDataDatabaseIdTableIdImport } from './routes/_authenticated/data/$databaseId.$tableId'
+import { Route as AuthenticatedDataDatabaseIdTableNameImport } from './routes/_authenticated/data/$databaseId.$tableName'
 
 // Create/Update Routes
 
@@ -92,9 +92,9 @@ const AuthenticatedDataDatabaseIdQueryRoute =
     getParentRoute: () => AuthenticatedDataDatabaseIdRoute,
   } as any)
 
-const AuthenticatedDataDatabaseIdTableIdRoute =
-  AuthenticatedDataDatabaseIdTableIdImport.update({
-    path: '/$tableId',
+const AuthenticatedDataDatabaseIdTableNameRoute =
+  AuthenticatedDataDatabaseIdTableNameImport.update({
+    path: '/$tableName',
     getParentRoute: () => AuthenticatedDataDatabaseIdRoute,
   } as any)
 
@@ -179,11 +179,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQueryIndexImport
       parentRoute: typeof AuthenticatedImport
     }
-    '/_authenticated/data/$databaseId/$tableId': {
-      id: '/_authenticated/data/$databaseId/$tableId'
-      path: '/$tableId'
-      fullPath: '/data/$databaseId/$tableId'
-      preLoaderRoute: typeof AuthenticatedDataDatabaseIdTableIdImport
+    '/_authenticated/data/$databaseId/$tableName': {
+      id: '/_authenticated/data/$databaseId/$tableName'
+      path: '/$tableName'
+      fullPath: '/data/$databaseId/$tableName'
+      preLoaderRoute: typeof AuthenticatedDataDatabaseIdTableNameImport
       parentRoute: typeof AuthenticatedDataDatabaseIdImport
     }
     '/_authenticated/data/$databaseId/query': {
@@ -199,14 +199,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthenticatedDataDatabaseIdRouteChildren {
-  AuthenticatedDataDatabaseIdTableIdRoute: typeof AuthenticatedDataDatabaseIdTableIdRoute
+  AuthenticatedDataDatabaseIdTableNameRoute: typeof AuthenticatedDataDatabaseIdTableNameRoute
   AuthenticatedDataDatabaseIdQueryRoute: typeof AuthenticatedDataDatabaseIdQueryRoute
 }
 
 const AuthenticatedDataDatabaseIdRouteChildren: AuthenticatedDataDatabaseIdRouteChildren =
   {
-    AuthenticatedDataDatabaseIdTableIdRoute:
-      AuthenticatedDataDatabaseIdTableIdRoute,
+    AuthenticatedDataDatabaseIdTableNameRoute:
+      AuthenticatedDataDatabaseIdTableNameRoute,
     AuthenticatedDataDatabaseIdQueryRoute:
       AuthenticatedDataDatabaseIdQueryRoute,
   }
@@ -258,7 +258,7 @@ export interface FileRoutesByFullPath {
   '/data': typeof AuthenticatedDataIndexRoute
   '/databackup': typeof AuthenticatedDatabackupIndexRoute
   '/query': typeof AuthenticatedQueryIndexRoute
-  '/data/$databaseId/$tableId': typeof AuthenticatedDataDatabaseIdTableIdRoute
+  '/data/$databaseId/$tableName': typeof AuthenticatedDataDatabaseIdTableNameRoute
   '/data/$databaseId/query': typeof AuthenticatedDataDatabaseIdQueryRoute
 }
 
@@ -273,7 +273,7 @@ export interface FileRoutesByTo {
   '/data': typeof AuthenticatedDataIndexRoute
   '/databackup': typeof AuthenticatedDatabackupIndexRoute
   '/query': typeof AuthenticatedQueryIndexRoute
-  '/data/$databaseId/$tableId': typeof AuthenticatedDataDatabaseIdTableIdRoute
+  '/data/$databaseId/$tableName': typeof AuthenticatedDataDatabaseIdTableNameRoute
   '/data/$databaseId/query': typeof AuthenticatedDataDatabaseIdQueryRoute
 }
 
@@ -290,7 +290,7 @@ export interface FileRoutesById {
   '/_authenticated/data/': typeof AuthenticatedDataIndexRoute
   '/_authenticated/databackup/': typeof AuthenticatedDatabackupIndexRoute
   '/_authenticated/query/': typeof AuthenticatedQueryIndexRoute
-  '/_authenticated/data/$databaseId/$tableId': typeof AuthenticatedDataDatabaseIdTableIdRoute
+  '/_authenticated/data/$databaseId/$tableName': typeof AuthenticatedDataDatabaseIdTableNameRoute
   '/_authenticated/data/$databaseId/query': typeof AuthenticatedDataDatabaseIdQueryRoute
 }
 
@@ -308,7 +308,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/databackup'
     | '/query'
-    | '/data/$databaseId/$tableId'
+    | '/data/$databaseId/$tableName'
     | '/data/$databaseId/query'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -322,7 +322,7 @@ export interface FileRouteTypes {
     | '/data'
     | '/databackup'
     | '/query'
-    | '/data/$databaseId/$tableId'
+    | '/data/$databaseId/$tableName'
     | '/data/$databaseId/query'
   id:
     | '__root__'
@@ -337,7 +337,7 @@ export interface FileRouteTypes {
     | '/_authenticated/data/'
     | '/_authenticated/databackup/'
     | '/_authenticated/query/'
-    | '/_authenticated/data/$databaseId/$tableId'
+    | '/_authenticated/data/$databaseId/$tableName'
     | '/_authenticated/data/$databaseId/query'
   fileRoutesById: FileRoutesById
 }
@@ -397,7 +397,7 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/data/$databaseId.tsx",
       "parent": "/_authenticated",
       "children": [
-        "/_authenticated/data/$databaseId/$tableId",
+        "/_authenticated/data/$databaseId/$tableName",
         "/_authenticated/data/$databaseId/query"
       ]
     },
@@ -425,8 +425,8 @@ export const routeTree = rootRoute
       "filePath": "_authenticated/query/index.tsx",
       "parent": "/_authenticated"
     },
-    "/_authenticated/data/$databaseId/$tableId": {
-      "filePath": "_authenticated/data/$databaseId.$tableId.tsx",
+    "/_authenticated/data/$databaseId/$tableName": {
+      "filePath": "_authenticated/data/$databaseId.$tableName.tsx",
       "parent": "/_authenticated/data/$databaseId"
     },
     "/_authenticated/data/$databaseId/query": {

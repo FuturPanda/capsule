@@ -1,4 +1,5 @@
 import { CapsuleAxios } from "@/api/axios.ts";
+import { CreateDatabaseFormValues } from "@/routes/_authenticated/data";
 import { GetDatabaseDto } from "@/stores/databases/database.model.ts";
 
 export const databaseRequest = {
@@ -8,4 +9,6 @@ export const databaseRequest = {
     CapsuleAxios.get(`dynamic-queries/${database}/${table}`, {
       params: params,
     }).then((x) => x.data),
+  createDatabase: (database: CreateDatabaseFormValues) =>
+    CapsuleAxios.post(`databases`, database).then((x) => x.data),
 };

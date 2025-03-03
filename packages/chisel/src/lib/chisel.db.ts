@@ -1,13 +1,13 @@
-import { ChiselQuerable } from "./chisel.querable";
-import pino from "pino";
-import { IFactoryOpts } from "./_utils/types/queries.type";
 import Database from "better-sqlite3";
-import path from "node:path";
-import fs from "node:fs";
-import { generateSQLCommands } from "./migrations";
-import { Migration } from "./_utils/types/migrations.type";
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
+import pino from "pino";
 import { ColInfoType } from "./_utils/types/database.type";
+import { Migration } from "./_utils/types/migrations.type";
+import { IFactoryOpts } from "./_utils/types/queries.type";
+import { ChiselQuerable } from "./chisel.querable";
+import { generateSQLCommands } from "./migrations";
 
 export class ChiselDb extends ChiselQuerable {
   private readonly logger = pino();
@@ -20,7 +20,7 @@ export class ChiselDb extends ChiselQuerable {
     super(new Database(dbFilePath));
 
     if (opts) {
-      this.dirPath = path.join(opts.uri, opts.dbName.toLowerCase());
+      this.dirPath = opts.uri;
     }
   }
 
@@ -30,15 +30,19 @@ export class ChiselDb extends ChiselQuerable {
    */
   static create(opts: IFactoryOpts): ChiselDb {
     try {
-      const dirPath = path.join(opts.uri, opts.dbName.toLowerCase());
       const filepath = path.join(
-        dirPath,
+        opts.uri,
         `${opts.dbName.toLowerCase()}.capsule`,
       );
       const exists = fs.existsSync(filepath);
-      if (!exists) fs.mkdirSync(dirPath, { recursive: true });
+      if (!exists) fs.mkdirSync(opts.uri, { recursive: true });
       const db = new ChiselDb(filepath, opts);
-      return db.initializeFromMigrations();
+      if (opts.migrations) {
+        console.log(
+          "Initializing database from migrations.BVIUFYGIUEfhUIEHF..",
+        );
+        return db.initializeFromMigrations();
+      } else return db;
     } catch (e: any) {
       throw new Error(`Failed to get database connection: ${e.message}`);
     }

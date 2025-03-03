@@ -56,7 +56,8 @@ type = "createTable"
 tableName = "database"
 columns = [
     { name = "id", type = "integer", autoIncrement = true, constraints = { primaryKey = true, nullable = false } },
-    { name = "name", type = "text", constraints = { nullable = false, unique = true } }
+    { name = "name", type = "text", constraints = { nullable = false, unique = true } },
+    { name = "client_id", type = "text", constraints = { nullable = false} }
 ]
 
 # Database Permission table

@@ -47,7 +47,7 @@ function LoginComponent() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    console.log("is submitting ");
+    console.log("is submitting ::: ", values);
     try {
       auth!
         .login(values.email, values.password, values.url, values.encodedApiKey)

@@ -1,6 +1,4 @@
-import { Link } from "@tanstack/react-router";
-import { cn } from "@/lib/utils.ts";
-import { ComponentProps } from "react";
+import { ComboboxDatabase } from "@/components/ComboBoxDatabase.tsx";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,16 +6,18 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb.tsx";
-import { Slash } from "lucide-react";
+import { cn } from "@/lib/utils.ts";
 import { useBoundStore } from "@/stores/global.store.ts";
-import { ComboboxDatabase } from "@/components/ComboBoxDatabase.tsx";
+import { Link } from "@tanstack/react-router";
+import { Slash } from "lucide-react";
+import { ComponentProps } from "react";
 
 type TopbarComponentProps = ComponentProps<"header">;
 
 export function Topbar({ className, ...props }: TopbarComponentProps) {
   const path = useBoundStore((state) => state.breadcrumbsPath);
   const databases = useBoundStore((state) => state.databases);
-  const selectedDatabaseId = useBoundStore((state) => state.selectedDatabaseId);
+  const selectedDatabase = useBoundStore((state) => state.selectedDatabase);
   const setSelectedDatabaseId = useBoundStore(
     (state) => state.setSelectedDatabaseId,
   );
@@ -57,7 +57,7 @@ export function Topbar({ className, ...props }: TopbarComponentProps) {
                 <ComboboxDatabase
                   databases={databases}
                   setSelectedDb={setSelectedDatabaseId}
-                  selectedDb={selectedDatabaseId}
+                  selectedDb={selectedDatabase}
                 />
               );
             })}

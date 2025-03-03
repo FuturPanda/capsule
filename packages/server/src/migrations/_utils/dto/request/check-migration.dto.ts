@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -5,9 +6,7 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
-// First, let's create proper class-based DTOs for validation
 export class ColumnConstraints {
   @IsOptional()
   @IsBoolean()
