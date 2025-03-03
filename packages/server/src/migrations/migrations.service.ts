@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { ChiselService } from '../chisel/chisel.service';
+import { DatabasesMapper } from '../databases/databases.mapper';
+import { DatabasesService } from '../databases/databases.service';
 import {
   CheckMigrationDto,
   Migration,
 } from './_utils/dto/request/check-migration.dto';
-import { ChiselService } from '../chisel/chisel.service';
-import { DatabasesMapper } from '../databases/databases.mapper';
-import { DatabasesService } from '../databases/databases.service';
 
 @Injectable()
 export class MigrationsService {
@@ -17,7 +17,6 @@ export class MigrationsService {
 
   async runMigrations(apiKey: string, checkMigrationDto: CheckMigrationDto) {
     for (const migration of checkMigrationDto.migrations) {
-      console.log(migration);
       this.applyMigrationAndSaveToDb(apiKey, migration);
     }
   }
@@ -30,8 +29,11 @@ export class MigrationsService {
       const tableInfos = tables.map((t) =>
         this.databaseMapper.toTableDefinition(t, db.getTableInfo(t)),
       );
-      console.log('TABLE INFOS AFTER MIGRATIONS BEFORE SAVE : ', tableInfos);
-      this.databasesService.saveDatabaseInfo(migration.database, tableInfos);
+      this.databasesService.saveDatabaseInfo(
+        migration.database,
+        tableInfos,
+        apiKey,
+      );
       return { dbName: migration.database, tableInfos: tableInfos };
     }
   }

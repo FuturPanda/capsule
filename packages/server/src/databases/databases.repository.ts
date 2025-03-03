@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '../chisel/chisel.module';
 import { ChiselId, ChiselModel } from '@capsulesh/chisel';
+import { Injectable } from '@nestjs/common';
 import { Database } from '../_utils/models/root/database';
-import { EntityAttribute } from '../_utils/models/root/entity_attribute';
 import { DatabaseEntity } from '../_utils/models/root/entity';
+import { EntityAttribute } from '../_utils/models/root/entity_attribute';
+import { InjectModel } from '../chisel/chisel.module';
 
 @Injectable()
 export class DatabasesRepository {
@@ -16,24 +16,14 @@ export class DatabasesRepository {
     private readonly databaseEntityModel: ChiselModel<DatabaseEntity>,
   ) {}
 
-  createDatabase = (name: string) => this.databaseModel.insert({ name: name });
+  createDatabase = (name: string, clientId: string) => {
+    return this.databaseModel.insert(
+      { name: name, client_id: clientId },
+      { ignoreExisting: true },
+    );
+  };
 
-  findAllDatabase = () =>
-    this.entityAttributeModel
-      .select({
-        dbId: 'database.id',
-        dbName: 'database.name',
-        entityId: 'database_entity.id',
-        entityName: 'database_entity.entity_name',
-        attributeId: 'entity_attribute.id',
-        attributeName: 'entity_attribute.name',
-        attributeType: 'entity_attribute.type',
-        isRequired: 'entity_attribute.is_required',
-        isPrimaryKey: 'entity_attribute.is_primary_key',
-      })
-      .join(EntityAttribute, DatabaseEntity, 'database_entity_id', 'id')
-      .join(DatabaseEntity, Database, 'database_id', 'id')
-      .exec();
+  findAllDatabase = () => this.databaseModel.select().exec();
 
   createDatabaseEntity = (entityName: string, databaseId: ChiselId) =>
     this.databaseEntityModel.insert(

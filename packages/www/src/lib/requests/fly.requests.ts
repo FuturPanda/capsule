@@ -171,7 +171,7 @@ export const createFlyMachinesForFlyAppRequest = async (
 					protocol: 'tcp',
 					internal_port: 3000,
 					autostart: true,
-					autostop: 'stop'
+					autostop: 'suspend'
 				}
 			]
 		}
