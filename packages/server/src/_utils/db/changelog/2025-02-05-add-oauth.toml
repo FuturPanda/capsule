@@ -1,0 +1,12 @@
+changeSetId = "20250205-01"
+author = "futurpanda"
+description = "add oauth tokens"
+database = "root"
+
+[[operations]]
+type = "createTable"
+tableName = "test"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "content", type = "text" },
+]

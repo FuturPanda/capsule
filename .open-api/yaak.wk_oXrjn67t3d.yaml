@@ -1,0 +1,10 @@
+type: workspace
+model: workspace
+id: wk_oXrjn67t3d
+createdAt: 2025-03-06T08:15:11.030653
+updatedAt: 2025-03-06T08:19:43
+name: Capsule
+description: ''
+settingValidateCertificates: true
+settingFollowRedirects: true
+settingRequestTimeout: 0
