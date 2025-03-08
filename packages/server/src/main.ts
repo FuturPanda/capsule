@@ -1,13 +1,16 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as Sentry from '@sentry/node';
+import * as cookieParser from 'cookie-parser';
+import { join } from 'path';
 import { EnvironmentVariables } from './_utils/config/env.config';
 import { AppModule } from './app.module';
-import * as Sentry from '@sentry/node';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   Sentry.init({
     dsn: 'https://fbed917e42b3f3e7094d483f83a3216c@o4508760491163648.ingest.us.sentry.io/4508760491491328',
@@ -22,6 +25,9 @@ async function bootstrap() {
         transformOptions: { enableImplicitConversion: true },
       }),
     )
+    .use(cookieParser())
+    .setViewEngine('pug')
+    .setBaseViewsDir(join(__dirname, '..', 'views'))
     .enableCors();
 
   const config = new DocumentBuilder()

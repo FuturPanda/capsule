@@ -1,7 +1,7 @@
-import { Migration } from '../_types/migrations.types';
+import * as TOML from '@iarna/toml';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as TOML from '@iarna/toml';
+import { Migration } from '../_types/migrations.types';
 
 function loadMigration(filename: string): Migration {
   const filePath = path.join(__dirname, './changelog', filename);
@@ -12,4 +12,5 @@ function loadMigration(filename: string): Migration {
 export const migrations: Migration[] = [
   loadMigration('2024-12-13-initial-database.toml'),
   loadMigration('2024-12-13-add-test.toml'),
+  loadMigration('2025-02-05-add-oauth.toml'),
 ];

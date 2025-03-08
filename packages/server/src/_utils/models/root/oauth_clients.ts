@@ -1,11 +1,9 @@
-  id SERIAL PRIMARY KEY,
-  client_id VARCHAR(100) NOT NULL UNIQUE,
-  client_secret VARCHAR(100) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  redirect_uris TEXT[] NOT NULL,
-  allowed_scopes TEXT[] NOT NULL,
-  logo_url VARCHAR(255),
-  website_url VARCHAR(255),
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+export class OauthClients {
+  id: number;
+  client_id: number;
+  name: string;
+  redirect_uri: string;
+  allowed_scopes: string;
+  created_at: Date;
+  updated_at: Date | null;
+}

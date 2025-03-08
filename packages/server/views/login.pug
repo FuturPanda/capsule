@@ -1,0 +1,179 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Capsule OAuth Login
+    script.
+          document.addEventListener('DOMContentLoaded', function() {
+            const redirectUrl = '#{redirect}';
+            if (redirectUrl && redirectUrl.length > 0) {
+              window.location.href = redirectUrl;
+            }
+          });
+    style.
+      :root {
+        --background: #09090b;
+        --foreground: #fafafa;
+        --card: #09090b;
+        --card-foreground: #fafafa;
+        --primary: #3b82f6;
+        --primary-foreground: #fafafa;
+        --muted: #27272a;
+        --muted-foreground: #a1a1aa;
+        --border: #27272a;
+        --input: #27272a;
+        --ring: #3b82f6;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--background);
+        color: var(--foreground);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      .card {
+        background-color: var(--card);
+        border-radius: 0.5rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+        overflow: hidden;
+      }
+      .header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--foreground);
+      }
+      .description {
+        margin-top: 0.5rem;
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+      }
+      .content {
+        padding: 1.5rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .input {
+        width: 100%;
+        padding: 0.5rem;
+        background-color: var(--input);
+        border: 1px solid var(--border);
+        border-radius: 0.25rem;
+        color: var(--foreground);
+        font-size: 0.875rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .input:focus {
+        outline: none;
+        border-color: var(--ring);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+      }
+      .footer {
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid var(--border);
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.5;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .button-primary {
+        background-color: var(--primary);
+        color: var(--primary-foreground);
+        border: none;
+      }
+      .button-primary:hover {
+        background-color: #2563eb;
+      }
+      .oauth-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+      .oauth-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.625rem;
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 0.25rem;
+        color: var(--foreground);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .oauth-button:hover {
+        background-color: var(--muted);
+      }
+      .divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+      }
+      .divider::before, .divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background-color: var(--border);
+      }
+      .divider::before {
+        margin-right: 0.5rem;
+      }
+      .divider::after {
+        margin-left: 0.5rem;
+      }
+
+  body
+    div.card
+      div.header
+        h2.title Capsule Login
+        p.description Sign in with your Capsule account
+
+      div.content
+        form(action="/api/v1/users/oauth/login?redirect_uri=" + encodeURIComponent(redirect_uri) + "&scopes=" + encodeURIComponent(scopes) + "&client_identifier=" + encodeURIComponent(client_identifier) method="POST")
+          div.form-group
+            label.label(for="email") Email
+            input.input(type="email" id="email" name="email" placeholder="name@example.com" required)
+
+          div.form-group
+            label.label(for="password") Password
+            input.input(type="password" id="password" name="password" required)
+
+          div.footer
+            a(href="/forgot-password" style="color: var(--primary); font-size: 0.875rem; text-decoration: none;") Forgot password?
+            button.button.button-primary(type="submit") Sign In

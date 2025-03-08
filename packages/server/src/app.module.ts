@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { validateEnv } from './_utils/config/env.config';
 import { migrations } from './_utils/db';
 import { ApiKeysModule } from './api-keys/api-keys.module';
@@ -17,6 +18,8 @@ import { MigrationsModule } from './migrations/migrations.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { SurrealModule } from './surreal/surreal.module';
 import { UsersModule } from './users/users.module';
+import { EventsModule } from './events/events.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -28,6 +31,10 @@ import { UsersModule } from './users/users.module';
       migrations: migrations,
       generateTypes: true,
       typesDir: './src/_utils/models',
+    }),
+    NestjsFormDataModule.config({
+      storage: MemoryStoredFile,
+      isGlobal: true,
     }),
     ScheduleModule.forRoot(),
     UsersModule,
@@ -45,6 +52,8 @@ import { UsersModule } from './users/users.module';
     PermissionsModule,
     MigrationsModule,
     DynamicQueriesModule,
+    EventsModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [AppService],

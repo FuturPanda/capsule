@@ -3,4 +3,5 @@ export class CreateSessionDto {
   email: string;
   redirectUri: string;
   scopes: string;
+  clientIdentifier: string;
 }

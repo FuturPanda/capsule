@@ -1,6 +1,6 @@
-import axios, { AxiosInstance } from "axios";
-import { CapsuleApiError, CapsuleNetworkError } from "./errors";
-import { AuthTokens, CapsuleConfig, OAuthConfig } from "./types";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { SESSION_STORAGE_AUTH_TOKENS } from "./constants";
+import { AuthTokens, CapsuleConfig, Migration, OAuthConfig } from "./types";
 
 export class ApiClient {
   private client: AxiosInstance;
@@ -14,17 +14,26 @@ export class ApiClient {
     }
 
     this.baseUrl = config.capsuleUrl;
+    console.log("creating apiclient and axios instance");
+    const tokens = this.getAuthTokens();
+
     this.client = axios.create({
       baseURL: this.baseUrl,
       headers: {
         "Content-Type": "application/json",
-        "Client-Id": config.oauth?.clientId || "",
-        ...(config.apiKey && { Authorization: `Bearer ${config.apiKey}` }),
+        "Client-Id": config.identifier || "",
+        ...(tokens?.accessToken && {
+          Authorization: `Bearer ${tokens.accessToken}`,
+        }),
       },
-      timeout: config.timeout || 30000,
+      timeout: 30000,
     });
-    this.oauthConfig = config.oauth;
+
     this.setupInterceptors();
+    this.oauthConfig = {
+      identifier: config.identifier,
+      scopes: config.scopes,
+    };
   }
 
   updateBaseUrl(url: string): void {
@@ -34,74 +43,69 @@ export class ApiClient {
 
   private setupInterceptors() {
     this.client.interceptors.request.use(async (config) => {
-      if (this.tokens?.accessToken) {
-        config.headers.Authorization = `Bearer ${this.tokens.accessToken}`;
+      const tokens = this.getAuthTokens();
+      if (tokens?.accessToken) {
+        config.headers.Authorization = `Bearer ${tokens.accessToken}`;
       }
+      console.log("Capsule SDK - Outgoing request:", {
+        method: config.method,
+        url: config.url,
+        headers: config.headers,
+      });
+
       return config;
     });
 
     this.client.interceptors.response.use(
-      (response) => response,
+      async (response: AxiosResponse) => response,
       async (error) => {
+        const tokens = this.getAuthTokens();
         if (error.response) {
-          if (error.response.status === 401 && this.tokens?.refreshToken) {
-            return this.refreshAccessToken().then(() => {
+          if (error.response.status === 401 && tokens?.refreshToken) {
+            console.log("Capsule SDK - Attempting to refresh token");
+            try {
+              await this.refreshAccessToken();
               const originalRequest = error.config;
-              originalRequest.headers.Authorization = `Bearer ${this.tokens?.accessToken}`;
+              originalRequest.headers.Authorization = `Bearer ${tokens?.accessToken}`;
               return this.client(originalRequest);
-            });
+            } catch (refreshError) {
+              console.error(
+                "Capsule SDK - Token refresh failed:",
+                refreshError,
+              );
+            }
           }
-          return Promise.reject(
-            new CapsuleApiError(
-              error.response.data.message || "API error occurred",
-              error.response.status,
-              error.response.data,
-            ),
-          );
-        } else if (error.request) {
-          return Promise.reject(
-            new CapsuleNetworkError(
-              "No response received from server",
-              error.request,
-            ),
-          );
         } else {
-          return Promise.reject(
-            new Error(`Error setting up request: ${error.message}`),
-          );
+          return new Error(`Error setting up request: ${error.message}`);
         }
       },
     );
   }
 
-  async authenticate(username: string, password: string): Promise<AuthTokens> {
-    if (!this.oauthConfig?.clientId) {
-      throw new Error("OAuth configuration is missing");
-    }
-
-    const response = await this.client.post("/oauth/token", {
-      username,
-      password,
-      client_id: this.oauthConfig.clientId,
+  async exchangeSingleUseTokenForTokens(singleUseToken: string) {
+    const response = await this.client.post("users/oauth/single-use-token", {
+      singleUseToken,
     });
-
-    this.setTokens(response.data);
-    return this.tokens as AuthTokens;
+    console.log("After Token SingleUse Exchange", response.data);
+    return response;
   }
 
   private async refreshAccessToken(): Promise<void> {
-    if (!this.tokens?.refreshToken || !this.oauthConfig?.clientId) {
-      throw new Error("No refresh token available or OAuth config missing");
+    if (!this.tokens?.refreshToken) {
+      throw new Error("No refresh token available");
     }
 
     try {
-      const response = await this.client.post("/oauth/token", {
+      const payload: Record<string, any> = {
         grant_type: "refresh_token",
         refresh_token: this.tokens.refreshToken,
-        client_id: this.oauthConfig.clientId,
-        client_secret: this.oauthConfig.clientSecret,
-      });
+      };
 
+      if (this.oauthConfig?.identifier) {
+        payload.client_identifier = this.oauthConfig.identifier;
+      }
+
+      const response = await this.client.post("/oauth/token", payload);
       this.setTokens(response.data);
     } catch (error) {
       this.tokens = null;
@@ -110,49 +114,68 @@ export class ApiClient {
   }
 
   setAuthTokens(tokens: AuthTokens): void {
-    this.tokens = tokens;
+    sessionStorage.setItem(
+      SESSION_STORAGE_AUTH_TOKENS,
+      JSON.stringify({
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      }),
+    );
   }
 
   getAuthTokens(): AuthTokens | null {
-    return this.tokens;
+    const tokensString = sessionStorage.getItem(SESSION_STORAGE_AUTH_TOKENS);
+    const tokens: AuthTokens | null = tokensString
+      ? JSON.parse(tokensString)
+      : null;
+    return tokens;
   }
 
   logout(): void {
     this.tokens = null;
   }
 
-  private setTokens(tokenData: any): void {
-    this.tokens = {
-      accessToken: tokenData.access_token,
-      refreshToken: tokenData.refresh_token,
-      expiresAt: tokenData.expires_in
-        ? Date.now() + tokenData.expires_in * 1000
-        : undefined,
-    };
+  async migrateDatabase(migrations: Migration[]) {
+    try {
+      const response = await this.client
+        .post("/migrations/check", {
+          migrations: migrations,
+        })
+        .then((x) => x.data);
+
+      console.log("After migrations check :", response);
+      return response.data;
+    } catch (error) {
+      console.error("Migration check failed:", error);
+      throw error;
+    }
   }
 
-  async get<T>(path: string, params?: Record<string, any>): Promise<T> {
-    const response = await this.client.get<T>(path, { params });
+  private setTokens(tokenData: any): void {}
+
+  async get<T>(url: string, params?: any): Promise<T> {
+    const config: AxiosRequestConfig = { params };
+    const response = await this.client.get<T>(url, config);
     return response.data;
   }
 
-  async post<T>(path: string, data?: any): Promise<T> {
-    const response = await this.client.post<T>(path, data);
+  async post<T>(url: string, data?: any): Promise<T> {
+    const response = await this.client.post<T>(url, data);
     return response.data;
   }
 
-  async put<T>(path: string, data?: any): Promise<T> {
-    const response = await this.client.put<T>(path, data);
+  async put<T>(url: string, data?: any): Promise<T> {
+    const response = await this.client.put<T>(url, data);
     return response.data;
   }
 
-  async patch<T>(path: string, data?: any): Promise<T> {
-    const response = await this.client.patch<T>(path, data);
+  async patch<T>(url: string, data?: any): Promise<T> {
+    const response = await this.client.patch<T>(url, data);
     return response.data;
   }
 
-  async delete<T>(path: string): Promise<T> {
-    const response = await this.client.delete<T>(path);
+  async delete<T>(url: string): Promise<T> {
+    const response = await this.client.delete<T>(url);
     return response.data;
   }
 }

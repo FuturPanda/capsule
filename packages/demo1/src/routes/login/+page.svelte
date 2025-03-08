@@ -1,32 +1,43 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import useCapsuleClient from '$lib/capsule-client.svelte';
+	import type { CapsuleClient } from '@capsule-mono-repo/capsule-client';
+	import { onMount } from 'svelte';
 
-	let username = '';
-	let password = '';
-	let errorMessage = '';
+	let username = $state('');
+	let password = $state('');
+	let errorMessage = $state('');
 
 	async function handleLogin() {
 		if (!username || !password) {
 			errorMessage = 'Please enter both username and password';
 			return;
 		}
-
-		// Simple validation - in a real app you'd use a proper auth service
 		if (username === 'admin' && password === 'password') {
-			// Store some indication of login state
+			console.log(username, password);
 			localStorage.setItem('isLoggedIn', 'true');
-			// Redirect to the main page
 			goto('/');
 		} else {
 			errorMessage = 'Invalid username or password';
 		}
 	}
+
+	async function handleLoginWithCapsule() {
+		if (capsuleClient) {
+			capsuleClient.handleOnLoginClick();
+		}
+	}
+
+	let capsuleClient: CapsuleClient | null = $state(null);
+	onMount(() => {
+		capsuleClient = useCapsuleClient();
+	});
 </script>
 
 <main>
 	<h1>Login</h1>
 
-	<form on:submit|preventDefault={handleLogin}>
+	<form onsubmit={handleLogin}>
 		{#if errorMessage}
 			<div class="error-message">{errorMessage}</div>
 		{/if}
@@ -48,6 +59,8 @@
 
 		<button type="submit">Login</button>
 	</form>
+
+	<button onclick={handleLoginWithCapsule}>Login with your Capsule</button>
 </main>
 
 <style>

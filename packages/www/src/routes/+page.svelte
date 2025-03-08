@@ -4,6 +4,8 @@
 	import Separator from '$lib/components/separator.svelte';
 	import CustomCard from '$lib/components/custom-card.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
+	import useCapsuleClient from '$lib/capsule.svelte';
+	import type { CapsuleClient } from '@capsule-mono-repo/capsule-client';
 
 	let showBackground = false;
 	let showLoader = false;
@@ -13,6 +15,7 @@
 	const adjectives = ['better', 'private', 'sovereign', 'yours', 'secure', 'lame'];
 	let currentIndex = 0;
 	let currentWord = adjectives[0];
+	let capsuleClient: CapsuleClient;
 
 	let visible = true;
 	const cycleWord = () => {
@@ -33,6 +36,7 @@
 		setTimeout(() => {
 			interval = setInterval(cycleWord, 3000);
 		}, 6000);
+		capsuleClient = useCapsuleClient();
 		return () => clearInterval(interval);
 	});
 	const features = [
@@ -52,6 +56,13 @@
 				"Security isn't just a feature—it's the foundation. Every aspect of the platform is built with zero-trust principles and end-to-end encryption. Your VM operates as a sovereign entity, with cryptographic guarantees ensuring that only you and your authorized applications can access your data. Take control of your digital sovereignty without sacrificing modern cloud conveniences."
 		}
 	];
+	async function handleLogin() {
+		console.log('Login button clicked');
+
+		console.log('Client created, handling login click');
+
+		await capsuleClient.handleOnLoginClick();
+	}
 </script>
 
 <main class="mx-auto">
@@ -68,6 +79,10 @@
 			<Button class="" variant="ghost">
 				<a href="https://docs.capsule.sh">Docs</a>
 			</Button>
+			<!-- <Button on:click={handleLogin}>Login with capsule</Button> -->
+			<Button onclick={handleLogin}
+				>{capsuleClient?.authStatus() ? 'AlreadyLoggedIn' : 'LoginWithCapsule'}</Button
+			>
 			<Button variant="outline"><a href="./signup" data-sveltekit-reload>Get Started</a></Button>
 		</div>
 	{/if}

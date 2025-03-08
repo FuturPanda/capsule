@@ -47,7 +47,7 @@ export const POST = async ({ url }) => {
 			emit('message', JSON.stringify({ content: `Physical instance created`, progress: 70 }));
 			emit('message', JSON.stringify({ content: `Mounting volumes ...`, progress: 75 }));
 			const res4 = await createFlyMachinesForFlyAppRequest(appName, email, password, res3.id);
-			const result = await res4.json();
+			await res4.json();
 			emit('message', JSON.stringify({ content: `Volume Mounted`, progress: 85 }));
 			emit('message', JSON.stringify({ content: `Done. Your Capsule is ready`, progress: 90 }));
 			console.log('BEFORE SECOND REQUEST');

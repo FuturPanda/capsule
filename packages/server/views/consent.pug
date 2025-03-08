@@ -1,0 +1,233 @@
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title Capsule OAuth Consent
+    script.
+          function submitForm(approved) {
+            document.getElementById('authorizeBtn').disabled = true;
+            document.getElementById('denyBtn').disabled = true;
+
+            const sessionId = document.getElementById('sessionId').value;
+
+            const formData = new FormData();
+            formData.append('sessionId', sessionId);
+            formData.append('approved', approved);
+
+            fetch('/api/v1/users/oauth/consent', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => {
+              console.log('in response pug : ', response);
+
+              if (response.ok) {
+                   return response.json().then(data => {
+
+                     if (window.opener && !window.opener.closed) {
+                       const message = {
+                         type: 'oauth_complete',
+                         approved: approved === 'true',
+                         timestamp: new Date().toISOString(),
+                         singleUseToken: data.singleUseToken
+                       };
+
+                       window.opener.postMessage(message, '*');
+                     }
+
+                     window.close();
+                   });
+                 } else {
+                   alert('An error occurred. Please try again.');
+                   document.getElementById('authorizeBtn').disabled = false;
+                   document.getElementById('denyBtn').disabled = false;
+                 }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              alert('An error occurred. Please try again.');
+
+              document.getElementById('authorizeBtn').disabled = false;
+              document.getElementById('denyBtn').disabled = false;
+            });
+
+            return false;
+          }
+    style.
+      :root {
+        --background: #09090b;
+        --foreground: #fafafa;
+        --card: #09090b;
+        --card-foreground: #fafafa;
+        --primary: #3b82f6;
+        --primary-foreground: #fafafa;
+        --muted: #27272a;
+        --muted-foreground: #a1a1aa;
+        --border: #27272a;
+        --input: #27272a;
+        --ring: #3b82f6;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: var(--background);
+        color: var(--foreground);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+      .card {
+        background-color: var(--card);
+        border-radius: 0.5rem;
+        border: 1px solid var(--border);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 450px;
+        overflow: hidden;
+      }
+      .header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--foreground);
+      }
+      .description {
+        margin-top: 0.5rem;
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+      }
+      .content {
+        padding: 1.5rem;
+      }
+      .app-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+      .app-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        background-color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        overflow: hidden;
+      }
+      .app-icon img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+      .app-name {
+        font-weight: 600;
+        font-size: 1.125rem;
+      }
+      .permissions {
+        margin-top: 1rem;
+      }
+      .permission-list {
+        list-style: none;
+        padding: 0;
+        margin: 1rem 0;
+      }
+      .permission-item {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 0;
+        gap: 0.75rem;
+      }
+      .permission-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+      }
+      .footer {
+        padding: 1rem 1.5rem;
+        margin-top: 2rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        border-top: 1px solid var(--border);
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.5;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .button-primary {
+        background-color: var(--primary);
+        color: var(--primary-foreground);
+        border: none;
+      }
+      .button-primary:hover {
+        background-color: #2563eb;
+      }
+      .button-secondary {
+        background-color: transparent;
+        color: var(--foreground);
+        border: 1px solid var(--border);
+      }
+      .button-secondary:hover {
+        background-color: var(--muted);
+      }
+      .user-info {
+        font-size: 0.875rem;
+        color: var(--muted-foreground);
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
+  body
+    div.card
+      div.header
+        h2.title Authorize Application
+        p.description The following application is requesting access to your Capsule account
+
+      div.content
+        div.app-info
+          div.app-icon
+            if clientLogo
+              img(src=clientLogo alt=clientName)
+            else
+              span(style="color: var(--primary-foreground); font-size: 1.5rem;") #{clientName.charAt(0).toUpperCase()}
+          div
+            div.app-name #{clientName}
+            if clientUrl
+              div(style="font-size: 0.875rem; color: var(--muted-foreground);") #{clientUrl}
+
+        div.permissions
+          p The application will be able to:
+          ul.permission-list
+            each scope in scopes
+              li.permission-item
+                div.permission-icon
+                  svg(xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
+                    circle(cx="12" cy="12" r="10")
+                    path(d="M12 16v-4")
+                    path(d="M12 8h.01")
+                div
+                  strong #{scope.name}
+                  if scope.description
+                    p(style="margin: 0.25rem 0 0 0; color: var(--muted-foreground); font-size: 0.875rem;") #{scope.description}
+
+
+        div.footer
+                input#sessionId(type="hidden" value=sessionId)
+
+                button#denyBtn.button.button-secondary(type="button" onclick="submitForm('false')") Deny
+                button#authorizeBtn.button.button-primary(type="button" onclick="submitForm('true')") Authorize

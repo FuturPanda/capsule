@@ -1,2 +1,2 @@
 #V2
-select * from session
+select * from sessi

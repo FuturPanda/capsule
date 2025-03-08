@@ -8,12 +8,17 @@ import {
 const config: CapsuleConfig = {
 	scopes: [OAuthScopes.PROFILE_READ, OAuthScopes.TASKS_READ, OAuthScopes.TASKS_WRITE],
 	identifier: 'my-awesome-app-v1.0.3',
-	redirectUri: 'https://localhost:3000/'
+	redirectUri: 'http://localhost:5173/?yes=yes'
 };
 
-const useCapsuleClient = async (): Promise<CapsuleClient> => {
+let client: CapsuleClient | null = $state(null);
+
+const useCapsuleClient = () => {
 	try {
-		const client = await createCapsuleClient(config);
+		if (!client) {
+			console.log('Creating Capsule client');
+			client = createCapsuleClient(config);
+		}
 		return client;
 	} catch (error) {
 		console.error('Failed to create Capsule client:', error);

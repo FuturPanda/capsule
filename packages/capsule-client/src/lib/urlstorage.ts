@@ -1,15 +1,14 @@
 export interface UrlStorageOptions {
   storageKey?: string;
-  validateUrl?: (url: string) => boolean | Promise<boolean>;
 }
 
 export class UrlStorage {
   private storageKey: string;
-  private validateUrl: (url: string) => boolean | Promise<boolean>;
+  private validateUrl: (url: string) => boolean;
 
-  constructor(options: UrlStorageOptions = {}) {
-    this.storageKey = options.storageKey || "capsule_api_url";
-    this.validateUrl = options.validateUrl || this.defaultUrlValidator;
+  constructor(storageKey: string) {
+    this.storageKey = storageKey;
+    this.validateUrl = this.defaultUrlValidator;
   }
 
   private defaultUrlValidator(url: string): boolean {
@@ -21,15 +20,15 @@ export class UrlStorage {
     }
   }
 
-  async getUrl(): Promise<string | null> {
+  getUrl(): string | null {
     if (typeof localStorage !== "undefined") {
       return localStorage.getItem(this.storageKey);
     }
     return null;
   }
 
-  async saveUrl(url: string): Promise<boolean> {
-    const isValid = await this.validateUrl(url);
+  saveUrl(url: string): boolean {
+    const isValid = this.validateUrl(url);
 
     if (!isValid) {
       return false;
@@ -42,7 +41,7 @@ export class UrlStorage {
     return true;
   }
 
-  async promptUserForUrl(): Promise<string | null> {
+  promptUserForUrl(): string | null {
     if (typeof window === "undefined") {
       throw new Error("Cannot prompt for URL in non-browser environment");
     }
@@ -57,7 +56,7 @@ export class UrlStorage {
         return null;
       }
 
-      isValid = await this.validateUrl(url);
+      isValid = this.validateUrl(url);
 
       if (!isValid) {
         window.alert(
@@ -66,12 +65,12 @@ export class UrlStorage {
       }
     }
 
-    await this.saveUrl(url ?? "");
+    this.saveUrl(url ?? "");
     return url;
   }
 
-  async getOrPromptForUrl(): Promise<string | null> {
-    const storedUrl = await this.getUrl();
+  getOrPromptForUrl(): string | null {
+    const storedUrl = this.getUrl();
 
     if (storedUrl) {
       return storedUrl;
