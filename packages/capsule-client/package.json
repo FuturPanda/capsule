@@ -1,5 +1,5 @@
 {
-  "name": "capsule-client",
+  "name": "@capsulesh/capsule-client",
   "version": "0.0.1",
   "description": "SDK for capsule ",
   "main": "dist/index.js",
@@ -10,14 +10,11 @@
   ],
   "browser": "dist/browser.mjs",
   "keywords": [
-    "orm",
-    "sqlite",
-    "database",
-    "typescript",
-    "query-builder"
+    "sdk",
+    "capsule"
   ],
   "license": "MIT",
-  "homepage": "https://capsule.sh",
+  "homepage": "https://docs.capsule.sh",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --platform=browser",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch --platform=browser",
