@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
-import { IsPort, IsString, validateSync } from 'class-validator';
+import { IsOptional, IsPort, IsString, validateSync } from 'class-validator';
 import { exit } from 'process';
 
 export class EnvironmentVariables {
@@ -13,6 +13,17 @@ export class EnvironmentVariables {
 
   @IsString()
   OWNER_PASSWORD: string;
+
+  @IsString()
+  IS_CLOUD_PROVIDED: string = 'false';
+
+  @IsOptional()
+  @IsString()
+  CLOUD_CAPSULE_CALLBACK_URL: string | null;
+
+  @IsOptional()
+  @IsString()
+  CLOUD_CAPSULE_URL: string | null;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

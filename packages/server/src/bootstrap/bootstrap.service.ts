@@ -7,10 +7,10 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
-import { UsersRepository } from '../users/users.repository';
-import { ChiselService } from '../chisel/chisel.service';
 import { ApiKeysService } from '../api-keys/api-keys.service';
+import { ChiselService } from '../chisel/chisel.service';
 import { PermissionsRepository } from '../permissions/permissions.repository';
+import { UsersRepository } from '../users/users.repository';
 
 export enum TestEnum {
   ONE = 'ONE',
@@ -36,17 +36,43 @@ export class BootstrapService
     const password = this.configService.get('OWNER_PASSWORD');
     this.logger.log(ownerEmail, password);
     const hashedPassword = bcrypt.hashSync(password, 10);
-    this.usersRepository.createUserIfNotExists(
-      {
-        email: ownerEmail,
-        password: hashedPassword,
-      },
-      UserTypeEnum.OWNER,
-    );
-    const apiKey = this.apiKeysService.createApiKeyIfNotExists(
-      ownerEmail,
-      password,
-    );
+    const user = this.usersRepository.findOneByEmail(ownerEmail);
+    this.logger.debug(`user : ${user}`);
+
+    const apiKey = this.apiKeysService.createApiKeyIfNotExists();
+    if (!user) {
+      this.usersRepository.createUserIfNotExists(
+        {
+          email: ownerEmail,
+          password: hashedPassword,
+        },
+        UserTypeEnum.OWNER,
+      );
+    }
+
+    const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
+    const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
+    const capsuleUrl = this.configService.get('CLOUD_CAPSULE_URL');
+
+    if (isCloudProvided === 'true' && callbackUrl && !user) {
+      this.logger.debug('Sending callback to cloud provider --> ', apiKey);
+      try {
+        await fetch(callbackUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: ownerEmail,
+            apiKey,
+            capsuleUrl,
+          }),
+        });
+      } catch (e: any) {
+        this.logger.error('Error sending callback to cloud provider', e);
+      }
+      this.logger.debug('Application Bootstrap Completed');
+    }
 
     // await this.permissionRepository.createPermissions();
   }

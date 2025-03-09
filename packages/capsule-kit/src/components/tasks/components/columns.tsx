@@ -1,10 +1,10 @@
-import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox.tsx";
-import { DataTableColumnHeader } from "./data-table-column-header";
-import { XIcon } from "lucide-react";
-import { CheckIcon } from "@radix-ui/react-icons";
-import { useMemo } from "react";
 import { GetEntitiesDto } from "@/stores/databases/database.model.ts";
+import { CheckIcon } from "@radix-ui/react-icons";
+import { ColumnDef } from "@tanstack/react-table";
+import { XIcon } from "lucide-react";
+import { useMemo } from "react";
+import { DataTableColumnHeader } from "./data-table-column-header";
 
 function formatColumnTitle(name: string): string {
   return name
@@ -93,7 +93,7 @@ export function useColumnDefs2(table: GetEntitiesDto) {
         enableSorting: false,
         enableHiding: false,
       },
-      ...table.attributes.map(
+      ...table.columns.map(
         (column): ColumnDef<Record<string, unknown>> => ({
           accessorKey: column.name,
           header: ({ column: tableColumn }) => (

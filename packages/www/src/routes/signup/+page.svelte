@@ -16,7 +16,8 @@
 	import { Button } from '$lib/components/ui/button';
 	import { EyeClosedIcon, EyeIcon, Mail } from 'lucide-svelte';
 	import { fly } from 'svelte/transition';
-	import { Turnstile } from 'svelte-turnstile';
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 	const form = superForm(data.form, {
@@ -33,6 +34,7 @@
 	const { form: formData, enhance, errors } = form;
 	let isLoading = $state(false);
 	let isSecondScreen = $state(false);
+	let mounted = $state(false);
 
 	let isOpen = $state(false);
 	let showPassword = $state(false);
@@ -58,10 +60,19 @@
 	function togglePasswordVisibility() {
 		showPassword = !showPassword;
 	}
+
+	onMount(() => {
+		mounted = true;
+		return () => {
+			mounted = false;
+		};
+	});
 </script>
 
 <svelte:head>
-	<script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+	{#if browser}
+		<script async defer src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+	{/if}
 </svelte:head>
 
 {#if !isSecondScreen}
@@ -132,14 +143,15 @@
 						<FormField {form} name="cf-turnstile-response">
 							<FormControl>
 								{#snippet children()}
-									<Turnstile siteKey="0x4AAAAAAA7oFhcbnoayUME5" class="mt-3" />
-
-									<!-- <div
-										class="cf-turnstile mt-3 rounded-s"
-										data-sitekey="0x4AAAAAAA7oFhcbnoayUME5"
-										data-callback="javascriptCallback"
-										data-size="flexible"
-									></div> -->
+									{#if mounted}
+										<div style="display: block; flex-flow: row;">
+											<div
+												class="cf-turnstile mt-3"
+												data-sitekey="0x4AAAAAAA7oFhcbnoayUME5"
+												data-size="flexible"
+											></div>
+										</div>
+									{/if}
 								{/snippet}
 							</FormControl>
 						</FormField>

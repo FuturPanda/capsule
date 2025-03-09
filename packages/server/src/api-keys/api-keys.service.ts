@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { BASE64 } from '../_utils/constants/primitives.constant';
 import { ConfigService } from '@nestjs/config';
-import { ApiKeysRepository } from './api-keys.repository';
-import { ApiKeyTypeEnum } from './_utils/enum/api-key-type.enum';
 import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
+import { BASE64 } from '../_utils/constants/primitives.constant';
+import { ApiKeyTypeEnum } from './_utils/enum/api-key-type.enum';
+import { ApiKeysRepository } from './api-keys.repository';
 
 @Injectable()
 export class ApiKeysService {
@@ -54,14 +54,14 @@ export class ApiKeysService {
     }
   };
 
-  createApiKeyIfNotExists(ownerEmail: string, password: string) {
+  createApiKeyIfNotExists() {
     const apiContent = {
       clientId: uuidv4(),
     };
     const existingApiKey = this.apiKeysRepository.getApiKeyByType(
       ApiKeyTypeEnum.OWNER_UI,
     );
-    console.log('Existing APIKEY ;: ', existingApiKey);
+    console.log('Existing APIKEY : ', existingApiKey);
     if (!existingApiKey) {
       const apiKey = this.encode(apiContent);
       this.logger.log(`API Key: ${apiKey}`);

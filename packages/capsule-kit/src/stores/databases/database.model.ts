@@ -30,8 +30,8 @@ export type GetAttributesDto = {
 
 export type GetEntitiesDto = {
   id: string;
-  name: string;
-  attributes: GetAttributesDto[];
+  tableName: string;
+  columns: GetAttributesDto[];
 };
 export type GetDatabaseDto = {
   id: string;

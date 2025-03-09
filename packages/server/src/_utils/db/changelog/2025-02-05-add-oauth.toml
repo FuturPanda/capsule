@@ -1,0 +1,48 @@
+changeSetId = "20250205-01"
+author = "futurpanda"
+description = "add oauth tokens"
+database = "root"
+
+[[operations]]
+type = "createTable"
+tableName = "oauth_clients"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "name", type = "text", constraints = { notNull = true } },
+    { name = "redirect_uri", type = "text", constraints = { notNull = true } },
+    { name = "allowed_scopes", type = "text", constraints = { notNull = true } },
+    { name = "created_at", type = "timestamp", constraints = { notNull = true } },
+    { name = "updated_at", type = "timestamp"  },
+]
+
+
+[[operations]]
+type = "createTable"
+tableName = "oauth_authorization"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "client_id", type = "integer", constraints = { notNull = true } },
+    { name = "authorized_scopes", type = "text", constraints = { notNull = true } },
+    { name = "created_at", type = "timestamp", constraints = { notNull = true } },
+    { name = "updated_at", type = "timestamp"  },
+]
+foreignKeys = [
+    { baseColumnName = "client_id", referencedTableName = "oauth_client", referencedColumnName = "id", constraintName = "fk_oauth_client_authorization_oauth_client" },
+]
+
+[[operations]]
+type = "createTable"
+tableName = "oauth_refresh_token"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "token", type = "text" , constraints = { notNull = true }  },
+    { name = "client_id", type = "text" },
+    { name = "user_id", type = "integer"},
+    { name = "expires_at", type = "timestamp", constraints = { notNull = true } },
+    { name = "revoked_at", type = "timestamp"  },
+    { name = "created_at", type = "timestamp", constraints = { notNull = true } , defaultValue = "CURRENT_TIMESTAMP" },
+    { name = "updated_at", type = "timestamp"  },
+]
+foreignKeys = [
+    { baseColumnName = "user_id", referencedTableName = "user", referencedColumnName = "id", constraintName = "fk_user_oauth_refresh_token_user" },
+]

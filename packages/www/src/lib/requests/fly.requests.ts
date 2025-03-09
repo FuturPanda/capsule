@@ -1,6 +1,5 @@
 import { env } from '$env/dynamic/private';
 import { adjectives, names, uniqueNamesGenerator } from 'unique-names-generator';
-import { v4 as uuidv4 } from 'uuid';
 
 const FLY_API_HOSTNAME = 'https://api.machines.dev';
 const FLY_GRAPHQL_HOSTNAME = 'https://api.fly.io/graphql';
@@ -16,26 +15,28 @@ export type ResponseCapsuleCreationDto = {
 
 function generateUniqueFlyAppName(): string {
 	const randomName = uniqueNamesGenerator({
-		dictionaries: [adjectives, adjectives, NAMES_DICTIONARY, NAMES_DICTIONARY],
+		dictionaries: [adjectives, adjectives, NAMES_DICTIONARY],
 		separator: '-'
 	});
 
-	return `${randomName}-${uuidv4()}`;
+	return env.ENV_VERSION === 'DEV'
+		? `dev-${randomName}-${Date.now()}`
+		: `${randomName}-${Date.now()}`;
 }
 
 export async function createFlyAppRequest(maxAttempts: number = 5, delayMs: number = 1000) {
 	let attempt = 0;
 	let lastError: any;
 	const data = {
-		app_name: 'comfortable-objective-valentia-dyna-579e9aaa-ee1a-4d1b-bd77-12388b3eddd5', //generateUniqueFlyAppName(),
+		app_name: '',
 		org_slug: 'capsules-801'
 	};
 	const url = `${FLY_API_HOSTNAME}/v1/apps`;
 
 	while (attempt < maxAttempts) {
 		try {
-			const name = generateUniqueFlyAppName();
-			console.log(`Attempt ${attempt + 1}: Trying with name: ${name}`);
+			data.app_name = generateUniqueFlyAppName();
+			console.log(`Attempt ${attempt + 1}: Trying with name: ${data.app_name}`);
 
 			const response = await fetch(url, {
 				method: 'POST',
@@ -48,7 +49,7 @@ export async function createFlyAppRequest(maxAttempts: number = 5, delayMs: numb
 			const result = await response.json();
 
 			if (!result.err) {
-				return { appName: name, result: result };
+				return { appName: data.app_name, result: result };
 			}
 
 			if (result.err?.includes(NAME_ALREADY_EXISTS_ERROR)) {
@@ -96,7 +97,6 @@ export const allocateIpAddressToFlyAppRequest = async (appName: string) => {
 
 		const result = await response.json();
 
-		// GraphQL error handling
 		if (result.errors) {
 			throw new Error(`GraphQL Error: ${result.errors[0].message}`);
 		}
@@ -119,10 +119,19 @@ export const allocateIpAddressToFlyAppRequest = async (appName: string) => {
 	}
 };
 
-export const createFlyMachinesForFlyAppRequest = async (appName: string) => {
+export const createFlyMachinesForFlyAppRequest = async (
+	appName: string,
+	owner_email: string,
+	owner_password: string,
+	volumeId: string
+) => {
 	const data = {
+		name: appName,
 		config: {
-			image: 'docker.io/futurpanda/capsule-back:latest',
+			image:
+				env.ENV_VERSION === 'DEV'
+					? 'docker.io/futurpanda/capsule-back-dev:latest'
+					: 'docker.io/futurpanda/capsule-back:latest',
 			restart: {
 				policy: 'always'
 			},
@@ -132,30 +141,37 @@ export const createFlyMachinesForFlyAppRequest = async (appName: string) => {
 				memory_mb: 1024
 			},
 			env: {
-				OWNER_PASSWORD: 'Np9-eGTWY6Wt*ac@',
-				OWNER_EMAIL: 'sty.hoareau@gmail.com',
-				JWT_SECRET: 'x@FLBG2jPMWnE*6vsfERsz.-ctECr!R@kd',
-				JWT_REFRESH_SECRET: '!BEJCZ7ijytZk7@@MXePAiwXM2T6Hx'
+				OWNER_PASSWORD: owner_password,
+				OWNER_EMAIL: owner_email,
+				JWT_SECRET: generateSecureSecret(),
+				JWT_REFRESH_SECRET: generateSecureSecret(),
+				IS_CLOUD_PROVIDED: 'true',
+				CLOUD_CAPSULE_CALLBACK_URL: `${env.BASE_URL}/api/callback`,
+				CLOUD_CAPSULE_URL: `https://${appName}.fly.dev`
 				// BASE_URL=http://localhost:3000/api/v1
 			},
+			mounts: [
+				{
+					volume: volumeId,
+					path: '/'
+				}
+			],
 			services: [
 				{
 					ports: [
 						{
 							port: 443,
-							handlers: ['http'],
-							force_https: true
+							handlers: ['tls', 'http']
 						},
 						{
 							port: 80,
-							handlers: ['http'],
-							force_https: true
+							handlers: ['http']
 						}
 					],
 					protocol: 'tcp',
 					internal_port: 3000,
 					autostart: true,
-					autostop: 'stop'
+					autostop: 'suspend'
 				}
 			]
 		}
@@ -171,4 +187,64 @@ export const createFlyMachinesForFlyAppRequest = async (appName: string) => {
 	});
 };
 
+export const creeateVolumeForFlyApp = async (appName: string) => {
+	const url = `${FLY_API_HOSTNAME}/v1/apps/${appName}/volumes`;
+	const volumeName = fromAppNameToVolumeName(appName);
+	console.log(volumeName);
+	const data = {
+		name: volumeName,
+		region: 'cdg',
+		size_gb: 10
+	};
+	const response = await fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${env.FLY_API_TOKEN}`
+		},
+		body: JSON.stringify(data)
+	});
+	const result = await response.json();
+	if (result.errors) {
+		throw new Error(`Error creating volume: ${result.errors[0].message}`);
+	}
+	console.log(result);
+
+	return result;
+};
+
 export const emmitSslCertificatesForFlyAppRequest = () => {};
+const fromAppNameToVolumeName = (appName: string) =>
+	appName
+		.toLowerCase()
+		.replace(/[^a-z0-9_]/g, '_')
+		.replace(/_+/g, '_')
+		.replace(/^_|_$/g, '')
+		.split('_')
+		.slice(0, 1)
+		.join('_') +
+	'_' +
+	Date.now() +
+	'_vol';
+
+function generateSecureSecret(length: number = 64, includeSpecialChars: boolean = true): string {
+	const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+	const numbers = '0123456789';
+	const special = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+	let chars = uppercase + lowercase + numbers;
+	if (includeSpecialChars) {
+		chars += special;
+	}
+
+	const cryptoArray = new Uint8Array(length);
+	crypto.getRandomValues(cryptoArray);
+
+	let result = '';
+	for (let i = 0; i < length; i++) {
+		result += chars[cryptoArray[i] % chars.length];
+	}
+
+	return result;
+}
