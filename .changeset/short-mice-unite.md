@@ -1,0 +1,5 @@
+---
+"@capsulesh/capsuler": minor
+---
+
+init
