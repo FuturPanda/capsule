@@ -16,7 +16,6 @@
 		"test": "npm run test:unit -- --run"
 	},
 	"devDependencies": {
-		"@capsule-mono-repo/capsule-client": "file:../capsule-client",
 		"@eslint/compat": "^1.2.3",
 		"@flydotio/dockerfile": "^0.5.9",
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -52,6 +51,8 @@
 		"zod": "^3.24.1"
 	},
 	"dependencies": {
+		"@capsulesh/capsule-client": "^0.0.1",
+		"@capsulesh/shared-types": "^0.1.0",
 		"@fontsource/atkinson-hyperlegible": "^5.1.0",
 		"@fontsource/jetbrains-mono": "^5.1.1",
 		"@tailwindcss/typography": "^0.5.15",

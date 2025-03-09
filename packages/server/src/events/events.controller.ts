@@ -1,5 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { QueryOptionsDto } from 'src/dynamic-queries/_utils/dto/request/query-options.dto';
+import { CreateEventDto } from './dto/request/create-event.dto';
+import { UpdateEventDto } from './dto/request/update-person.dto';
 import { EventsService } from './events.service';
 
 @ApiTags('Events')
@@ -8,36 +20,27 @@ export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  getAllEvents(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return this.eventsService.getAllEvents(page, limit);
-  }
-
-  @Get(':id')
-  getEventById(@Param('id') id: string) {
-    return this.eventsService.getEventById(id);
-  }
-
-  @Get('upcoming')
-  getUpcomingEvents(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return this.eventsService.getUpcomingEvents(page, limit);
-  }
-
-  @Get('calendar')
-  getCalendarEvents(
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
-  ) {
-    return this.eventsService.getCalendarEvents(startDate, endDate);
+  listEvents(@Query() queryOptions: QueryOptionsDto) {
+    return this.eventsService.listEvents(queryOptions);
   }
 
   @Post()
-  createEvent(@Body() createEventDto: any) {
-    return this.eventsService.createEvent(createEventDto);
+  createEvent(@Body() createTaskDto: CreateEventDto) {
+    return this.eventsService.createEvent(createTaskDto);
+  }
+
+  @Get('one')
+  getOneEvent(@Query() queryParams: any) {
+    return this.eventsService.getOneEvent(queryParams);
+  }
+
+  @Patch(':id')
+  updateEvent(@Param('id') id: number, @Body() updateTaskDto: UpdateEventDto) {
+    return this.eventsService.updateEvent(id, updateTaskDto);
+  }
+
+  @Delete(':id')
+  deleteEvent(@Param('id') id: number) {
+    return this.eventsService.deleteEvent(id);
   }
 }

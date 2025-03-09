@@ -1,19 +1,19 @@
-import { Database } from 'better-sqlite3';
-import { ClassType } from './_utils/types/queries.type';
-import { ChiselModel } from './chisel.model';
 import {
+  ClassType,
+  DeleteOptions,
   GroupByOptions,
   HavingOptions,
+  InsertOptions,
   OrderByOptions,
   PaginatedQuery,
   QueryOptions,
   RelationOptions,
   SelectOptions,
-  WhereOptions
-} from './_utils/interfaces/query-option.interface';
-import { InsertOptions } from './_utils/interfaces/insert-option.interface';
-import { UpdateOptions } from './_utils/interfaces/update-option.interface';
-import { DeleteOptions } from './_utils/interfaces/delete-options.interface';
+  UpdateOptions,
+  WhereOptions,
+} from "@capsulesh/shared-types";
+import { Database } from "better-sqlite3";
+import { ChiselModel } from "./chisel.model";
 
 /**
  * Class to queries dynamic models.

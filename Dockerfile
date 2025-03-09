@@ -1,4 +1,4 @@
-FROM node:18-slim AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
@@ -11,18 +11,17 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-COPY packages/chisel/package.json ./packages/chisel/
 COPY packages/server/package.json ./packages/server/
 COPY packages/capsule-kit/package.json ./packages/capsule-kit/
 
 COPY . .
 
 RUN npm install
-RUN npm run build --if-present
+RUN cd packages/server && npm i && npm run build
+RUN cd packages/capsule-kit && npm i && npm run build
 
 
-#RUN cd packages/server && npm ci && npm run build
-#RUN cd packages/capsule-kit && npm ci && npm run build
+
 #RUN cd packages/chisel && npm ci && npm run build
 
 FROM debian:bullseye-slim
@@ -46,12 +45,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY --from=builder /app/packages/chisel/dist ./packages/chisel
 COPY --from=builder /app/packages/server/dist ./packages/server
 COPY --from=builder /app/packages/capsule-kit/dist ./packages/capsule-kit
 
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/packages/chisel/package.json ./packages/chisel/
 COPY --from=builder /app/packages/server/package.json ./packages/server/
 COPY --from=builder /app/packages/capsule-kit/package.json ./packages/capsule-kit/
 

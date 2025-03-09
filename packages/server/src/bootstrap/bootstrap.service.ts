@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { DatabasesRepository } from 'src/databases/databases.repository';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
 import { ApiKeysService } from '../api-keys/api-keys.service';
 import { ChiselService } from '../chisel/chisel.service';
@@ -28,6 +29,7 @@ export class BootstrapService
     private readonly chiselService: ChiselService,
     private readonly apiKeysService: ApiKeysService,
     private readonly permissionRepository: PermissionsRepository,
+    private readonly databaseRepository: DatabasesRepository,
   ) {}
 
   async onApplicationBootstrap(): Promise<any> {
@@ -49,6 +51,7 @@ export class BootstrapService
         UserTypeEnum.OWNER,
       );
     }
+    this.databaseRepository.createDatabase('root', 'root');
 
     const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
     const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');

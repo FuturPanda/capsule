@@ -1,13 +1,13 @@
-import { EditorContent, useEditor } from "@tiptap/react";
-import { forwardRef, useImperativeHandle } from "react";
 import { cn } from "@/lib/utils.ts";
-import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
-import { common, createLowlight } from "lowlight";
-import Document from "@tiptap/extension-document";
-import StarterKit from "@tiptap/starter-kit";
 import { Extension } from "@tiptap/core";
-import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import Document from "@tiptap/extension-document";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { common, createLowlight } from "lowlight";
+import { forwardRef, useImperativeHandle } from "react";
 
 interface TiptapEditorProps {
   content: string;
@@ -114,7 +114,7 @@ export const SqlEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
       <>
         <EditorContent
           className={cn(
-            "border-none text-white placeholder:text-gray-500",
+            "border-none text-white placeholder:text-gray-500 bg-background",
             className,
           )}
           editor={editor}

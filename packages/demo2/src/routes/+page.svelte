@@ -1,11 +1,35 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import useCapsuleClient from '$lib/capsule-client.svelte';
 	import { db, type CalendarEvent } from '$lib/db';
 	import { liveQuery } from 'dexie';
+	import { onMount } from 'svelte';
 
+	let isLoggedIn = $state(false);
 	let currentDate = $state(new Date());
 	let showEventForm = $state(false);
 	let isEditing = $state(false);
 	let editingEventId = $state<number | null>(null);
+
+	let client = useCapsuleClient();
+	let todosWithDueDate = $state([]);
+	let events = $state([]);
+
+	onMount(async () => {
+		isLoggedIn = client.authStatus();
+
+		if (!isLoggedIn) {
+			goto('/login');
+		}
+
+		todosWithDueDate = await client.models.tasks
+			?.select()
+			.where({ due_date: { $neq: null } })
+			.list();
+		events = await client.models.events?.list();
+
+		console.log(events);
+	});
 
 	let newEvent = $state({
 		title: '',
@@ -134,7 +158,9 @@
 
 <main>
 	<h1>Beautiful Calendar</h1>
-
+	<ul>
+		{todosWithDueDate}
+	</ul>
 	<div class="calendar-header">
 		<button onclick={previousMonth}>&lt;</button>
 		<h2>

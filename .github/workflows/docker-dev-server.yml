@@ -52,10 +52,10 @@ jobs:
           tags: futurpanda/capsule-back:latest
           labels: ${{ steps.meta.outputs.labels }}
           
-      - name: Build and push to capsule repository
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: futurpanda/capsule:latest
-          labels: ${{ steps.meta.outputs.labels }}
+      #- name: Build and push to capsule repository
+       # uses: docker/build-push-action@v4
+        #with:
+        #  context: .
+        #  push: true
+        #  tags: futurpanda/capsule:latest
+        #  labels: ${{ steps.meta.outputs.labels }}

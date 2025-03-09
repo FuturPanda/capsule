@@ -1,4 +1,4 @@
 export * from "./event";
-export * from "./people";
+export * from "./person";
 export * from "./task";
 

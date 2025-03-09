@@ -1,11 +1,12 @@
-import { Database } from "better-sqlite3";
-import console from "node:console";
 import {
   ClassType,
   ExecParams,
   FilterQuery,
   QuerySelector,
-} from "./_utils/types/queries.type";
+} from "@capsulesh/shared-types";
+import { Database } from "better-sqlite3";
+import console from "node:console";
+import {} from "..";
 import { fromClassTypeToSnakeCase } from "./_utils/functions/string-converter.function";
 
 type WriteOutput = {
@@ -13,13 +14,18 @@ type WriteOutput = {
   id: number | bigint | null;
   changes: number;
 };
-
 type QueryBuilder = {
-  where: (params: FilterQuery<any>) => any;
-  orderBy?: (column: any, order: "DESC" | "ASC") => any;
+  where: (params: FilterQuery<any>) => QueryBuilder;
+  orderBy?: (column: keyof any, order: "DESC" | "ASC") => QueryBuilder;
   exec: (params?: ExecParams) => any;
-  limit?: (params: number) => any;
-  join?: any;
+  limit?: (params: number) => { exec: (params?: ExecParams) => any };
+  join?: <Local, Foreign>(
+    fromTable: ClassType<Local>,
+    toTable: ClassType<Foreign>,
+    localKey: keyof Local & string,
+    foreignKey: keyof Foreign & string,
+    type?: "INNER" | "LEFT" | "RIGHT",
+  ) => QueryBuilder;
 };
 
 export class ChiselModel<T> {
@@ -33,29 +39,19 @@ export class ChiselModel<T> {
 
   insert(
     params: Partial<Pick<T, keyof T>> | Record<string, string>,
-    opts?: { ignoreExisting: boolean },
+    opts?: { ignoreExisting?: boolean; returning?: boolean },
   ): WriteOutput {
     const query = this.buildInsertQuery(
       Object.keys(params),
       opts?.ignoreExisting,
+      opts?.returning,
     );
-    console.log("QUERYYYYY : ", query);
-    return this.executeWrite(query, Object.values(params));
-  }
 
-  upsert(
-    params: Partial<Pick<T, keyof T>> | Record<string, string>,
-    conflictColumns: (keyof T)[],
-    updateColumns?: (keyof T)[],
-  ): WriteOutput {
-    const keys = Object.keys(params);
-    const baseInsert = this.buildInsertQuery(keys);
-    const conflictClause = this.buildConflictClause(
-      conflictColumns,
-      updateColumns || keys,
+    const values = Object.values(params).map((value) =>
+      typeof value === "boolean" ? (value ? 1 : 0) : value,
     );
-    const query = `${baseInsert} ${conflictClause}`;
-    return this.executeWrite(query, Object.values(params));
+
+    return this.executeWrite(query, values);
   }
 
   insertMany(
@@ -86,15 +82,40 @@ export class ChiselModel<T> {
       ${opts?.ignoreExisting ? "OR IGNORE " : ""}INTO
       ${this.modelName} ` + `(${keys.join(", ")}) VALUES ${placeholders}`;
 
-    const values = rows.flatMap((row) => Object.values(row));
+    const values = rows.flatMap((row) =>
+      Object.values(row).map((value) =>
+        typeof value === "boolean" ? (value ? 1 : 0) : value,
+      ),
+    );
 
+    return this.executeWrite(query, values);
+  }
+
+  upsert(
+    params: Partial<Pick<T, keyof T>> | Record<string, string>,
+    conflictColumns: (keyof T)[],
+    updateColumns?: (keyof T)[],
+  ): WriteOutput {
+    const keys = Object.keys(params);
+    const baseInsert = this.buildInsertQuery(keys);
+    const conflictClause = this.buildConflictClause(
+      conflictColumns,
+      updateColumns || keys,
+    );
+    const query = `${baseInsert} ${conflictClause}`;
+
+    const values = Object.values(params).map((value) =>
+      typeof value === "boolean" ? (value ? 1 : 0) : value,
+    );
     return this.executeWrite(query, values);
   }
 
   select(dto?: Record<string, `${string}.${string}`>): QueryBuilder {
     let query = this.buildSelectQuery(dto);
-    const exec = (params?: ExecParams): T[] | T | undefined =>
-      this.executeSelect(query, params);
+    const exec = (params?: ExecParams): T[] | T | undefined => {
+      const results = this.executeSelect(query, params);
+      return this.convertBooleanFields(results);
+    };
 
     const queryBuilder: QueryBuilder = {
       where: (params: FilterQuery<T>) => {
@@ -134,7 +155,47 @@ export class ChiselModel<T> {
   update(params: { [P in keyof T]?: T[P] }): QueryBuilder {
     const entries = Object.entries(params);
     const placeholders = entries.map(([key]) => `${key} = ?`);
-    const values = entries.map(([_, value]) => value);
+    const values = entries.map(([_, value]) => {
+      console.log("IN update model ::: ", value);
+      if (typeof value === "boolean") {
+        return value ? 1 : 0;
+      }
+      return value;
+    });
+    console.log("BEFORE UYPDATE MODEL ==== ", values, params);
+
+    let query = `UPDATE ${this.modelName}
+                 SET ${placeholders.join(", ")} `;
+
+    const exec = () => this.executeWrite(query, values);
+
+    const queryBuilder: QueryBuilder = {
+      where: (params: FilterQuery<T>) => {
+        const { whereQuery, whereValues } =
+          this.buildWhereClauseWithParams(params);
+        query += whereQuery;
+        return {
+          exec: () => this.executeWrite(query, [...values, ...whereValues]),
+        } as QueryBuilder;
+      },
+      exec,
+    };
+
+    return queryBuilder;
+  }
+  /*
+
+  update(params: { [P in keyof T]?: T[P] }): QueryBuilder {
+    const entries = Object.entries(params);
+    const placeholders = entries.map(([key]) => `${key} = ?`);
+    const values = entries.map(([_, value]) => {
+      console.log("IN update model ::: ", value);
+      if (typeof value === "boolean") {
+        return value ? 1 : 0;
+      }
+      return value;
+    });
+    console.log("BEFORE UYPDATE MODEL ==== ", values, params);
 
     let query = `UPDATE ${this.modelName}
                  SET ${placeholders.join(", ")} `;
@@ -153,30 +214,38 @@ export class ChiselModel<T> {
       exec,
     };
   }
-
+*/
   delete(): QueryBuilder {
     let query = `DELETE
-                 FROM ${this.modelName} `;
+               FROM ${this.modelName} `;
     const exec = () => this.executeWrite(query, []);
 
-    return {
+    const queryBuilder: QueryBuilder = {
       where: (params: FilterQuery<T>) => {
         query += this.buildWhereClause(params);
-        return { exec };
+        return {
+          exec,
+        } as QueryBuilder;
       },
       exec,
     };
+
+    return queryBuilder;
   }
 
-  private buildInsertQuery(keys: string[], ignoreExisting = false): string {
+  private buildInsertQuery(
+    keys: string[],
+    ignoreExisting = false,
+    returning = false,
+  ): string {
     const placeholders = keys.map(() => "?").join(", ");
-    return `INSERT
-    ${ignoreExisting ? "OR IGNORE " : ""}INTO
-    ${this.modelName}
-    (
-    ${keys.join(", ")}
-    )
-    VALUES (${placeholders})`;
+    let query = `INSERT ${ignoreExisting ? "OR IGNORE " : ""}INTO ${this.modelName} (${keys.join(", ")}) VALUES (${placeholders})`;
+
+    if (returning) {
+      query += ` RETURNING *`;
+    }
+
+    return query;
   }
 
   private buildConflictClause(
@@ -191,11 +260,41 @@ export class ChiselModel<T> {
     return `ON CONFLICT(${conflictColumns.join(", ")}) DO UPDATE SET ${updates}`;
   }
 
+  private convertBooleanFields<R>(
+    results: R[] | R | undefined,
+  ): R[] | R | undefined {
+    if (!results) return results;
+
+    if (Array.isArray(results)) {
+      return results.map((item) => this.convertSingleItemBooleanFields(item));
+    } else {
+      return this.convertSingleItemBooleanFields(results);
+    }
+  }
+
+  private convertSingleItemBooleanFields<R>(item: R): R {
+    if (!item) return item;
+
+    const result = { ...item };
+
+    for (const key in result) {
+      const value = result[key];
+      if (
+        (key.startsWith("is_") || key.startsWith("has_")) &&
+        (value === 0 || value === 1)
+      ) {
+        result[key] = Boolean(value) as any;
+      }
+    }
+
+    return result;
+  }
+
   private executeWrite(query: string, values: unknown[]): WriteOutput {
-    console.log("BEFORE EXE = ", query);
     try {
       const stmt = this.db.prepare(query);
       const res = stmt.run(values);
+      console.log("After EXEC WRITE ::::::: ", res);
       return {
         success: res.changes > 0,
         id: res.lastInsertRowid,

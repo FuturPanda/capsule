@@ -1,15 +1,8 @@
+import type { Task } from '@capsule-mono-repo/capsule-client';
 import Dexie, { type Table } from 'dexie';
 
-export interface Todo {
-	id?: number;
-	text: string;
-	completed: boolean;
-	createdAt: Date;
-	dueDate?: Date | null;
-}
-
 export class TodoDB extends Dexie {
-	todos!: Table<Todo>;
+	todos!: Table<Task>;
 
 	constructor() {
 		super('TodoDB');

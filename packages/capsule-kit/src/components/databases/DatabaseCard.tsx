@@ -23,17 +23,18 @@ export function DatabaseCard({ database }: DatabaseCardProps) {
     <Link
       onClick={() => setSelectedDatabase(database.id)}
       to={`/data/${database.id}`}
+      className="block transition-transform hover:-translate-y-1"
     >
-      <Card className="cursor-pointer hover:shadow-md transition-shadow">
+      <Card className="border bg-background hover:border-teal-500/30 transition-colors">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DatabaseIcon className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-zinc-100">
+            <DatabaseIcon className="h-5 w-5 text-teal-500" />
             {database.name}
           </CardTitle>
-          <CardDescription>SQLite</CardDescription>
+          <CardDescription className="text-zinc-400">SQLite</CardDescription>
         </CardHeader>
         <CardContent>
-          <p>Tables: {database.entities.length}</p>
+          <p className="text-zinc-300">Tables: {database.entities.length}</p>
         </CardContent>
       </Card>
     </Link>

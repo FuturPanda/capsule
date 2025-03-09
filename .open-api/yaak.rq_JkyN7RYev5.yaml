@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_JkyN7RYev5
+createdAt: 2025-03-29T15:45:59.636346
+updatedAt: 2025-03-29T15:46:17.145957
+workspaceId: wk_oXrjn67t3d
+folderId: fl_6ovYv4DZ86
+authentication:
+  token: ${[ token ]}
+authenticationType: bearer
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: 999.9998
+url: ${[ BASE_URL ]}/databases
+urlParameters: []

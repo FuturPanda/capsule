@@ -1,22 +1,26 @@
+import { InsertOptions } from '@capsulesh/shared-types';
 import { Injectable } from '@nestjs/common';
+import { DatabasesRepository } from 'src/databases/databases.repository';
 import { ChiselService } from '../chisel/chisel.service';
-import { InsertOptions } from '@capsulesh/chisel';
-import { QueryOptionsDto } from './_utils/dto/request/query-options.dto';
 import { DeleteOptionsDto } from './_utils/dto/request/delete-options.dto';
+import { QueryOptionsDto } from './_utils/dto/request/query-options.dto';
+import { SafeSqlStatement } from './_utils/dto/request/safe-sql-statement.dto';
 import { UpdateOptionsDto } from './_utils/dto/request/update-options.dto';
 import { QueryParams } from './_utils/types/params.type';
-import { SafeSqlStatement } from './_utils/dto/request/safe-sql-statement.dto';
 
 @Injectable()
 export class DynamicQueriesService {
-  constructor(private readonly chiselService: ChiselService) {}
+  constructor(
+    private readonly chiselService: ChiselService,
+    private readonly databaseRepository: DatabasesRepository,
+  ) {}
 
-  async query(
-    { clientId, dbName, tableName }: QueryParams,
-    queryOptions: QueryOptionsDto,
-  ) {
-    const db = this.chiselService.getConnection(clientId, dbName);
-    return db.query(tableName, queryOptions);
+  async query(database: string, table: string, queryOptions: QueryOptionsDto) {
+    const { name, client_id } =
+      this.databaseRepository.findDatabaseByName(database);
+    const db = this.chiselService.getConnection(client_id, name);
+
+    return db.query(table, queryOptions);
   }
 
   async insert(

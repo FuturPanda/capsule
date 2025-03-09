@@ -1,4 +1,8 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  ScopesAndClientIdentifier,
+  ScopesAndClientIdentifierType,
+} from 'src/_utils/decorators/scopes.decorator';
 import { CreateDatabaseDto } from './_utils/dto/request/create-database.dto';
 import { DatabasesService } from './databases.service';
 
@@ -9,28 +13,25 @@ export class DatabasesController {
   @Post()
   createDatabase(
     @Body() createDatabaseDto: CreateDatabaseDto,
-    @Req() request: Request,
+    @ScopesAndClientIdentifier()
+    { clientIdentifier }: ScopesAndClientIdentifierType,
   ) {
-    const apiKey = request.headers['client-id'];
-    console.log('in database creation controller');
-    return this.databasesService.createDatabase(createDatabaseDto, apiKey);
+    return this.databasesService.createDatabase(
+      createDatabaseDto,
+      clientIdentifier,
+    );
   }
 
   @Get()
-  getAllDatabase() {
-    return this.databasesService.getAllDatabases();
+  getAllDatabase(
+    @ScopesAndClientIdentifier()
+    { clientIdentifier }: ScopesAndClientIdentifierType,
+  ) {
+    return this.databasesService.getAllDatabases(clientIdentifier);
   }
 
-  /* @Put('database/:dbId')
-	 updateDatabase(
-		 @Param('dbId') dbId: string,
-		 @Body() updateDatabaseDto: UpdateDatabaseDto,
-	 ) {
-		 return this.databasesService.updateDatabase(dbId, updateDatabaseDto);
-	 }
-
-	 @Delete('database')
-	 deleteDatabase(@Param('dbId') dbId: string) {
-		 return this.databasesService.deleteDatabase(dbId);
-	 }*/
+  @Delete('database')
+  deleteDatabase(@Param('dbId') dbId: number) {
+    return this.databasesService.deleteDatabase(dbId);
+  }
 }

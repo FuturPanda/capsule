@@ -17,7 +17,6 @@ columns = [
     { name = "type", type = "text", constraints = { nullable = false }, enumValues = ["OWNER", "USER", "CLIENT"] }
 ]
 
-# API Key table
 [[operations]]
 type = "createTable"
 tableName = "api_key"
@@ -26,7 +25,6 @@ columns = [
     { name = "type", type = "text", constraints = { nullable = false }, enumValues = ["PUBLIC", "PRIVATE", "OWNER_UI"] }
 ]
 
-# Permission table
 [[operations]]
 type = "createTable"
 tableName = "permission"
@@ -36,7 +34,6 @@ columns = [
     { name = "type", type = "text", enumValues = ["DATABASE_LEVEL_PERMISSION", "ACTION_LEVEL_PERMISSION"] }
 ]
 
-# API Key Permission table
 [[operations]]
 type = "createTable"
 tableName = "api_key_permission"
@@ -48,9 +45,8 @@ foreignKeys = [
     { baseColumnName = "api_key_id", referencedTableName = "api_key", referencedColumnName = "value", constraintName = "fk_api_key_permission_api_key" },
     { baseColumnName = "permission_id", referencedTableName = "permission", referencedColumnName = "id", constraintName = "fk_api_key_permission_permission" }
 ]
-primaryKey = { columnNames = ["api_key_id", "permission_id"] }
+primaryKey =  ["api_key_id", "permission_id"]
 
-# Database table
 [[operations]]
 type = "createTable"
 tableName = "database"
@@ -58,51 +54,4 @@ columns = [
     { name = "id", type = "integer", autoIncrement = true, constraints = { primaryKey = true, nullable = false } },
     { name = "name", type = "text", constraints = { nullable = false, unique = true } },
     { name = "client_id", type = "text", constraints = { nullable = false} }
-]
-
-# Database Permission table
-[[operations]]
-type = "createTable"
-tableName = "database_permission"
-columns = [
-    { name = "database_id", type = "integer", constraints = { nullable = false } },
-    { name = "permission_id", type = "integer", constraints = { nullable = false } }
-]
-foreignKeys = [
-    { baseColumnName = "database_id", referencedTableName = "database", referencedColumnName = "id", constraintName = "fk_database_permission_database" },
-    { baseColumnName = "permission_id", referencedTableName = "permission", referencedColumnName = "id", constraintName = "fk_database_permission_permission" }
-]
-primaryKey = { columnNames = ["database_id", "permission_id"] }
-
-
-# Entity table
-[[operations]]
-type = "createTable"
-tableName = "database_entity"
-columns = [
-    { name = "id", type = "integer", autoIncrement = true, constraints = { primaryKey = true, nullable = false } },
-    { name = "database_id", type = "integer", constraints = { nullable = false } },
-    { name = "entity_name", type = "text", constraints = { nullable = false } }
-]
-foreignKeys = [
-    { baseColumnName = "database_id", referencedTableName = "database", referencedColumnName = "id", constraintName = "fk_entity_database" },
-]
-uniqueConstraints = [
-    "database_id", "entity_name"
-]
-
-# Entity Attribute table
-[[operations]]
-type = "createTable"
-tableName = "entity_attribute"
-columns = [
-    { name = "id", type = "integer", autoIncrement = true, constraints = { primaryKey = true, nullable = false } },
-    { name = "database_entity_id", type = "integer", constraints = { nullable = false } },
-    { name = "name", type = "text", constraints = { nullable = false } },
-    { name = "type", type = "text", constraints = { nullable = false } },
-    { name = "is_required", type = "integer", constraints = { nullable = false } },
-    { name = "is_primary_key", type = "integer", constraints = { nullable = false } }
-]
-foreignKeys = [
-    { baseColumnName = "database_entity_id", referencedTableName = "database_entity", referencedColumnName = "id", constraintName = "fk_entity_attribute_database_entity" }
 ]

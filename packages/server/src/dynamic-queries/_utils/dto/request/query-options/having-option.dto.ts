@@ -1,15 +1,14 @@
-import { BaseRecordDto } from './base-record.dto';
-import {
-  HavingOptions,
-  T_ComparisonOperator,
-  T_HavingFunction,
-} from '@capsulesh/chisel';
-import { Type } from 'class-transformer';
-import { IsIn } from 'class-validator';
 import {
   COMPARISON_OPERATORS,
   HAVING_FUNCTIONS,
-} from '../../../constants/query-options.constant';
+  HavingOptions,
+  T_ComparisonOperator,
+  T_HavingFunction,
+} from '@capsulesh/shared-types';
+import { Type } from 'class-transformer';
+import { IsIn } from 'class-validator';
+
+import { BaseRecordDto } from './base-record.dto';
 
 export class HavingOptionsDto
   extends BaseRecordDto<HavingConditionDto>

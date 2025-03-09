@@ -1,11 +1,14 @@
+import {
+    ColInfoType,
+    IFactoryOpts,
+    Migration,
+    MigrationOperation,
+} from "@capsulesh/shared-types";
 import Database from "better-sqlite3";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import pino from "pino";
-import { ColInfoType } from "./_utils/types/database.type";
-import { Migration } from "./_utils/types/migrations.type";
-import { IFactoryOpts } from "./_utils/types/queries.type";
 import { ChiselQuerable } from "./chisel.querable";
 import { generateSQLCommands } from "./migrations";
 
@@ -72,6 +75,10 @@ export class ChiselDb extends ChiselQuerable {
       }
     }
     return this;
+  }
+
+  applyOperations(operations: MigrationOperation[]) {
+    return this.executeOperations(operations);
   }
 
   applyMigrations(migrations: Migration[]) {
@@ -165,8 +172,8 @@ export class ChiselDb extends ChiselQuerable {
     return !!result;
   }
 
-  private executeMigration(migration: Migration, filename: string = "opde") {
-    for (const operation of migration.operations) {
+  private executeOperations(operations: MigrationOperation[]) {
+    for (const operation of operations) {
       const commands = generateSQLCommands(operation);
 
       this.db.transaction(() => {
@@ -175,7 +182,10 @@ export class ChiselDb extends ChiselQuerable {
         }
       })();
     }
+  }
 
+  private executeMigration(migration: Migration, filename: string = "opde") {
+    this.executeOperations(migration.operations);
     const hashedContent = crypto
       .createHash("sha256")
       .update(migration.operations.join(""))

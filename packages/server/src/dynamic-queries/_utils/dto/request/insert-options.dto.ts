@@ -1,4 +1,4 @@
-import { InsertOptions } from '@capsulesh/chisel';
+import { InsertOptions, OnConflictActionEnum } from '@capsulesh/shared-types';
 import {
   ArrayMinSize,
   IsArray,
@@ -7,12 +7,6 @@ import {
   IsString,
 } from 'class-validator';
 import { Optional } from 'class-validator-extended';
-
-export enum OnConflictActionEnum {
-  IGNORE = 'IGNORE',
-  REPLACE = 'REPLACE',
-  UPDATE = 'UPDATE',
-}
 
 export class OnConflictOptsDto {
   @IsArray()

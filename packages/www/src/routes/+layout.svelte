@@ -4,7 +4,6 @@
 </script>
 
 <div class="">
-	<!-- <LoadingAnimation /> -->
 	<ModeWatcher />
 	<slot />
 </div>

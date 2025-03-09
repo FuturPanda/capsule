@@ -1,7 +1,6 @@
+import { SnapshotType, TableOptions } from "@capsulesh/shared-types";
 import * as fs from "fs";
 import * as path from "path";
-import { SnapshotType } from "./_utils/types/snapshot.type";
-import { TableOptions } from "./_utils/types/schema.type";
 
 export interface IFlintParams {
   dir?: string;

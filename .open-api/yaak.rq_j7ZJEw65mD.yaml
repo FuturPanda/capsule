@@ -1,0 +1,27 @@
+type: http_request
+model: http_request
+id: rq_j7ZJEw65mD
+createdAt: 2025-03-09T17:44:26.192811
+updatedAt: 2025-03-29T14:29:53.247204
+workspaceId: wk_oXrjn67t3d
+folderId: fl_KkxHSSFxJM
+authentication:
+  token: ''
+authenticationType: bearer
+body:
+  text: |-
+    {
+      "content": "from yaak"
+    }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: vvzRHD32Ae
+method: POST
+name: BASE_URL/tasks
+sortPriority: 4000.0
+url: ${[ BASE_URL ]}/tasks
+urlParameters: []

@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button.tsx";
 import {
   Form,
   FormControl,
@@ -7,18 +8,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { createFileRoute } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Textarea } from "@/components/ui/textarea.tsx";
-import { Database } from "lucide-react";
 import { useBoundStore } from "@/stores/global.store.ts";
-import { useMemo } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { userRequests } from "@/stores/users/user.request.ts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const profileFormSchema = z.object({
   username: z
@@ -80,11 +79,10 @@ export const Profile = () => {
   }
 
   return (
-    <div className="flex flex-col h-full w-full bg-zinc-950">
+    <div className="flex flex-col h-full w-full bg-background">
       <div className="px-6 py-4 border-b border-zinc-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Database className="w-5 h-5 text-zinc-400" />
             <h2 className="text-lg font-semibold text-zinc-100">Account</h2>
           </div>
         </div>
@@ -107,7 +105,7 @@ export const Profile = () => {
                     <Input
                       placeholder="Capsule"
                       {...field}
-                      className="bg-zinc-900 border-none text-white"
+                      className="bg-background focus-visible:ring-1 rounded-md focus-visible:ring-ring border text-white"
                     />
                   </FormControl>
                   <FormDescription className="text-zinc-400">
@@ -128,7 +126,7 @@ export const Profile = () => {
                     <Input
                       placeholder="hello@capsule.com"
                       {...field}
-                      className="bg-zinc-900 border-none text-white"
+                      className="bg-background border focus-visible:ring-1 rounded-md focus-visible:ring-ring  text-white"
                     />
                   </FormControl>
 
@@ -147,7 +145,7 @@ export const Profile = () => {
                     <Input
                       placeholder="https://avatar.com/avatar1"
                       {...field}
-                      className="bg-zinc-900 border-none text-white"
+                      className="bg-background focus-visible:ring-1 rounded-md focus-visible:ring-ring  border text-white"
                     />
                   </FormControl>
 
@@ -164,7 +162,7 @@ export const Profile = () => {
                   <FormControl>
                     <Textarea
                       placeholder="Tell us a little bit about yourself"
-                      className="resize-none bg-zinc-900 border-none text-white min-h-[100px]"
+                      className="resize-none bg-background border text-white min-h-[100px]"
                       {...field}
                     />
                   </FormControl>
@@ -174,7 +172,7 @@ export const Profile = () => {
 
             <Button
               type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-transparent text-ring border hover:bg-ring  hover:text-white"
             >
               Update profile
             </Button>

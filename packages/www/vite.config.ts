@@ -9,7 +9,7 @@ export default defineConfig({
 	},
 	build: {
 		rollupOptions: {
-			external: ['@capsule-mono-repo/capsule-client']
+			external: ['@capsulesh/capsule-client']
 		}
 	}
 });

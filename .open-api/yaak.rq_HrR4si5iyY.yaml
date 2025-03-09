@@ -1,0 +1,18 @@
+type: http_request
+model: http_request
+id: rq_HrR4si5iyY
+createdAt: 2025-03-29T16:38:24.379728
+updatedAt: 2025-03-29T16:39:48.027801
+workspaceId: wk_oXrjn67t3d
+folderId: fl_vQAJp5Kxa7
+authentication: {}
+authenticationType: null
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: 999.9997
+url: ${[ BASE_URL ]}/dynamic-queries/root/api_key
+urlParameters: []

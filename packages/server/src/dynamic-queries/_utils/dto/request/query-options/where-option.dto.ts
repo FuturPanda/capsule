@@ -1,6 +1,5 @@
+import { T_WhereOperator, WHERE_OPERATORS } from '@capsulesh/shared-types';
 import { IsBoolean, IsIn, IsString } from 'class-validator';
-import { T_WhereOperator } from '@capsulesh/chisel';
-import { WHERE_OPERATORS } from '../../../constants/query-options.constant';
 import { Optional } from 'class-validator-extended';
 
 export class WhereConditionDto {

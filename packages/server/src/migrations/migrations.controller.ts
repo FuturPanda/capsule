@@ -1,6 +1,10 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
-import { MigrationsService } from './migrations.service';
+import { Body, Controller, Post } from '@nestjs/common';
+import {
+    ScopesAndClientIdentifier,
+    ScopesAndClientIdentifierType,
+} from 'src/_utils/decorators/scopes.decorator';
 import { CheckMigrationDto } from './_utils/dto/request/check-migration.dto';
+import { MigrationsService } from './migrations.service';
 
 @Controller('migrations')
 export class MigrationsController {
@@ -8,10 +12,14 @@ export class MigrationsController {
 
   @Post('/check')
   runMigration(
-    @Req() request: Request,
+    @ScopesAndClientIdentifier()
+    { clientIdentifier }: ScopesAndClientIdentifierType,
     @Body() checkMigrationDto: CheckMigrationDto,
   ) {
-    const apiKey = request.headers['client-id'];
-    return this.migrationsService.runMigrations(apiKey, checkMigrationDto);
+
+    return this.migrationsService.runMigrations(
+      clientIdentifier,
+      checkMigrationDto,
+    );
   }
 }

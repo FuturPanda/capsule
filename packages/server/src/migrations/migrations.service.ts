@@ -29,11 +29,7 @@ export class MigrationsService {
       const tableInfos = tables.map((t) =>
         this.databaseMapper.toTableDefinition(t, db.getTableInfo(t)),
       );
-      this.databasesService.saveDatabaseInfo(
-        migration.database,
-        tableInfos,
-        apiKey,
-      );
+      this.databasesService.saveDatabaseInfo(migration.database, apiKey);
       return { dbName: migration.database, tableInfos: tableInfos };
     }
   }

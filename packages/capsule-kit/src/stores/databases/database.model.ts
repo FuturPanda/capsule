@@ -1,4 +1,4 @@
-import { ColumnOptions } from "@capsulesh/chisel";
+import { ColumnOptions } from "@capsulesh/shared-types";
 
 export type Database = {
   id: string;

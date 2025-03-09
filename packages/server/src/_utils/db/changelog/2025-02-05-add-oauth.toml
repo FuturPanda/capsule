@@ -32,6 +32,22 @@ foreignKeys = [
 
 [[operations]]
 type = "createTable"
+tableName = "database_permission"
+columns = [
+    { name = "database_id", type = "integer", constraints = { nullable = false } },
+    { name = "oauth_autorization_id", type = "integer", constraints = { nullable = false } }
+]
+foreignKeys = [
+    { baseColumnName = "database_id", referencedTableName = "database", referencedColumnName = "id", constraintName = "fk_database_permission_database" },
+    { baseColumnName = "oauth_autorization_id", referencedTableName = "oauth_authorization", referencedColumnName = "id", constraintName = "fk_database_oauth_autorization_id" }
+]
+primaryKey =  ["database_id", "oauth_autorization_id"]
+
+
+
+
+[[operations]]
+type = "createTable"
 tableName = "oauth_refresh_token"
 columns = [
     { name = "id", type = "integer", constraints = { primaryKey = true } },

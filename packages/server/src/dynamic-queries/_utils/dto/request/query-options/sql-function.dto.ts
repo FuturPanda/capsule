@@ -1,6 +1,5 @@
+import { SQL_FUNCTIONS, T_SqlFunction } from '@capsulesh/shared-types';
 import { IsIn, IsOptional, IsString } from 'class-validator';
-import { T_SqlFunction } from '@capsulesh/chisel';
-import { SQL_FUNCTIONS } from '../../../constants/query-options.constant';
 
 export class SqlFunctionDto {
   @IsString()

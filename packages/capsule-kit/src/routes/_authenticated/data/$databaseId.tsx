@@ -1,106 +1,134 @@
+import { CustomCombobox } from "@/components/ComboBoxDatabase";
 import { Button } from "@/components/ui/button.tsx";
-import { Card } from "@/components/ui/card.tsx";
-import { cn } from "@/lib/utils.ts";
+import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useBoundStore } from "@/stores/global.store.ts";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
 import {
   createFileRoute,
-  Link,
   Outlet,
+  useNavigate,
   useParams,
 } from "@tanstack/react-router";
-import {
-  BarChart3,
-  ChevronRight,
-  Database,
-  FileText,
-  Search,
-} from "lucide-react";
-import { useState } from "react";
+import { PlusCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Form, useForm } from "react-hook-form";
+import { z } from "zod";
+import { CreateDatabaseFormValues } from ".";
+
+const formSchema = z.object({
+  name: z.string().min(2).max(100),
+});
 
 const DatabaseScreen = () => {
+  const navigate = useNavigate();
+  const form = useForm<CreateDatabaseFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+    },
+  });
   const { databaseId } = useParams({
     from: "/_authenticated/data/$databaseId",
   });
   const findDb = useBoundStore((state) => state.findDatabase);
   const database = findDb(databaseId);
-  const [activeTable, setActiveTable] = useState("");
+  const [selectedTable, setSelectedTable] = useState(null);
 
-  // Function to get appropriate icon based on table name
-  const getTableIcon = (tableName) => {
-    if (
-      tableName.toLowerCase().includes("database") ||
-      tableName.toLowerCase().includes("changelog")
-    ) {
-      return <Database className="h-4 w-4 mr-2" />;
-    } else if (tableName.toLowerCase().includes("content")) {
-      return <FileText className="h-4 w-4 mr-2" />;
-    } else if (tableName.toLowerCase().includes("query")) {
-      return <Search className="h-4 w-4 mr-2" />;
-    } else {
-      return <BarChart3 className="h-4 w-4 mr-2" />;
+  const onSubmit = () => {};
+
+  useEffect(() => {
+    if (database?.entities && database.entities.length > 0) {
+      // Set the selected table in the store
+      setSelectedTable(database.entities[0]);
+
+      // Navigate to the first table
+      navigate({
+        to: "/data/$databaseId/$tableName",
+        params: {
+          databaseId: databaseId,
+          tableName: database.entities[0].tableName,
+        },
+      });
     }
-  };
+  }, []);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 w-full">
-      <Card
-        className={cn(
-          "w-full lg:w-[320px] h-auto lg:h-[calc(var(--sidebar-height)_-_10px)]",
-        )}
-      >
-        <div className="p-4 border-b">
-          <h2 className="text-xl lg:text-2xl font-bold tracking-tight flex items-center">
-            <Database className="h-5 w-5 mr-2" /> Tables
-          </h2>
-        </div>
-
-        <div className="p-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {database?.entities.map((table) => (
-            <Button
-              key={table.id}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start text-left font-normal mb-1 p-3",
-                "transition-all duration-200 ease-in-out",
-                activeTable === table.tableName ? "bg-muted" : "",
-                "rounded-lg group",
-              )}
-              onClick={() => setActiveTable(table.tableName)}
-            >
-              <Link
-                to="/data/$databaseId/$tableName"
-                params={{ databaseId: databaseId, tableName: table.tableName }}
-                className="w-full flex items-center"
-                activeOptions={{ exact: true }}
-              >
-                <div className="flex items-center w-full">
-                  <div className="flex flex-col flex-grow">
-                    <span className="font-medium">{table.tableName}</span>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </Link>
-            </Button>
-          ))}
-        </div>
-      </Card>
-
-      <Card
-        className={cn(
-          "w-full lg:flex-1 h-auto lg:h-[calc(var(--sidebar-height)_-_10px)]",
-        )}
-      >
-        <div className="h-full flex flex-col">
-          <div className="border-b p-4">
-            <h3 className="text-lg font-medium">
-              {activeTable ? activeTable : "Select a table"}
-            </h3>
+    <div className="hidden h-2/3 w-full px-20 m-auto flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="flex gap-4">
+            <h2 className="text-2xl font-bold tracking-tight">
+              {database?.name.slice(0, 1).toUpperCase() +
+                database?.name.slice(1)}
+            </h2>
+            <CustomCombobox
+              choiceLabel="Tables"
+              choices={database?.entities ?? []}
+              nameKey="tableName"
+              selected={selectedTable}
+              callback={(table: GetEntities) => {
+                setSelectedTable(table);
+                navigate({
+                  to: "/data/$databaseId/$tableName",
+                  params: {
+                    databaseId: databaseId,
+                    tableName: table.tableName,
+                  },
+                });
+              }}
+            />
           </div>
-          <div className="flex-grow p-4 overflow-auto">
-            <Outlet />
-          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button onClick={() => {}} className="border">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Database
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md border-zinc-800/50 bg-background">
+              <DialogHeader>
+                <DialogTitle className="custom-text text-xl font-light text-zinc-100">
+                  Create Database
+                </DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex flex-col gap-4 py-3"></div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter className="flex justify-end pt-2">
+                    <Button
+                      type="submit"
+                      className="bg-transparent border hover:bg-ring text-ring hover:text-white"
+                    >
+                      Create
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
-      </Card>
+        <Outlet />
+      </div>
     </div>
   );
 };

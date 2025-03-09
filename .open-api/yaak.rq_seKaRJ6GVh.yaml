@@ -1,0 +1,40 @@
+type: http_request
+model: http_request
+id: rq_seKaRJ6GVh
+createdAt: 2025-03-09T18:08:39.008601
+updatedAt: 2025-03-29T14:29:53.247244
+workspaceId: wk_oXrjn67t3d
+folderId: fl_KkxHSSFxJM
+authentication:
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRJZGVudGlmaWVyIjoiYmVhdXRpZnVsdG9kbzo6aHR0cDovL2xvY2FsaG9zdDo1MTczL2xvZ2luIiwic2NvcGVzIjoicHJvZmlsZTpyZWFkLHRhc2tzOnJlYWQsdGFza3M6d3JpdGUiLCJpYXQiOjE3NDIwMzM0NDMsImV4cCI6MTc0MjAzNDM0M30.KS0ezB2_1hiWAfDIluTCizFfdjqVKwsRLee_NEzhVrM
+authenticationType: bearer
+body:
+  text: ''
+bodyType: null
+description: ''
+headers:
+- enabled: true
+  name: Cache-Control
+  value: no-cache
+  id: xzHM5ib4PI
+- enabled: true
+  name: Connection
+  value: keep-alive
+  id: 2HMhXmWHRU
+- enabled: true
+  name: ''
+  value: ''
+  id: Zp83wshUEJ
+method: GET
+name: ''
+sortPriority: 3000.0
+url: ${[ BASE_URL ]}/reactivity/events
+urlParameters:
+- enabled: false
+  name: eventType[0]
+  value: tasks
+  id: cX6QkbjgJT
+- enabled: true
+  name: ''
+  value: ''
+  id: 23SvVkzFQK

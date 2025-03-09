@@ -5,13 +5,12 @@ import starlightThemeBlack from 'starlight-theme-black'
 
 // https://astro.build/config
 export default defineConfig({
-      site: "https://docs.capsule.sh",
+    site: "https://docs.capsule.sh",
 	integrations: [
 		starlight({
-			title: 'Capsule',
+			title: 'capsule',
 			customCss: [
-        './src/css/global.css',
-      ],
+			'./src/css/custom.css'      ],
 			social: {
 				github: 'https://github.com/withastro/starlight',
 			},

@@ -1,13 +1,248 @@
 :root {
-  --sl-color-accent-low: #ffffff;
-  --sl-color-accent: #ffffff;
-  --sl-color-accent-high: #2c394c;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #e8eef8;
-  --sl-color-gray-2: #c1c9d5;
-  --sl-color-gray-3: #96a5bc;
-  --sl-color-gray-4: #4b596e;
-  --sl-color-gray-5: #2c394c;
-  --sl-color-gray-6: #0000;
-  --sl-color-black: #0000;
+  /* Monochromatic palette with minimal teal accent */
+  --sl-color-accent-low: rgba(20, 184, 166, 0.05);
+  --sl-color-accent: rgb(20, 184, 166);
+  --sl-color-accent-high: rgb(13, 148, 136);
+
+  /* Deep blue-black background colors - much darker */
+  --sl-color-black: #000810; /* Almost black with slight blue hint */
+  --sl-color-gray-6: #01060f; /* Very dark blue-black */
+  --sl-color-gray-5: #010a14; /* Extremely dark blue */
+  --sl-color-gray-4: #011019; /* Dark navy */
+
+  /* Muted text colors */
+  --sl-color-gray-3: #555a66;
+  --sl-color-gray-2: #888d99;
+  --sl-color-gray-1: #cccfd9;
+  --sl-color-white: #f5f5f7;
+
+  /* Content width */
+  --sl-content-width: 50rem;
+}
+
+/* Sleek background for all containers */
+html,
+body,
+.sl-container {
+  background: var(--sl-color-black);
+}
+
+/* Clean typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6 {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  font-weight: 300;
+  color: var(--sl-color-white);
+  letter-spacing: -0.02em;
+}
+
+/* Subtle card styling */
+.sl-card {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+/* Minimalist button styling */
+.sl-btn {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+  font-weight: 400;
+}
+
+.sl-btn-primary {
+  background-color: var(--sl-color-gray-5);
+  color: var(--sl-color-white);
+  border: 1px solid var(--sl-color-gray-4);
+}
+
+.sl-btn-primary:hover {
+  background-color: var(--sl-color-accent);
+  border-color: var(--sl-color-accent);
+  color: #000;
+}
+
+.sl-btn-outline {
+  border: 1px solid var(--sl-color-gray-4);
+  color: var(--sl-color-gray-1);
+}
+
+.sl-btn-outline:hover {
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-accent);
+  background-color: transparent;
+}
+
+/* Clean code blocks */
+pre,
+code {
+  background-color: var(--sl-color-gray-6) !important;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 2px;
+}
+
+/* Subtle link styling */
+a {
+  color: var(--sl-color-gray-1);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--sl-color-accent);
+  text-decoration: none;
+}
+
+/* Sidebar styling - now matching main dark blue theme */
+.sl-sidebar {
+  background-color: white;
+  border-right: 3px solid white;
+}
+
+.sl-sidebar-nav {
+  padding: 1rem;
+}
+
+.sl-sidebar h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sl-color-gray-3);
+  margin-top: 1.5rem;
+}
+
+.sl-sidebar a {
+  color: var(--sl-color-gray-1);
+  font-size: 0.9rem;
+  padding: 0.3rem 0;
+}
+
+.sl-sidebar a:hover,
+.sl-sidebar a[aria-current="page"] {
+  color: var(--sl-color-accent);
+  background-color: transparent;
+}
+
+/* Topbar styling - now matching main dark blue theme */
+.sl-topbar {
+  background-color: var(--sl-color-black);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+/* Logo styling */
+.sl-logo {
+  opacity: 0.9;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  color: var(--sl-color-gray-2);
+  font-weight: 500;
+}
+
+td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--sl-color-gray-6);
+}
+
+/* Separator styling */
+hr {
+  border: none;
+  border-top: 1px solid var(--sl-color-gray-5);
+  margin: 2rem 0;
+}
+
+/* Remove unnecessary gradients and effects */
+.sl-markdown-content :not(pre) > code {
+  background-color: rgba(0, 8, 16, 0.3) !important;
+  border: none;
+  color: var(--sl-color-gray-1);
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+}
+
+/* Focus on content */
+.sl-markdown-content {
+  line-height: 1.6;
+  color: var(--sl-color-gray-2);
+}
+
+/* Make important content stand out subtly */
+.sl-markdown-content strong {
+  color: var(--sl-color-white);
+  font-weight: 500;
+}
+
+/* Blockquote styling */
+blockquote {
+  border-left: 2px solid var(--sl-color-gray-4);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: var(--sl-color-gray-2);
+  font-style: italic;
+}
+
+/* Ensure consistent background for any other elements */
+.sl-container > *,
+main,
+.sl-page,
+.sl-sidebar-header,
+.sl-page-header,
+.sl-content-wrapper {
+  background-color: var(--sl-color-black);
+}
+
+/* Ensure proper coloring for sidebar elements */
+.sl-sidebar-header {
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+/* Mobile menu button */
+.sl-mobile-menu-button {
+  color: var(--sl-color-white);
+  background-color: var(--sl-color-gray-6);
+}
+
+/* Search input styling */
+.sl-search {
+  background-color: var(--sl-color-gray-6);
+}
+
+/* Footer styling */
+.sl-footer {
+  background-color: var(--sl-color-black);
+  border-top: 1px solid var(--sl-color-gray-5);
 }
