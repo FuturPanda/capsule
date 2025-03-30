@@ -1,75 +1,30 @@
 import { Injectable } from '@nestjs/common';
+import { QueryOptionsDto } from 'src/dynamic-queries/_utils/dto/request/query-options.dto';
+import { CreateEventDto } from './dto/request/create-event.dto';
+import { UpdateEventDto } from './dto/request/update-person.dto';
+import { EventsMapper } from './events.mapper';
+import { EventsRepository } from './events.repository';
 
 @Injectable()
 export class EventsService {
-  constructor() {}
-
-  async getAllEvents(page: number, limit: number) {
-    return {
-      data: [
-        {
-          id: '1',
-          title: 'Team Meeting',
-          description: 'Weekly team sync',
-          startDate: '2025-07-15T14:00:00Z',
-          endDate: '2025-07-15T15:00:00Z',
-          location: 'Conference Room A',
-          attendees: ['user1', 'user2'],
-          organizer: 'user1',
-          status: 'scheduled',
-          type: 'meeting',
-          createdAt: '2025-07-10T10:00:00Z',
-          updatedAt: '2025-07-10T10:00:00Z',
-        },
-      ],
-      meta: {
-        total: 1,
-        page,
-        limit,
-        totalPages: 1,
-      },
-    };
+  constructor(
+    private readonly eventsMapper: EventsMapper,
+    private readonly eventsRepository: EventsRepository,
+  ) {}
+  deleteEvent(id: number) {
+    throw new Error('Method not implemented.');
   }
-
-  async getEventById(id: string) {
-    return {
-      id,
-      title: 'Team Meeting',
-      description: 'Weekly team sync',
-      startDate: '2025-07-15T14:00:00Z',
-      endDate: '2025-07-15T15:00:00Z',
-      location: 'Conference Room A',
-      attendees: ['user1', 'user2'],
-      organizer: 'user1',
-      status: 'scheduled',
-      type: 'meeting',
-      createdAt: '2025-07-10T10:00:00Z',
-      updatedAt: '2025-07-10T10:00:00Z',
-    };
+  updateEvent(id: number, updateTaskDto: UpdateEventDto) {
+    throw new Error('Method not implemented.');
   }
-
-  async getUpcomingEvents(page: number, limit: number) {
-    return this.getAllEvents(page, limit);
+  getOneEvent(queryParams: any) {
+    throw new Error('Method not implemented.');
   }
-
-  async getCalendarEvents(startDate: string, endDate: string) {
-    return [
-      {
-        id: '1',
-        title: 'Team Meeting',
-        startDate: '2025-07-15T14:00:00Z',
-        endDate: '2025-07-15T15:00:00Z',
-        type: 'meeting',
-      },
-    ];
+  createEvent(createEventDto: CreateEventDto) {
+    const event = this.eventsRepository.createEvent(createEventDto);
   }
-
-  async createEvent(createEventDto: any) {
-    return {
-      id: '2',
-      ...createEventDto,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+  listEvents(queryOptions: QueryOptionsDto) {
+    const events = this.eventsRepository.findAllEvents();
+    return this.eventsMapper.toGetEventsDto(events);
   }
 }

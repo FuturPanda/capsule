@@ -1,5 +1,5 @@
-import { TableOptions } from '@capsulesh/chisel';
 import { IsOptional, IsString } from 'class-validator';
+import { TableOptions } from '@capsulesh/shared-types';
 
 export class CreateDatabaseDto {
   @IsString()

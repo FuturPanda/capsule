@@ -1,49 +1,50 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { QueryOptionsDto } from 'src/dynamic-queries/_utils/dto/request/query-options.dto';
+import { CreateTaskDto } from './dto/request/create-task.dto';
+import { UpdateTaskDto } from './dto/request/update-task.dto';
 import { TasksService } from './tasks.service';
 
-@Controller('events/tasks')
+@Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  getAllTasks(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return this.tasksService.getAllTasks(page, limit);
-  }
-
-  @Get(':id')
-  getTaskById(@Param('id') id: string) {
-    return this.tasksService.getTaskById(id);
-  }
-
-  @Post(':id/complete')
-  markAsCompleted(@Param('id') id: string) {
-    return this.tasksService.markTaskAsCompleted(id);
-  }
-
-  @Get('assignee/:assigneeId')
-  getTasksByAssignee(
-    @Param('assigneeId') assigneeId: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return this.tasksService.getTasksByAssignee(assigneeId, page, limit);
-  }
-
-  @Get('due-soon')
-  getTasksDueSoon(@Query('days') days: number = 7) {
-    return this.tasksService.getTasksDueSoon(days);
-  }
-
-  @Get('overdue')
-  getOverdueTasks() {
-    return this.tasksService.getOverdueTasks();
+  listTasks(@Query() queryOptions: QueryOptionsDto) {
+    console.log('Query params::::::', JSON.stringify(queryOptions));
+    return this.tasksService.listTasks(queryOptions);
   }
 
   @Post()
-  createTask(@Body() createTaskDto: any) {
+  createTask(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.createTask(createTaskDto);
+  }
+
+  @Get('one')
+  getOneTask(@Query() queryParams: any) {
+    return this.tasksService.getOneTask(queryParams);
+  }
+
+  @Patch(':id')
+  updateTask(@Param('id') id: number, @Body() updateTaskDto: UpdateTaskDto) {
+    return this.tasksService.updateTask(id, updateTaskDto);
+  }
+
+  @Delete(':id')
+  deleteTask(@Param('id') id: number) {
+    return this.tasksService.deleteTask(id);
+  }
+
+  @Get('tasks/paginated')
+  getPaginatedTasks(@Query() queryParams: any) {
+    return this.tasksService.getPaginatedTasks(queryParams);
   }
 }

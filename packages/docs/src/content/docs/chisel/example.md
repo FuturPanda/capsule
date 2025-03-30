@@ -177,6 +177,34 @@ const migration = {
 db.applyMigrations([migration]);
 ```
 
+## Using Triggers with Migrations
+
+Chisel now supports adding SQLite triggers through migrations. Here's an example of how to define a trigger:
+
+```toml
+[[operations]]
+type = "addTrigger"
+[operations.trigger]
+name = "trigger_name"
+table = "table_name"
+timing = "BEFORE" | "AFTER" | "INSTEAD OF"
+event = "INSERT" | "UPDATE" | "DELETE"
+for_each = "ROW" | "STATEMENT"
+when = "condition"
+statements = """
+  SQL statements to execute
+  when the trigger fires
+```
+
+Triggers are useful for tasks like:
+
+- Automatically updating timestamps
+- Maintaining audit logs
+- Enforcing complex business rules
+- Updating calculated fields
+
+This implementation enhances the Chisel library to support trigger creation as part of database migrations. The design follows the existing patterns in the codebase and provides a flexible way to define triggers with various options supported by SQLite.
+
 ## 5. Performance Considerations
 
 ### 5.1 Query Optimization
@@ -275,3 +303,11 @@ db.applyMigrations([migration]);
 ## 10. Conclusion
 
 `@capsulesh/chisel` provides a robust, type-safe interface for SQLite databases with a focus on developer experience and performance. By combining the simplicity of SQLite with the power of a modern ORM, Chisel enables rapid development of applications that require a reliable, embedded database solution.
+
+```
+
+```
+
+```
+
+```

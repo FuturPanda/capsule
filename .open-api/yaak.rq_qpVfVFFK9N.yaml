@@ -1,0 +1,30 @@
+type: http_request
+model: http_request
+id: rq_qpVfVFFK9N
+createdAt: 2025-03-15T11:26:47.897764
+updatedAt: 2025-03-29T14:29:53.246820
+workspaceId: wk_oXrjn67t3d
+folderId: fl_KkxHSSFxJM
+authentication: {}
+authenticationType: bearer
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: 2000.0
+url: ${[ BASE_URL ]}/tasks
+urlParameters:
+- enabled: true
+  name: where[due_date][operator]
+  value: neq
+  id: rF0CJd5NHy
+- enabled: true
+  name: where[due_date][value]
+  value: 'null'
+  id: s0aumPfVCA
+- enabled: true
+  name: ''
+  value: ''
+  id: ehAhFgzaEI

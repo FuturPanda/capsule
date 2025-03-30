@@ -11,6 +11,6 @@ function loadMigration(filename: string): Migration {
 
 export const migrations: Migration[] = [
   loadMigration('2024-12-13-initial-database.toml'),
-  loadMigration('2024-12-13-add-test.toml'),
   loadMigration('2025-02-05-add-oauth.toml'),
+  loadMigration('2025-03-24-add-resources.toml'),
 ];

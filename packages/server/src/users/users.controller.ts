@@ -62,12 +62,13 @@ export class UsersController {
     @Res() response: Response,
   ) {
     const refreshToken = request.cookies['refresh_token'];
-    if (refreshToken) {
+    const tokenRecord = this.authService.validateRefreshToken(refreshToken);
+    if (refreshToken && tokenRecord) {
       const consentUrl = await this.usersService.createConsentUrl(
-        refreshToken,
         query.client_identifier,
         query.redirect_uri,
         query.scopes,
+        tokenRecord.token,
       );
       response.redirect(consentUrl);
     }
@@ -75,12 +76,17 @@ export class UsersController {
       redirect_uri: query.redirect_uri,
       scopes: query.scopes,
       client_identifier: query.client_identifier,
+      error: query.error ? 'Wrong email or password' : '',
+      email: query.email,
     };
   }
 
   @Get('consent')
   @Render('consent')
-  async getConsentPage(@Query() query: any, @Req() request: Request) {
+  async getConsentPage(
+    @Query() query: OauthQueryDto & { session_id: string },
+    @Req() request: Request,
+  ) {
     const refreshToken = request.cookies['refresh_token'];
     return this.usersService.manageConsentRequest(query, refreshToken);
   }
@@ -93,18 +99,25 @@ export class UsersController {
     @Query()
     query: OauthQueryDto,
   ) {
-    const { refreshToken, consentUrl } = await this.usersService.loginViaOauth(
-      loginUserDto,
-      query.client_identifier,
-      query.redirect_uri,
-      query.scopes,
-    );
-    response.cookie('refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-    });
-    return response.redirect(consentUrl);
+    console.log('loginOauthUser', loginUserDto);
+    console.log('loginOauthUser', query);
+    const { refreshToken, redirectUrl, error } =
+      await this.usersService.loginViaOauth(
+        loginUserDto,
+        query.client_identifier,
+        query.redirect_uri,
+        query.scopes,
+      );
+    if (error) {
+      return response.redirect(redirectUrl);
+    } else {
+      response.cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+      });
+      return response.redirect(redirectUrl);
+    }
   }
 
   @Post('oauth/consent')

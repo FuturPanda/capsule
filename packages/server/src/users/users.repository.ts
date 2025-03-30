@@ -1,10 +1,11 @@
-import { ChiselId, ChiselModel } from '@capsulesh/chisel';
+import { ChiselModel } from '@capsulesh/chisel';
 import { Injectable } from '@nestjs/common';
 import { UserTypeEnum } from '../_utils/schemas/root.schema';
 import { InjectModel } from '../chisel/chisel.module';
 import { CreateUserDto } from './_utils/dto/request/create-user.dto';
 import { User } from '../_utils/models/root/user';
 import { UpdateProfileDto } from './_utils/dto/request/update-profile.dto';
+import { ChiselId } from '@capsulesh/shared-types';
 
 @Injectable()
 export class UsersRepository {

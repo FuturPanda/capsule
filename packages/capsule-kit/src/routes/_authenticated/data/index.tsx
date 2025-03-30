@@ -8,21 +8,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog.tsx";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input.tsx";
-import { databaseRequest } from "@/stores/databases/database.request.ts";
+import { useCapsuleClient } from "@/hooks/use-capsule-client";
+import { toast } from "@/hooks/use-toast";
 import { useBoundStore } from "@/stores/global.store.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
-import { useEffect } from "react";
+import { PlusCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -33,104 +27,103 @@ const formSchema = z.object({
 export type CreateDatabaseFormValues = z.infer<typeof formSchema>;
 
 export const DataDashboard = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<CreateDatabaseFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
     },
   });
-  const query = useQuery({
-    queryKey: ["databases"],
-    queryFn: databaseRequest.getAllDatabases,
-  });
-  const setDatabases = useBoundStore((state) => state.setDatabases);
-  const mutation = useMutation({
-    mutationFn: (dbDto: CreateDatabaseFormValues) => {
-      return databaseRequest.createDatabase(dbDto);
-    },
-  });
-  const onSubmit = (values: CreateDatabaseFormValues) => {
-    console.log(values);
-    console.log("HELLOOOOOOOO");
-    mutation.mutate(values);
+  const client = useCapsuleClient();
+
+  const loadDatabases = async () => {
+    setIsLoading(true);
+    try {
+      const databases = await client?.getAllDatabases();
+      console.log(databases);
+      setDatabases(databases);
+    } catch (error) {
+      toast({
+        title: `Failed to load Databases`,
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const setDatabases = useBoundStore((state) => state.setDatabases);
+  const databases = useBoundStore((state) => state.databases);
+  const onSubmit = (values: CreateDatabaseFormValues) => {
+    client?.createDatabase(values);
+  };
+
   useEffect(() => {
-    setDatabases(query.data ?? []);
-  }, [query.data, setDatabases]);
+    loadDatabases();
+  }, []);
 
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Databases</h2>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Create Database</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Create Database</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <div className="flex flex-col gap-4 py-3">
-                          <Input
-                            id="name"
-                            placeholder="Database name..."
-                            className="w-full"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter className="flex justify-end pt-2">
-                  {/* <DialogClose asChild> */}
-                  <Button type="submit">Create</Button>
-                  {/* </DialogClose> */}
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {query.isLoading ? (
-        <div className="flex justify-center p-8">
-          <p>Loading databases...</p>
+    <div className="hidden h-2/3 w-full px-20 m-auto flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold tracking-tight">Databases</h2>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button onClick={() => {}} className="border">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Database
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md border-zinc-800/50 bg-background">
+              <DialogHeader>
+                <DialogTitle className="custom-text text-xl font-light text-zinc-100">
+                  Create Database
+                </DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-8"
+                >
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="flex flex-col gap-4 py-3">
+                            <Input
+                              id="name"
+                              placeholder="Enter database name..."
+                              className="w-full border rounded-md bg-transparent text-white"
+                              {...field}
+                            />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter className="flex justify-end pt-2">
+                    <Button
+                      type="submit"
+                      className="bg-transparent border hover:bg-ring text-ring hover:text-white"
+                    >
+                      Create
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
-      ) : query.data?.length ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {query.data.map((db) => (
+          {databases.map((db) => (
             <DatabaseCard key={db.id} database={db} />
           ))}
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center p-8 text-center">
-          <p className="text-muted-foreground mb-4">No databases found</p>
-          <p className="text-sm text-muted-foreground">
-            Create your first database to get started
-          </p>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

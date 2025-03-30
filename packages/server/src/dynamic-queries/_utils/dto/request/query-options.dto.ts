@@ -1,15 +1,15 @@
+import { QueryOptions } from '@capsulesh/shared-types';
 import { Type } from 'class-transformer';
 import { IsBoolean, ValidateNested } from 'class-validator';
-import { QueryOptions } from '@capsulesh/chisel';
-import { SelectOptionsDto } from './query-options/select-options.dto';
-import { WhereConditionDto } from './query-options/where-option.dto';
-import { OrderByOptionsDto } from './query-options/order-by-options.dto';
-import { PaginatedQueryDto } from './paginated-query.dto';
-import { RelationOptionsDto } from './query-options/relation-option.dto';
-import { GroupByOptionsDto } from './query-options/group-by-options.dto';
-import { HavingOptionsDto } from './query-options/having-option.dto';
 import { Optional } from 'class-validator-extended';
 import { KeyValue } from '../../../../_utils/decorators/key-value.decorator';
+import { PaginatedQueryDto } from './paginated-query.dto';
+import { GroupByOptionsDto } from './query-options/group-by-options.dto';
+import { HavingOptionsDto } from './query-options/having-option.dto';
+import { OrderByOptionsDto } from './query-options/order-by-options.dto';
+import { RelationOptionsDto } from './query-options/relation-option.dto';
+import { SelectOptionsDto } from './query-options/select-options.dto';
+import { WhereConditionDto } from './query-options/where-option.dto';
 
 export class QueryOptionsDto implements QueryOptions {
   @Optional()

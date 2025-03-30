@@ -4,6 +4,7 @@ import { PermissionsService } from 'src/permissions/permissions.service';
 import { SurrealService } from 'src/surreal/surreal.service';
 import { v4 } from 'uuid';
 import { LoginUserDto } from './_utils/dto/request/login-user.dto';
+import { OauthQueryDto } from './_utils/dto/request/oauth.dto';
 import { UpdateProfileDto } from './_utils/dto/request/update-profile.dto';
 import { UsersMapper } from './users.mapper';
 import { UsersRepository } from './users.repository';
@@ -41,7 +42,10 @@ export class UsersService {
     return this.usersMapper.toPublicProfile(user);
   }
 
-  async manageConsentRequest(query: any, refreshToken: string) {
+  async manageConsentRequest(
+    query: OauthQueryDto & { session_id: string },
+    refreshToken: string,
+  ) {
     if (!query.session_id) {
       throw new UnauthorizedException('Invalid session');
     }
@@ -51,6 +55,7 @@ export class UsersService {
     if (!sessionData) {
       throw new UnauthorizedException('Session expired');
     }
+
     this.authService.validateRefreshToken(refreshToken);
     const userData = this.authService.getUserDataFromToken(refreshToken);
 
@@ -73,14 +78,13 @@ export class UsersService {
   manageAuthorization() {}
 
   async createConsentUrl(
-    refreshToken: string,
     client_identifier: string,
     redirect_uri: string,
     scopes: string,
+    token: string,
   ): Promise<string> | null {
     try {
-      const tokenRecord = this.authService.validateRefreshToken(refreshToken);
-      const userData = this.authService.getUserDataFromToken(tokenRecord.token);
+      const userData = this.authService.getUserDataFromToken(token);
       if (userData) {
         const sessionToken = v4();
         const session = await this.surrealService.createSession(
@@ -102,33 +106,57 @@ export class UsersService {
     }
   }
 
+  createLoginUrl(
+    client_identifier: string,
+    redirect_uri: string,
+    scopes: string,
+    error?: string,
+    email?: string,
+  ): string {
+    return `/api/v1/users/login?redirect_uri=${redirect_uri}&scopes=${scopes}&client_identifier=${client_identifier}&email=${email}&error=${error}`;
+  }
+
   async loginViaOauth(
     loginUserDto: LoginUserDto,
     client_identifier: string,
     redirect_uri: string,
     scopes: string,
   ) {
-    const output: { consentUrl: string; refreshToken: string } = {
-      consentUrl: '',
+    const output: {
+      redirectUrl: string;
+      refreshToken: string;
+      error: any | null;
+    } = {
+      redirectUrl: '',
       refreshToken: '',
+      error: null,
     };
     try {
       const loginResult = await this.loginUser(loginUserDto);
+      console.log('Login result::: ', loginResult);
       if (loginResult && loginResult.user) {
         output.refreshToken = loginResult.refresh_token;
         const consentUrl = await this.createConsentUrl(
-          loginResult.refresh_token,
           client_identifier,
           redirect_uri,
           scopes,
+          loginResult.refresh_token,
         );
+        console.log('Consent URL::: ', consentUrl);
 
-        output.consentUrl = consentUrl;
+        output.redirectUrl = consentUrl;
       } else {
         throw new UnauthorizedException('Invalid Crédentials');
       }
     } catch (error) {
-      throw new Error('Error logging in via OAuth');
+      output.error = error;
+      output.redirectUrl = this.createLoginUrl(
+        client_identifier,
+        redirect_uri,
+        scopes,
+        error.message,
+        loginUserDto.email,
+      );
     }
     return output;
   }
@@ -153,7 +181,7 @@ export class UsersService {
     if (body.approved === 'true') {
       const singleUseTokenRecord =
         await this.surrealService.createSingleUseToken(
-          sessionData.clientIdentifier,
+          `${sessionData.clientIdentifier.replace(/\s+/g, '').trim().toLowerCase()}::${sessionData.redirectUri.replace(/\s+/g, '').trim().toLowerCase()}`,
           sessionData.id,
         );
       return { singleUseToken: singleUseTokenRecord.token };
@@ -177,6 +205,7 @@ export class UsersService {
     const updatedRecord = await this.surrealService.updateSingleUseToken(
       singleUseTokenRecord.id,
     );
+    console.log('IN EXCHANGE :::: updated record ::  ', updatedRecord);
     const sessionData = await this.surrealService.getSessionById(
       updatedRecord.sessionId,
     );
@@ -185,7 +214,7 @@ export class UsersService {
       sessionData.userId as number,
     );
     const tokens = this.authService.generateThirdPartyTokens(
-      updatedRecord.clientIdentifier,
+      updatedRecord.identifier,
       sessionData.scopes,
       user,
     );

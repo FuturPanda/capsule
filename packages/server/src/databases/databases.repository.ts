@@ -1,4 +1,5 @@
-import { ChiselId, ChiselModel } from '@capsulesh/chisel';
+import { ChiselModel } from '@capsulesh/chisel';
+import { ChiselId } from '@capsulesh/shared-types';
 import { Injectable } from '@nestjs/common';
 import { Database } from '../_utils/models/root/database';
 import { DatabaseEntity } from '../_utils/models/root/entity';
@@ -22,6 +23,12 @@ export class DatabasesRepository {
       { ignoreExisting: true },
     );
   };
+
+  findDatabaseByName = (name: string): Database =>
+    this.databaseModel
+      .select()
+      .where({ name: { $eq: name } })
+      .exec({ one: true });
 
   findAllDatabase = () => this.databaseModel.select().exec();
 
@@ -48,4 +55,8 @@ export class DatabasesRepository {
       is_required: isRequired,
       is_primary_key: isPrimaryKey,
     });
+
+  deleteDatabase(dbId: number) {
+    return this.databaseModel.delete().where({ id: dbId }).exec();
+  }
 }

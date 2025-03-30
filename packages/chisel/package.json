@@ -28,6 +28,7 @@
   "license": "MIT",
   "homepage": "https://capsule.sh",
   "dependencies": {
+    "@capsulesh/shared-types": "^0.1.0",
     "better-sqlite3": "^11.3.0",
     "pino": "^9.4.0",
     "unique-names-generator": "^4.7.1",

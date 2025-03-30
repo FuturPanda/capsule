@@ -31,5 +31,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@capsulesh/shared-types": "^0.1.0",
+    "sse.js": "^2.6.0"
   }
 }

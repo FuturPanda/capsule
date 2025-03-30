@@ -1,7 +1,6 @@
-import { BaseRecordDto } from './base-record.dto';
-import { T_OrderOpts } from '@capsulesh/chisel';
+import { ORDER_OPTIONS, T_OrderOpts } from '@capsulesh/shared-types';
 import { IsIn } from 'class-validator';
-import { ORDER_OPTIONS } from '../../../constants/query-options.constant';
+import { BaseRecordDto } from './base-record.dto';
 
 export class OrderByOptionsDto extends BaseRecordDto<T_OrderOpts> {
   @IsIn(ORDER_OPTIONS, { each: true })

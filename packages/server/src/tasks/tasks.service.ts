@@ -1,133 +1,53 @@
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { TaskEvents } from 'src/_utils/decorators/event-emitter.decorator';
+import { QueryOptionsDto } from 'src/dynamic-queries/_utils/dto/request/query-options.dto';
+import { CreateTaskDto } from './dto/request/create-task.dto';
+import { UpdateTaskDto } from './dto/request/update-task.dto';
+import { TasksMapper } from './tasks.mapper';
+import { TasksRepository } from './tasks.repository';
 
 @Injectable()
 export class TasksService {
-  constructor() {}
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly tasksRepository: TasksRepository,
+    private readonly tasksMapper: TasksMapper,
+  ) {}
 
-  async getAllTasks(page: number, limit: number) {
-    return {
-      data: [
-        {
-          id: '1',
-          title: 'Complete project proposal',
-          description: 'Finalize the project proposal document',
-          dueDate: '2025-07-20T23:59:59Z',
-          assignee: 'user1',
-          priority: 'high',
-          progress: 50,
-          completed: false,
-          type: 'task',
-          createdAt: '2025-07-10T10:00:00Z',
-          updatedAt: '2025-07-12T15:30:00Z',
-        },
-      ],
-      meta: {
-        total: 1,
-        page,
-        limit,
-        totalPages: 1,
-      },
-    };
+  @TaskEvents.emitCreated()
+  async createTask(createTaskDto: CreateTaskDto) {
+    const result = this.tasksRepository.createTask(createTaskDto);
+    const createdTask = this.tasksRepository.findTaskById(result.id);
+    return this.tasksMapper.toGetTaskDto(createdTask);
   }
 
-  async getTaskById(id: string) {
-    return {
-      id,
-      title: 'Complete project proposal',
-      description: 'Finalize the project proposal document',
-      dueDate: '2025-07-20T23:59:59Z',
-      assignee: 'user1',
-      priority: 'high',
-      progress: 50,
-      completed: false,
-      type: 'task',
-      createdAt: '2025-07-10T10:00:00Z',
-      updatedAt: '2025-07-12T15:30:00Z',
-    };
+  @TaskEvents.emitUpdated()
+  async updateTask(id: number, updateTaskDto: UpdateTaskDto) {
+    console.log('updating ::: ', updateTaskDto);
+    this.tasksRepository.updateTaskById(id, updateTaskDto);
+    const updatedTask = this.tasksRepository.findTaskById(id);
+    return this.tasksMapper.toGetTaskDto(updatedTask);
   }
 
-  async markTaskAsCompleted(id: string) {
-    return {
-      id,
-      title: 'Complete project proposal',
-      description: 'Finalize the project proposal document',
-      dueDate: '2025-07-20T23:59:59Z',
-      assignee: 'user1',
-      priority: 'high',
-      progress: 100,
-      completed: true,
-      completedAt: new Date().toISOString(),
-      type: 'task',
-      createdAt: '2025-07-10T10:00:00Z',
-      updatedAt: new Date().toISOString(),
-    };
+  @TaskEvents.emitDeleted()
+  async deleteTask(id: number) {
+    this.tasksRepository.deleteTaskById(id);
+    return id;
   }
 
-  async getTasksByAssignee(assigneeId: string, page: number, limit: number) {
-    return {
-      data: [
-        {
-          id: '1',
-          title: 'Complete project proposal',
-          description: 'Finalize the project proposal document',
-          dueDate: '2025-07-20T23:59:59Z',
-          assignee: assigneeId,
-          priority: 'high',
-          progress: 50,
-          completed: false,
-          type: 'task',
-          createdAt: '2025-07-10T10:00:00Z',
-          updatedAt: '2025-07-12T15:30:00Z',
-        },
-      ],
-      meta: {
-        total: 1,
-        page,
-        limit,
-        totalPages: 1,
-      },
-    };
+  getPaginatedTasks(queryParams: any) {
+    return this.tasksRepository.findAllTasks();
   }
 
-  async getTasksDueSoon(days: number) {
-    return [
-      {
-        id: '1',
-        title: 'Complete project proposal',
-        description: 'Finalize the project proposal document',
-        dueDate: '2025-07-20T23:59:59Z',
-        assignee: 'user1',
-        priority: 'high',
-        progress: 50,
-        completed: false,
-        type: 'task',
-      },
-    ];
+  getOneTask(queryParams: any) {
+    throw new Error('Method not implemented.');
   }
 
-  async getOverdueTasks() {
-    return [
-      {
-        id: '2',
-        title: 'Submit expense report',
-        description: 'Submit monthly expense report',
-        dueDate: '2025-07-05T23:59:59Z',
-        assignee: 'user1',
-        priority: 'medium',
-        progress: 25,
-        completed: false,
-        type: 'task',
-      },
-    ];
-  }
-
-  async createTask(createTaskDto: any) {
-    return {
-      id: '3',
-      ...createTaskDto,
-      type: 'task',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+  listTasks(queryOptions: QueryOptionsDto) {
+    const tasks = this.tasksRepository.findAllTasks(queryOptions);
+    console.log('List tasksssss', tasks);
+    if (!tasks) return;
+    return this.tasksMapper.toGetTasksDto(tasks);
   }
 }

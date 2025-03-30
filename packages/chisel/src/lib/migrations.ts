@@ -1,4 +1,4 @@
-import { Column, MigrationOperation } from "./_utils/types/migrations.type";
+import { Column, MigrationOperation } from "@capsulesh/shared-types";
 
 export const generateSqlFromCommandArray = (operations: MigrationOperation[]) =>
   operations.map((op) => generateSQLCommands(op));
@@ -9,6 +9,12 @@ export function generateSQLCommands(operation: MigrationOperation): string[] {
   switch (operation.type) {
     case "createTable":
       commands = generateCreateTableSQL(operation);
+      break;
+    case "addForeignKey":
+      commands = generateAddForeignKeySQL(operation);
+      break;
+    default:
+      throw new Error(`Unsupported operation type: ${operation.type}`);
   }
 
   return commands;
@@ -55,56 +61,56 @@ function buildColumnDefinition(column: Column): string {
   return parts.join(" ");
 }
 
+function escapeIdentifier(identifier: string): string {
+  return `"${identifier.replace(/"/g, '""')}"`;
+}
+
 export const generateCreateTableSQL = (
   operation: MigrationOperation,
 ): string[] => {
-  if (
-    operation.primaryKey?.columnNames?.length <= 0 &&
-    Object.values(operation.columns).every((it) => !it.constraints?.primaryKey)
-  )
-    throw new Error(`${operation.tableName} require a primary key`);
-  if (
-    operation.primaryKey &&
-    Object.values(operation.columns).some((it) => it.constraints?.primaryKey)
-  )
+  const hasPrimaryKeyColumns = Object.values(operation.columns).some(
+    (it) => it.constraints?.primaryKey,
+  );
+  const hasCompositePrimaryKey = operation.primaryKey?.length > 0;
+
+  if (!hasPrimaryKeyColumns && !hasCompositePrimaryKey) {
+    throw new Error(`${operation.tableName} requires a primary key`);
+  }
+
+  if (hasPrimaryKeyColumns && hasCompositePrimaryKey) {
     throw new Error(
-      `${operation.tableName} should only have a one primary key declaration`,
+      `${operation.tableName} should have only one primary key declaration (either column-level or table-level)`,
     );
+  }
 
   const columnsSQL = operation.columns.map((col) => buildColumnDefinition(col));
 
-  /*if (operation.indexes)
-    operation.indexes.forEach((indexName) =>
-      columnsSQL.push(
-        `CREATE INDEX ${escapeIdentifier(indexName)} ON ${escapeIdentifier(operation.)} (${escapeIdentifier(
-          field,
-        )});`,
-      ),
-    );*/
-  if (operation.primaryKey)
+  if (hasCompositePrimaryKey) {
     columnsSQL.push(
-      `PRIMARY KEY (${operation.primaryKey?.columnNames?.map((it) => ` ${escapeIdentifier(it)}`).join(",")} )`,
+      `PRIMARY KEY (${operation.primaryKey.map((name) => escapeIdentifier(name)).join(", ")})`,
     );
+  }
 
   if (operation.foreignKeys) {
     operation.foreignKeys.forEach((fk) => {
       columnsSQL.push(
         `FOREIGN KEY (${escapeIdentifier(fk.baseColumnName)}) ` +
-          `REFERENCES ${escapeIdentifier(fk.referencedTableName)}` +
+          `REFERENCES ${escapeIdentifier(fk.referencedTableName)} ` +
           `(${escapeIdentifier(fk.referencedColumnName)})`,
       );
     });
   }
 
   if (operation.uniqueConstraints?.length > 0) {
-    columnsSQL.push(`UNIQUE (${operation.uniqueConstraints.join(", ")})`);
+    columnsSQL.push(
+      `UNIQUE (${operation.uniqueConstraints.map(escapeIdentifier).join(", ")})`,
+    );
   }
 
   const output = [
-    `CREATE TABLE IF NOT EXISTS ${escapeIdentifier(operation.tableName)}
-     (
-         ${columnsSQL.join(",\n\t")}
-     );  `,
+    `CREATE TABLE IF NOT EXISTS ${escapeIdentifier(operation.tableName)} (
+      ${columnsSQL.join(",\n      ")}
+    );`,
   ];
 
   operation.columns.forEach((column) => {
@@ -115,9 +121,21 @@ export const generateCreateTableSQL = (
       );
     }
   });
+
   return output;
 };
 
-function escapeIdentifier(identifier: string): string {
-  return `"${identifier.replace(/"/g, '""')}"`;
+function generateAddForeignKeySQL(operation: MigrationOperation): string[] {
+  if (!operation.table || !operation.columns || !operation.references) {
+    throw new Error("Missing required properties for addForeignKey operation");
+  }
+
+  const { table, columns, references } = operation;
+  const { table: refTable, columns: refColumns } = references;
+
+  return [
+    `ALTER TABLE ${escapeIdentifier(table)} ADD CONSTRAINT fk_${table}_${refTable} ` +
+      `FOREIGN KEY (${columns.map((it) => escapeIdentifier(it.name)).join(", ")}) ` +
+      `REFERENCES ${escapeIdentifier(refTable)} (${refColumns.map(escapeIdentifier).join(", ")});`,
+  ];
 }

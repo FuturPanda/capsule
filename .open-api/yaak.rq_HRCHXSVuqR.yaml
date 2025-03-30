@@ -1,0 +1,19 @@
+type: http_request
+model: http_request
+id: rq_HRCHXSVuqR
+createdAt: 2025-03-27T15:16:08.169215
+updatedAt: 2025-03-29T14:29:53.246704
+workspaceId: wk_oXrjn67t3d
+folderId: fl_KkxHSSFxJM
+authentication:
+  token: ''
+authenticationType: bearer
+body: {}
+bodyType: null
+description: ''
+headers: []
+method: GET
+name: ''
+sortPriority: 1000.0
+url: ${[ BASE_URL ]}/events
+urlParameters: []

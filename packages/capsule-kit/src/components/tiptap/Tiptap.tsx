@@ -1,10 +1,10 @@
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { Typography } from "@tiptap/extension-typography";
-import { forwardRef, useImperativeHandle } from "react";
 import { cn } from "@/lib/utils.ts";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { Typography } from "@tiptap/extension-typography";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { common, createLowlight } from "lowlight";
+import { forwardRef, useImperativeHandle } from "react";
 
 interface TiptapEditorProps {
   content: string;
@@ -34,13 +34,14 @@ export const Tiptap = forwardRef<TiptapEditorRef, TiptapEditorProps>(
     const editor = useEditor({
       extensions,
       onUpdate: (e) => {
+        onChange(e.editor.getHTML());
         console.log(e.editor.getHTML());
       },
       content: content,
       editorProps: {
         attributes: {
           class:
-            "tiptap prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none",
+            "tiptap prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none !ring-0",
         },
       },
       autofocus: "end",

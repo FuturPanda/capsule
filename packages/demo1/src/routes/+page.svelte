@@ -1,80 +1,105 @@
 <script lang="ts">
-	import { db, type Todo } from '$lib/db';
-	import { liveQuery } from 'dexie';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import useCapsuleClient from '$lib/capsule-client.svelte';
+	import { CapsuleEventType, type GetTask } from '@capsulesh/shared-types';
 
 	let newTodoText = $state('');
 	let newTodoDueDate = $state('');
 	let isLoggedIn = $state(false);
 	let client = useCapsuleClient();
-
-	onMount(() => {
-		// isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+	let todos: GetTask[] | undefined = $state([]);
+	onMount(async () => {
 		isLoggedIn = client.authStatus();
 
 		if (!isLoggedIn) {
 			goto('/login');
 		}
+		todos = await client.models.tasks?.select().list();
+		console.log('after query todos :: ', todos);
 	});
+
+	/*client.on(CapsuleEventType.TASKS_CREATED, ({ task }) => {
+		todos = [...todos, task];
+	});
+	client.on(CapsuleEventType.TASKS_DELETED, ({ task: id }) => {
+		todos = todos?.filter((todo) => todo.id !== id);
+	});
+	client.on(CapsuleEventType.TASKS_UPDATED, ({ task }) => {
+		todos = todos?.map((todo) => (todo.id === task.id ? task : todo));
+		});*/
 
 	function handleLogout() {
 		localStorage.removeItem('isLoggedIn');
 		goto('/login');
 	}
 
-	let todos = liveQuery(() =>
-		db.todos
-			.orderBy('dueDate')
-			.filter((todo) => todo.dueDate !== null)
-			.reverse()
-			.toArray()
-			.then(async (todosWithDueDate) => {
-				const todosWithoutDueDate = await db.todos
-					.filter((todo) => todo.dueDate === null)
-					.reverse()
-					.toArray();
-				return [...todosWithDueDate, ...todosWithoutDueDate];
-			})
-	);
+	// let todos = liveQuery(() =>
+	// 	db.todos
+	// 		.orderBy('dueDate')
+	// 		.filter((todo) => todo.dueDate !== null)
+	// 		.reverse()
+	// 		.toArray()
+	// 		.then(async (todosWithDueDate) => {
+	// 			const todosWithoutDueDate = await db.todos
+	// 				.filter((todo) => todo.dueDate === null)
+	// 				.reverse()
+	// 				.toArray();
+	// 			return [...todosWithDueDate, ...todosWithoutDueDate];
+	// 		})
+	// );
 
 	async function addTodo() {
 		if (!newTodoText.trim()) return;
 
-		await db.todos.add({
-			text: newTodoText,
-			completed: false,
-			createdAt: new Date(),
-			dueDate: newTodoDueDate ? new Date(newTodoDueDate) : null
+		// await db.todos.add({
+		// 	id: 1387,
+		// 	content: newTodoText,
+		// 	isCompleted: false,
+		// 	dueDate: newTodoDueDate ?? null
+		// });
+		//
+		client.models.tasks?.create({
+			content: newTodoText,
+			isCompleted: false,
+			dueDate: newTodoDueDate ?? null
 		});
 
 		newTodoText = '';
 		newTodoDueDate = '';
 	}
 
-	async function toggleTodo(todo: Todo) {
+	async function toggleTodo(todo: GetTask) {
 		if (!todo.id) return;
-		await db.todos.update(todo.id, { completed: !todo.completed });
+		//await db.todos.update(todo.id, { completed: !todo.completed });
+		console.log('todo toggled ::: ', todo, todo.isCompleted);
+		client.models.tasks?.update(todo.id, { isCompleted: !todo.isCompleted });
 	}
 
 	async function deleteTodo(id: number) {
-		await db.todos.delete(id);
+		// await db.todos.delete(id);
+		await client.models.tasks?.delete(id);
 	}
 
-	async function updateDueDate(todo: Todo, dueDate: string) {
+	async function updateDueDate(todo: GetTask, dueDate: string) {
 		if (!todo.id) return;
-		await db.todos.update(todo.id, {
-			dueDate: dueDate ? new Date(dueDate) : null
-		});
+		// await db.todos.update(todo.id, {
+		// 	dueDate: dueDate ? new Date(dueDate) : null
+		// });
+		client.models.tasks?.update(todo.id, { dueDate: dueDate });
 	}
 
-	function formatDateForInput(date: Date | null): string {
+	function formatDateForInput(date: Date | string | null): string {
 		if (!date) return '';
+
+		if (typeof date === 'string') {
+			return new Date(date).toISOString().split('T')[0];
+		}
+
 		return date.toISOString().split('T')[0];
 	}
 
-	function getDueDateStatus(dueDate: Date | null): string {
+	function getDueDateStatus(dueDate: string | null): string {
 		if (!dueDate) return '';
 
 		const now = new Date();
@@ -101,13 +126,31 @@
 		<button type="submit">Add</button>
 	</form>
 
-	{#if $todos}
+	<!-- {#if $todos}
 		<ul>
 			{#each $todos as todo (todo.id)}
 				<li class={getDueDateStatus(todo.dueDate ?? null)}>
 					<input type="checkbox" checked={todo.completed} onchange={() => toggleTodo(todo)} />
 					<span class:completed={todo.completed}>
 						{todo.text}
+					</span>
+					<input
+						type="date"
+						value={formatDateForInput(todo.dueDate ?? null)}
+						onchange={(e) => updateDueDate(todo, e.currentTarget.value)}
+						class="due-date-input"
+					/>
+					<button onclick={() => deleteTodo(todo.id!)}>×</button>
+				</li>
+			{/each}
+		</ul> -->
+	{#if todos}
+		<ul>
+			{#each todos as todo (todo)}
+				<li class={getDueDateStatus(todo.dueDate ?? null)}>
+					<input type="checkbox" checked={todo.isCompleted} onchange={() => toggleTodo(todo)} />
+					<span class:completed={todo.isCompleted}>
+						{todo.content}
 					</span>
 					<input
 						type="date"

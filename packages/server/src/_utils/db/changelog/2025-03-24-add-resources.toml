@@ -1,0 +1,71 @@
+changeSetId = "20250324-01"
+author = "futurpanda"
+description = "Add resources"
+database = "root"
+
+[[operations]]
+type = "createTable"
+tableName = "person"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "first_name", type = "text", constraints = { notNull = true } },
+    { name = "last_name", type = "text", constraints = { notNull = true } },
+    { name = "date_of_birth", type = "date" },
+    { name = "gender", type = "text" },
+    { name = "email", type = "text" },
+    { name = "phone", type = "text" },
+    { name = "address", type = "text" },
+    { name = "occupation", type = "text" },
+    { name = "created_at", type = "timestamp", constraints = { notNull = true }, defaultValue = "CURRENT_TIMESTAMP" },
+    { name = "updated_at", type = "timestamp" },
+]
+
+[[operations]]
+type = "createTable"
+tableName = "task"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "content", type = "text", constraints = { notNull = true } },
+    { name = "due_date", type = "timestamp" },
+    { name = "assignee_id", type = "integer" },
+    { name = "priority", type = "text"  },
+    { name = "progress", type = "number"  },
+    { name = "completed_at", type = "timestamp" },
+    { name = "updated_at", type = "timestamp"  },
+    { name = "created_at", type = "timestamp", constraints = { notNull = true }, defaultValue = "CURRENT_TIMESTAMP" },
+]
+foreignKeys = [
+    { baseColumnName = "assignee_id", referencedTableName = "person", referencedColumnName = "id", constraintName = "fk_tasks_assignee_id_person_id" },
+]
+
+[[operations]]
+type = "createTable"
+tableName = "event"
+columns = [
+    { name = "id", type = "integer", constraints = { primaryKey = true } },
+    { name = "title", type = "text", constraints = { notNull = true } },
+    { name = "description", type = "text" },
+    { name = "start_time", type = "timestamp", constraints = { notNull = true } },
+    { name = "end_time", type = "timestamp", constraints = { notNull = true } },
+    { name = "location", type = "text" },
+    { name = "is_all_day", type = "boolean", constraints = { notNull = true } },
+    { name = "category", type = "text" },
+    { name = "created_by", type = "text", constraints = { notNull = true } },
+    { name = "created_at", type = "timestamp", constraints = { notNull = true }, defaultValue = "CURRENT_TIMESTAMP" },
+    { name = "updated_at", type = "timestamp" },
+    { name = "deleted_at", type = "timestamp" },
+]
+
+
+[[operations]]
+type = "createTable"
+tableName = "event_attendees"
+columns = [
+    { name = "event_id", type = "integer" },
+    { name = "attendee_id", type = "integer" },
+]
+primaryKey = ["event_id", "attendee_id"]
+foreignKeys = [
+    { baseColumnName = "event_id", referencedTableName = "event", referencedColumnName = "id", constraintName = "fk_event_attendees_event_id" },
+    { baseColumnName = "attendee_id", referencedTableName = "person", referencedColumnName = "id", constraintName = "fk_event_attendees_person_id" },
+]

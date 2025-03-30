@@ -76,22 +76,35 @@
 </svelte:head>
 
 {#if !isSecondScreen}
-	<!-- <div class="flex h-screen w-screen items-center justify-center"> -->
 	<div class="loading-page background min-h-screen text-foreground">
+		<h2
+			class="custom-text absolute left-0 top-0 z-10 mt-4 pl-4 text-lg text-gray-400"
+			in:fly={{ y: -50, duration: 800 }}
+		>
+			capsule
+		</h2>
 		<div class="loader" class:expanded={true}></div>
 		<div class="gradient-circle flex items-center justify-center" class:expanded={true}>
-			<Root class="mx-4 w-full max-w-10 border-transparent bg-none outline-none ">
+			<Root
+				class="mx-4 w-full max-w-md border-transparent bg-[rgba(20,25,35,0.7)] shadow-xl outline-none backdrop-blur-sm"
+			>
 				<CardHeader>
-					<CardTitle class="text-2xl">Get Started</CardTitle>
-					<CardDescription>Create a new Capsule.</CardDescription>
+					<CardTitle class="custom-text text-2xl font-light text-gray-200">Get Started</CardTitle>
+					<CardDescription class="text-gray-400"
+						>Create your sovereign cloud in seconds.</CardDescription
+					>
 				</CardHeader>
 				<form method="POST" use:enhance>
 					<CardContent class="w-full">
 						<FormField {form} name="email">
 							<FormControl>
 								{#snippet children({ props })}
-									<FormLabel>Email</FormLabel>
-									<Input {...props} bind:value={$formData.email} />
+									<FormLabel class="text-gray-300">Email</FormLabel>
+									<Input
+										{...props}
+										bind:value={$formData.email}
+										class="border-gray-700 bg-[rgba(20,25,35,0.7)] text-gray-200"
+									/>
 									{#if $errors.email}
 										<p class="mt-1 text-sm text-red-500">{$errors.email[0]}</p>
 									{/if}
@@ -101,7 +114,7 @@
 						<FormField {form} name="password">
 							<FormControl>
 								{#snippet children({ props })}
-									<FormLabel>Password</FormLabel>
+									<FormLabel class="text-gray-300">Password</FormLabel>
 									<div class="relative min-w-[300px]">
 										<Input
 											type={showPassword ? 'text' : 'password'}
@@ -109,12 +122,13 @@
 											bind:value={$formData.password}
 											onclick={onPasswordClick}
 											oninput={checkPassword}
+											class="border-gray-700 bg-[rgba(20,25,35,0.7)] text-gray-200"
 										/>
 										<Button
 											variant="ghost"
 											size="icon"
 											type="button"
-											class="absolute right-0 top-0 h-full px-3 py-2"
+											class="absolute right-0 top-0 h-full px-3 py-2 text-gray-400"
 											onclick={togglePasswordVisibility}
 										>
 											{#if showPassword}
@@ -131,22 +145,51 @@
 							</FormControl>
 						</FormField>
 						{#if isOpen}
-							{#each requirements as r}
-								<li class=" mt-2 flex items-center text-xs">
-									<Checkbox class="m-1 h-3 w-3" checked={r.met} disabled />
-									<p class={r.met ? 'text-green-600' : 'text-gray-600'}>
-										{r.text}
-									</p>
-								</li>
-							{/each}
+							<div class="mt-3 space-y-1 rounded-md bg-[rgba(20,25,35,0.7)] p-3">
+								{#each requirements as r}
+									<li class="flex items-center text-xs">
+										<Checkbox class="m-1 h-3 w-3" checked={r.met} disabled />
+										<p class={r.met ? 'text-teal-500' : 'text-gray-500'}>
+											{r.text}
+										</p>
+									</li>
+								{/each}
+							</div>
 						{/if}
+
+						<FormField {form} name="termsAccepted">
+							<FormControl>
+								{#snippet children({ props })}
+									<div class="mt-4 flex items-start space-x-2">
+										<Checkbox
+											bind:checked={$formData.termsAccepted}
+											id="terms"
+											class="mt-1 data-[state=checked]:bg-teal-500 data-[state=checked]:text-white"
+										/>
+										<div class="space-y-1 leading-none">
+											<label for="terms" class="cursor-pointer text-sm font-medium text-gray-300">
+												I agree to the <a href="/terms" class="text-teal-400 hover:underline"
+													>Terms of Service</a
+												>
+												and
+												<a href="/privacy" class="text-teal-400 hover:underline">Privacy Policy</a>
+											</label>
+										</div>
+									</div>
+									{#if $errors.termsAccepted}
+										<p class="mt-1 text-sm text-red-500">{$errors.termsAccepted[0]}</p>
+									{/if}
+								{/snippet}
+							</FormControl>
+						</FormField>
+
 						<FormField {form} name="cf-turnstile-response">
 							<FormControl>
 								{#snippet children()}
 									{#if mounted}
-										<div style="display: block; flex-flow: row;">
+										<div class="mt-4">
 											<div
-												class="cf-turnstile mt-3"
+												class="cf-turnstile"
 												data-sitekey="0x4AAAAAAA7oFhcbnoayUME5"
 												data-size="flexible"
 											></div>
@@ -156,8 +199,8 @@
 							</FormControl>
 						</FormField>
 						<FormButton
-							class="mt-5 w-full bg-teal-700 text-white transition-colors duration-200 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 enabled:hover:bg-teal-600 disabled:bg-teal-900"
-							disabled={!$formData?.email || !$formData?.password}
+							class="mt-6 w-full bg-teal-700 text-white transition-colors duration-200 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 enabled:hover:bg-teal-600 disabled:bg-gray-800 disabled:text-gray-400"
+							disabled={!$formData?.email || !$formData?.password || !$formData?.termsAccepted}
 						>
 							{#if isLoading}
 								<div class="flex items-center justify-center">
@@ -193,18 +236,22 @@
 		</div>
 	</div>
 {:else}
-	<div class="flex min-h-screen items-center justify-center bg-background p-4">
-		<div in:fly={{ y: 20, duration: 300, delay: 150 }} class="w-full max-w-md text-center">
-			<Card class="border-none bg-transparent shadow-none">
+	<div class="loading-page background min-h-screen">
+		<h2 class="custom-text absolute left-0 top-0 z-10 mt-4 pl-4 text-lg text-gray-400">capsule</h2>
+		<div in:fly={{ y: 20, duration: 300, delay: 150 }} class="z-10 w-full max-w-md text-center">
+			<Card class="border-none bg-[rgba(20,25,35,0.7)] shadow-xl backdrop-blur-sm">
 				<CardHeader class="space-y-6">
 					<div class="mx-auto">
-						<Mail class="h-12 w-12 text-primary" />
+						<Mail class="h-12 w-12 text-teal-500" />
 					</div>
 					<div class="space-y-4">
-						<CardTitle class="text-3xl font-medium">Check your email</CardTitle>
-						<p class="text-lg text-muted-foreground">
-							We just sent a verification link to {$formData.email}. Click on it to create your
-							capsule.
+						<CardTitle class="custom-text text-2xl font-light text-gray-200"
+							>Check your email</CardTitle
+						>
+						<p class="text-gray-400">
+							We just sent a verification link to <span class="text-teal-400"
+								>{$formData.email}</span
+							>. Click on it to create your capsule.
 						</p>
 					</div>
 				</CardHeader>
@@ -227,8 +274,20 @@
 	}
 
 	.background {
-		background: radial-gradient(#323232, #000);
+		background: radial-gradient(circle at center, #101820 0%, #000 100%);
+		position: relative;
 		z-index: 1;
+	}
+
+	.background::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: radial-gradient(circle at 30% 40%, rgba(20, 30, 48, 0.4) 0%, transparent 70%);
+		z-index: -1;
 	}
 
 	.loader {
@@ -267,19 +326,34 @@
 			transform: rotate(360deg);
 		}
 	}
+
 	.gradient-circle {
 		width: 700px;
 		height: 700px;
 		border-radius: 100%;
 		background: linear-gradient(
 			165deg,
-			rgba(40, 40, 40, 1) 0%,
-			rgb(30, 30, 30) 40%,
-			rgb(20, 20, 20) 98%,
-			rgb(0, 0, 0) 100%
+			rgba(40, 45, 55, 1) 0%,
+			rgb(30, 35, 45) 40%,
+			rgb(20, 25, 35) 98%,
+			rgb(10, 15, 25) 100%
 		);
 		position: absolute;
 		z-index: 4;
 		transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.loader,
+	.gradient-circle {
+		transform-origin: center center;
+	}
+
+	.loader.expanded,
+	.gradient-circle.expanded {
+		transform: scale(1);
+	}
+
+	.custom-text {
+		font-family: 'DelightExtraLight';
 	}
 </style>

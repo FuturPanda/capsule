@@ -1,0 +1,219 @@
+:root {
+  --sl-color-gray-6: #000000;
+  --sl-color-gray-5: #000000;
+  --sl-color-gray-4: #000000;
+
+  --sl-color-accent-low: white;
+  --sl-color-accent: #14b8a6;
+  --sl-color-accent-high: #0d9488;
+
+  --sl-color-gray-3: #555a66;
+  --sl-color-gray-2: #888d99;
+  --sl-color-gray-1: #cccfd9;
+
+  --sl-content-width: 50rem;
+
+  --border-color: red;
+}
+
+/* Font face for DelightExtraLight */
+@font-face {
+  font-family: "DelightExtraLight";
+  src: url("/fonts/DelightExtraLight.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Background radial gradient for that "capsule" feel */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at 30% 40%,
+    rgba(20, 30, 48, 0.2) 0%,
+    transparent 70%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Custom fonts for headings */
+h1,
+h2,
+h3,
+.custom-text {
+  font-family: "DelightExtraLight", system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+/* Pure black background for all containers */
+html,
+body,
+.sl-container,
+main,
+.sl-page {
+  background: #000000;
+}
+
+.sl-content-wrapper {
+  background-color: red;
+}
+
+.sl-sidebar {
+  background-color: red;
+  border-right: 1px solid var(--border-color);
+}
+
+.sl-sidebar-header {
+  background-color: red;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sl-sidebar h2 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sl-color-gray-2);
+  margin-top: 1.5rem;
+}
+
+.sl-sidebar a:hover,
+.sl-sidebar a[aria-current="page"] {
+  color: var(--sl-color-accent);
+  background-color: transparent;
+}
+
+/* Topbar styling with fine border */
+.sl-topbar {
+  background-color: red;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Page header */
+.sl-page-header {
+  background-color: green;
+}
+
+/* Card styling */
+.sl-card {
+  background: rgba(10, 15, 20, 0.2);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+  border-radius: 4px;
+}
+
+/* Code blocks */
+pre,
+code {
+  background-color: rgba(10, 15, 20, 0.3) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+.sl-markdown-content :not(pre) > code {
+  background-color: rgba(10, 15, 20, 0.3) !important;
+  border: none;
+  color: var(--sl-color-gray-1);
+  padding: 0.2em 0.4em;
+  font-size: 0.9em;
+}
+
+/* Button styling */
+button,
+.sl-button {
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-weight: 400;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a transparent;
+}
+
+/* Table styling */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--sl-color-gray-2);
+  font-weight: 500;
+}
+
+td {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Main content */
+.sl-markdown-content {
+  line-height: 1.6;
+  color: var(--sl-color-gray-1);
+}
+
+a {
+  color: var(--sl-color-accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+blockquote {
+  border-left: 2px solid var(--sl-color-accent);
+  padding-left: 1rem;
+  margin-left: 0;
+  color: var(--sl-color-gray-2);
+  font-style: italic;
+}
+
+.right-sidebar-container {
+  background: transparent;
+}
+
+.right-sidebar {
+  background: transparent;
+  border: white;
+}
+
+.search-input {
+  background-color: rgba(10, 15, 20, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+.sl-footer {
+  background-color: #000000;
+  border-top: 1px solid var(--border-color);
+}

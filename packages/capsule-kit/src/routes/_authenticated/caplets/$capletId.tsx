@@ -1,47 +1,72 @@
+import Tiptap, { TiptapEditorRef } from "@/components/tiptap/Tiptap";
+import { Input } from "@/components/ui/input";
 import { createFileRoute } from "@tanstack/react-router";
-import ToolBar from "@/components/caplets/ToolBar.tsx";
-import { ContentRenderer } from "@/components/content/ContentRenderer.tsx";
-import { useEffect, useMemo, useRef } from "react";
-import { useAutoScroll } from "@/components/caplets/utils/hooks/auto-scroll.tsx";
-import { BoundStore, useBoundStore } from "@/stores/global.store.ts";
-import { useQuery } from "@tanstack/react-query";
-import { capletRequest } from "@/stores/caplets/caplet.request.ts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function CapletComponent() {
+  const [title, setTitle] = useState<string | undefined>("");
+  const [value, setValue] = useState<string>("");
+  const [isLoaded, setIsLoaded] = useState(false);
   const { capletId } = Route.useParams();
-  const mainRef = useRef<HTMLElement>(null);
-  const { autoScrollEnabled, scrollToBottom } = useAutoScroll(mainRef);
+  const editorRef = useRef<TiptapEditorRef>(null);
 
-  const selectCaplet = useMemo(
-    () => (state: BoundStore) => state.findCaplet(capletId),
-    [capletId],
+  const debouncedCallback = useDebouncedCallback((value: string) => {
+    localStorage.setItem(capletId, value);
+  }, 1000);
+
+  const onChange = useCallback(
+    (value: string) => {
+      setValue(value);
+      debouncedCallback(value);
+    },
+    [debouncedCallback],
   );
-  const query = useQuery({
-    queryKey: ["caplet"],
-    queryFn: () => capletRequest.getCapletContent(capletId),
-  });
-  const caplet = useBoundStore(selectCaplet);
-  console.log(caplet?.contentIds);
-  useEffect(() => {
-    if (autoScrollEnabled && caplet?.contentIds?.length) {
-      requestAnimationFrame(() => {
-        scrollToBottom();
-      });
-    }
-  }, [caplet?.contentIds?.length, autoScrollEnabled, scrollToBottom]);
 
-  if (!caplet?.contentIds) return null;
+  const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!(e.target as HTMLElement).closest(".button-container")) {
+      editorRef.current?.focus();
+    }
+  };
+
+  useEffect(() => {
+    const title = localStorage.getItem(`${capletId}::TITLE`);
+    const capletLS = localStorage.getItem(capletId);
+    const content = capletLS || "Let Your creativity flow";
+    if (title) setTitle(title);
+    setValue(content);
+    setIsLoaded(true);
+  }, [capletId]);
 
   return (
-    <div className="flex-1 flex flex-col">
-      <main
-        ref={mainRef}
-        className="flex-1 overflow-auto p-4 items-center pb-20 scroll-smooth"
-      >
-        {query.data?.map((content) => <ContentRenderer content={content} />)}
+    <div className="flex flex-col h-full px-6 py-4 overflow-y-auto overflow-x-hidden w-full">
+      {isLoaded && (
+        <div className="max-w-4xl w-full mx-auto">
+          <Input
+            value={title}
+            placeholder="We will need a title"
+            onChange={(e) => {
+              localStorage.setItem(`${capletId}::TITLE`, e.target.value);
+              setTitle(e.target.value);
+            }}
+            className="text-4xl font-bold p-0 text-ring border-none focus-visible:ring-0 w-full"
+          />
 
-        <ToolBar capletId={caplet.id} />
-      </main>
+          <div
+            className="my-3 group relative flex items-start border border-transparent w-full"
+            onMouseDown={(e) => handleContainerClick(e)}
+          >
+            <div className="flex-1 flex items-center w-full gap-2 mb-1 overflow-hidden">
+              <Tiptap
+                content={value}
+                onChange={onChange}
+                ref={editorRef}
+                className="w-full min-h-[calc(100vh-200px)] overflow-x-hidden"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

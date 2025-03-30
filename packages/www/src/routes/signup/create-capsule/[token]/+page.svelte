@@ -4,6 +4,7 @@
 	import { fade, fly } from 'svelte/transition';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { goto } from '$app/navigation';
+	import { Terminal } from 'lucide-svelte';
 
 	let { data } = $props();
 	let progress = $state(0);
@@ -94,65 +95,110 @@
 	});
 </script>
 
-<div class="loading-page">
-	<div class="container">
-		<div class="loader"></div>
-	</div>
-	<div class="absolute z-10 min-w-[300px] pt-6">
-		{#if !showEndMessage}
-			<div class="mb-4 space-y-2">
-				{#each messages as message, i (message + i)}
-					<div
-						in:fly={{ y: 20, duration: 400 }}
-						class="text-center font-mono text-sm tracking-wider text-neutral-300"
-					>
-						{message}
-					</div>
-				{/each}
+<div class="loading-page background min-h-screen text-foreground">
+	<h2
+		class="custom-text absolute left-0 top-0 z-10 mt-4 pl-4 text-lg text-gray-400"
+		in:fly={{ y: -50, duration: 800 }}
+	>
+		capsule
+	</h2>
+	<div class="loader" class:expanded={true}></div>
+	<div class="gradient-circle flex items-center justify-center" class:expanded={true}>
+		<div
+			class="z-10 flex flex-col items-center justify-center text-center"
+			in:fly={{ y: 20, duration: 800 }}
+		>
+			<div
+				class="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-black/60 p-2 text-teal-500"
+			>
+				<Terminal class="h-8 w-8" />
 			</div>
 
-			<div class="text-center font-mono text-xs tracking-widest text-neutral-400" in:fade>
-				{progress}%
-			</div>
-		{:else}
-			<div>Capsule is launching...</div>
-			<div>You will receive an email with the capsule details.</div>
-			<div>It can take a couple of minutes.</div>
-		{/if}
+			{#if !showEndMessage}
+				<h2 class="custom-text mb-6 text-2xl font-light text-gray-200">Creating Your Capsule</h2>
+
+				<div
+					class="terminal-container mb-8 w-full max-w-md overflow-hidden rounded-lg border border-gray-800 bg-black/60 backdrop-blur-md"
+				>
+					<div class="terminal-header flex items-center border-b border-gray-800 px-4 py-2">
+						<div class="mr-2 h-3 w-3 rounded-full bg-red-500"></div>
+						<div class="mr-2 h-3 w-3 rounded-full bg-yellow-500"></div>
+						<div class="h-3 w-3 rounded-full bg-green-500"></div>
+						<span class="ml-4 text-xs text-gray-400">capsule-creation</span>
+					</div>
+					<div class="terminal-body h-32 overflow-y-auto p-4 text-left">
+						{#each messages as message, i (message + i)}
+							<div
+								in:fly={{ y: 10, duration: 300 }}
+								class="terminal-line font-mono text-xs tracking-wider text-neutral-300"
+							>
+								<span class="mr-2 text-teal-500">></span>
+								{message}
+							</div>
+						{/each}
+					</div>
+				</div>
+
+				<div class="mb-2 w-full max-w-md">
+					<div class="h-2 overflow-hidden rounded-full bg-gray-800">
+						<div
+							class="h-full bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-300"
+							style="width: {progress}%"
+						></div>
+					</div>
+				</div>
+
+				<div class="text-center font-mono text-xs tracking-widest text-gray-400">
+					{progress}%
+				</div>
+			{:else}
+				<h2 class="custom-text mb-4 text-2xl font-light text-gray-200">Capsule Launch Initiated</h2>
+				<p class="mb-2 text-gray-400">Your capsule is now launching...</p>
+				<p class="mb-4 text-gray-400">
+					You will receive an email with your access details shortly.
+				</p>
+				<p class="text-xs text-gray-500">This process may take a few minutes to complete.</p>
+			{/if}
+		</div>
 	</div>
 </div>
 
 <style>
 	.loading-page {
-		margin: 0px;
-		background: radial-gradient(#323232, #000);
+		margin: 0;
+		background: #000;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 		height: 100vh;
-	}
-
-	.container {
-		width: 350px;
-		height: 350px;
-		border-radius: 100%;
-		background: linear-gradient(
-			165deg,
-			rgba(40, 40, 40, 1) 0%,
-			rgb(30, 30, 30) 40%,
-			rgb(20, 20, 20) 98%,
-			rgb(0, 0, 0) 100%
-		);
 		position: relative;
+		overflow: hidden;
 	}
 
-	.loader {
-		width: 100%;
-		height: 100%;
+	.background {
+		background: radial-gradient(circle at center, #101820 0%, #000 100%);
+		position: relative;
+		z-index: 1;
+	}
+
+	.background::after {
+		content: '';
 		position: absolute;
 		top: 0;
 		left: 0;
+		right: 0;
+		bottom: 0;
+		background: radial-gradient(circle at 30% 40%, rgba(20, 30, 48, 0.4) 0%, transparent 70%);
+		z-index: -1;
+	}
+
+	.loader {
+		width: 700px;
+		height: 700px;
+		position: absolute;
+		z-index: 3;
+		transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.loader:before {
@@ -183,5 +229,58 @@
 		100% {
 			transform: rotate(360deg);
 		}
+	}
+
+	.gradient-circle {
+		width: 700px;
+		height: 700px;
+		border-radius: 100%;
+		background: linear-gradient(
+			165deg,
+			rgba(40, 45, 55, 1) 0%,
+			rgb(30, 35, 45) 40%,
+			rgb(20, 25, 35) 98%,
+			rgb(10, 15, 25) 100%
+		);
+		position: absolute;
+		z-index: 4;
+		transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.loader,
+	.gradient-circle {
+		transform-origin: center center;
+	}
+
+	.loader.expanded,
+	.gradient-circle.expanded {
+		transform: scale(1);
+	}
+
+	.custom-text {
+		font-family: 'DelightExtraLight';
+	}
+
+	.terminal-line {
+		line-height: 1.6;
+		position: relative;
+	}
+
+	.terminal-body {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(75, 85, 99, 0.5) rgba(0, 0, 0, 0.1);
+	}
+
+	.terminal-body::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	.terminal-body::-webkit-scrollbar-track {
+		background: rgba(0, 0, 0, 0.1);
+	}
+
+	.terminal-body::-webkit-scrollbar-thumb {
+		background-color: rgba(75, 85, 99, 0.5);
+		border-radius: 6px;
 	}
 </style>

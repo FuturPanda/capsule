@@ -1,68 +1,127 @@
+import { CreateTask, Task, UpdateTask } from "@capsulesh/shared-types";
 import { ApiClient } from "../axios";
-import { ListResponse, PaginationParams } from "../types";
+import { EventEmitter } from "../event-emitter";
 import { BaseResource } from "./base";
-import { CreateEventParams, Event, UpdateEventParams } from "./event";
 
-export interface Task extends Event {
-  assignee?: string;
-  dueDate?: string;
-  priority?: "low" | "medium" | "high" | "urgent";
-  progress?: number;
-  completed?: boolean;
-  completedAt?: string;
-  type: "task";
-}
+export class Tasks extends BaseResource<Task, CreateTask, UpdateTask> {
+  //private querySerializer: QuerySerializer;
+  private cachedTasks: Task[] = [];
+  private eventEmitter: EventEmitter;
 
-export interface CreateTaskDto extends CreateEventParams {
-  assignee?: string;
-  dueDate?: string;
-  priority?: "low" | "medium" | "high" | "urgent";
-  progress?: number;
-  completed?: boolean;
-}
-
-export interface UpdateTaskDto extends UpdateEventParams {
-  assignee?: string;
-  dueDate?: string;
-  priority?: "low" | "medium" | "high" | "urgent";
-  progress?: number;
-  completed?: boolean;
-  completedAt?: string;
-  checklist?: {
-    id?: string;
-    description?: string;
-    completed?: boolean;
-  }[];
-}
-
-export class Tasks extends BaseResource<Task, CreateTaskDto, UpdateTaskDto> {
-  constructor(apiClient: ApiClient) {
-    super(apiClient, "/events/tasks");
+  constructor(apiClient: ApiClient, eventEmitter: EventEmitter) {
+    super(apiClient, "/tasks");
+    //this.querySerializer = new QuerySerializer();
+    this.eventEmitter = eventEmitter;
   }
 
-  async list(params?: PaginationParams): Promise<ListResponse<Task>> {
-    return this.apiClient.get<ListResponse<Task>>(this.basePath, params);
+  async create(data: CreateTask): Promise<Task> {
+    const newTask = await this.apiClient.post<Task>(this.basePath, data);
+    this.cachedTasks.push(newTask);
+    return newTask;
   }
 
-  async markAsCompleted(id: string): Promise<Task> {
-    return this.apiClient.post<Task>(`${this.basePath}/${id}/complete`);
-  }
-
-  async getByAssignee(
-    assigneeId: string,
-    params?: PaginationParams,
-  ): Promise<ListResponse<Task>> {
-    return this.apiClient.get<ListResponse<Task>>(
-      `${this.basePath}/assignee/${assigneeId}`,
-      params,
+  async update(id: number, data: UpdateTask): Promise<Task> {
+    console.log(data);
+    const updatedTask = await this.apiClient.patch<Task>(
+      `${this.basePath}/${id}`,
+      data,
     );
+
+    const index = this.cachedTasks.findIndex((task) => task.id === id);
+    if (index !== -1) {
+      this.cachedTasks[index] = { ...this.cachedTasks[index], ...updatedTask };
+    }
+
+    return updatedTask;
   }
 
-  async getDueSoon(days: number = 7): Promise<Task[]> {
-    return this.apiClient.get<Task[]>(`${this.basePath}/due-soon`, { days });
+  async delete(id: number): Promise<{ success: boolean }> {
+    const result = await this.apiClient.delete<{ success: boolean }>(
+      `${this.basePath}/${id}`,
+    );
+
+    if (result.success) {
+      this.cachedTasks = this.cachedTasks.filter((task) => task.id !== id);
+    }
+
+    return result;
   }
 
-  async getOverdue(): Promise<Task[]> {
-    return this.apiClient.get<Task[]>(`${this.basePath}/overdue`);
+  getCachedTasks(): Task[] {
+    return [...this.cachedTasks];
   }
+
+  /*
+
+  select<K extends keyof Task>(keys?: K | K[]): TaskQueryBuilder<K> {
+    const selectedFields = keys
+      ? Array.isArray(keys)
+        ? keys
+        : [keys]
+      : undefined;
+    const apiClient = this.apiClient;
+    const basePath = this.basePath;
+    const querySerializer = this.querySerializer;
+    const queryOptions: QueryOptions = {};
+    queryOptions.select = { fields: selectedFields };
+    return {
+      where: (conditions: FilterQuery<Task>) => {
+        const queryParams = {
+          select: selectedFields,
+          where: conditions,
+        };
+        console.log("In sdk in where :::", queryParams);
+
+        return {
+          async one(): Promise<Pick<Task, K> | null> {
+            return apiClient.get<Pick<Task, K> | null>(
+              `${basePath}/one`,
+              querySerializer.serializeQuery(queryParams),
+            );
+          },
+
+          async list(): Promise<Pick<Task, K>[]> {
+            return apiClient.get<Pick<Task, K>[]>(
+              basePath,
+              querySerializer.serializeQuery(queryParams),
+            );
+          },
+
+          async paginated(
+            params?: PaginationParams,
+          ): Promise<PaginatedResult<Pick<Task, K>>> {
+            return apiClient.get<PaginatedResult<Pick<Task, K>>>(
+              `${basePath}/paginated`,
+              {
+                ...querySerializer.serializeQuery(queryParams),
+                ...querySerializer.serializeQuery(params),
+              },
+            );
+          },
+        };
+      },
+
+      async one(): Promise<Pick<Task, K> | null> {
+        return apiClient.get<Pick<Task, K> | null>(`${basePath}/one`, {
+          select: selectedFields,
+        });
+      },
+
+      async list(): Promise<Pick<Task, K>[]> {
+        return apiClient.get<Pick<Task, K>[]>(basePath, {
+          select: selectedFields,
+        });
+      },
+
+      async paginated(
+        params?: PaginationParams,
+      ): Promise<PaginatedResult<Pick<Task, K>>> {
+        return apiClient.get<PaginatedResult<Pick<Task, K>>>(
+          `${basePath}/paginated`,
+          { select: selectedFields, ...querySerializer.serializeQuery(params) },
+        );
+      },
+    };
+  }
+  */
 }

@@ -1,160 +1,145 @@
-import { useAuth } from "@/_utils/providers/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useCapsuleClient } from "@/hooks/use-capsule-client";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  url: z.string().url(),
-  encodedApiKey: z.string().base64(),
-});
-
-type LoginFormValues = z.infer<typeof formSchema>;
 
 function LoginComponent() {
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      url: "",
-      encodedApiKey: "",
-    },
-  });
-
-  const auth = useAuth();
   const router = useRouter();
-  const [, setIsSubmitting] = useState(false);
+  const client = useCapsuleClient();
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true);
-    console.log("is submitting ::: ", values);
+  async function handleLogin() {
+    setIsLoggingIn(true);
+    setError(null);
+
     try {
-      auth!
-        .login(values.email, values.password, values.url, values.encodedApiKey)
-        .then(() => router.navigate({ to: "/" }));
+      if (client) {
+        const loginResult = await client.handleOnLoginClick({
+          newTab: true,
+        });
+
+        if (!loginResult) {
+          setError("Failed to start login process. Please try again.");
+        }
+      } else {
+        setError("Capsule client not initialized");
+      }
     } catch (error) {
-      console.error("Error logging in: ", error);
+      console.error("Error logging in:", error);
+      setError("Failed to connect to your Capsule. Please try again.");
     } finally {
-      setIsSubmitting(false);
+      setIsLoggingIn(false);
     }
   }
 
   return (
-    <div className="flex justify-center items-center w-full h-full">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
-            Enter your Capsule Api Key below to login to your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-8"
-                >
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Your email"
-                            type={"email"}
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="..."
-                            type={"password"}
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="url"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Your Capsule Instance Url</FormLabel>
-                        <FormControl>
-                          <Input placeholder="..." {...field} type={"url"} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="encodedApiKey"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Api Key</FormLabel>
-                        <FormControl>
-                          <Input placeholder="..." {...field} type={"text"} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <div className="w-full flex items-end justify-end">
-                    <Button
-                      type="submit"
-                      variant={"outline"}
-                      className="bg-green-800"
-                    >
-                      Submit
-                    </Button>
-                  </div>
-                </form>
-              </Form>
+    <div className="min-h-screen bg-[#0a0f16] flex flex-col items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-20%] w-[140%] h-[140%] bg-gradient-radial from-[#1a2e44]/20 to-transparent opacity-40" />
+        <div className="absolute bottom-[-30%] right-[-20%] w-[140%] h-[140%] bg-gradient-radial from-[#133e59]/10 to-transparent opacity-30" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="z-10 w-full max-w-md"
+      >
+        <div className="mb-8 text-center">
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-3xl font-light text-white mb-2 tracking-tight"
+          >
+            Welcome to your{" "}
+            <span className="bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent font-normal">
+              Capsule
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="text-zinc-400 max-w-sm mx-auto"
+          >
+            Connect with your Capsule instance to explore your data
+          </motion.p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-[rgba(30,41,59,0.4)] backdrop-blur-sm border border-zinc-800/50 rounded-xl p-6 shadow-xl"
+        >
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
+              {error}
             </div>
+          )}
+
+          <button
+            onClick={handleLogin}
+            disabled={isLoggingIn}
+            className="relative w-full py-3 px-4 rounded-lg bg-gradient-to-r from-teal-500 to-blue-500 text-white font-medium transition-all hover:from-teal-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-teal-500/50 group overflow-hidden"
+          >
+            <span className="absolute inset-0 bg-gradient-to-r from-teal-400/0 via-white/10 to-teal-400/0 opacity-0 group-hover:opacity-100 group-hover:translate-x-[100%] transition-all duration-1000" />
+            {isLoggingIn ? (
+              <div className="flex items-center justify-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Connecting...
+              </div>
+            ) : (
+              "Login with your Capsule"
+            )}
+          </button>
+
+          <div className="mt-5 text-center text-zinc-500 text-xs">
+            <p>
+              Need help? Check the{" "}
+              <a
+                href="#"
+                className="text-teal-400 hover:text-teal-300 transition-colors"
+              >
+                documentation
+              </a>
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
-    console.log("before login route : ", context.auth.isAuthenticated);
-    if (context.auth.isAuthenticated) {
+    const tokens = JSON.parse(
+      sessionStorage.getItem("capsule_auth_tokens") || "{}",
+    );
+    console.log("tokens", tokens);
+    if (tokens.accessToken) {
       throw redirect({ to: "/" });
     }
   },
