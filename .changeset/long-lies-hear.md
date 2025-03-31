@@ -1,5 +1,5 @@
 ---
-"capsule-client": minor
+"@capsulesh/capsule-client": minor
 ---
 
 oauth flow

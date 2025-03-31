@@ -1,5 +1,5 @@
-import { ChiselSchema } from '@capsulesh/chisel';
 import { ApiKeyTypeEnum } from '../../api-keys/_utils/enum/api-key-type.enum';
+import { ChiselSchema } from '@capsulesh/shared-types';
 
 export enum UserTypeEnum {
   OWNER = 'OWNER',

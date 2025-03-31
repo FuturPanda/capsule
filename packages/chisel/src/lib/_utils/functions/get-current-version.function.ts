@@ -1,5 +1,5 @@
+import { JournalType } from "@capsulesh/shared-types";
 import fs from "node:fs";
-import { JournalType } from "../types/journal.type";
 
 export function getCurrentVersion(journalPath: string): number {
   const journal = JSON.parse(

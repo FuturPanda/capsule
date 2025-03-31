@@ -6,7 +6,10 @@ export const formSchema = z
 			.string({ required_error: 'Email is required' })
 			.email({ message: 'It must be a valid email' }),
 		password: z.string().min(2).max(50),
-		'cf-turnstile-response': z.any()
+		'cf-turnstile-response': z.any(),
+		termsAccepted: z.boolean().refine((value) => value, {
+			message: 'You must accept the terms and conditions'
+		})
 	})
 	.superRefine(({ password }, ctx) => {
 		const containsUppercase = (ch: string) => /[A-Z]/.test(ch);

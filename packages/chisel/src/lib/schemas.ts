@@ -1,12 +1,15 @@
 import {
+  ColumnOptions,
+  JournalType,
+  SnapshotType,
+  TableOptions,
+} from "@capsulesh/shared-types";
+import {
   adjectives,
   names,
   uniqueNamesGenerator,
 } from "unique-names-generator";
 import { v4 as uuidv4 } from "uuid";
-import { JournalType } from "./_utils/types/journal.type";
-import { ColumnOptions, TableOptions } from "./_utils/types/schema.type";
-import { SnapshotType } from "./_utils/types/snapshot.type";
 
 const NAMES_DICTIONARY: string[] = names.map((name) => name.toLowerCase());
 const UUID_ZERO = uuidv4().replace(/[0-9a-fA-F]/g, "0");

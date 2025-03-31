@@ -13,8 +13,7 @@
     "server": "cd packages/server && npm run dev",
     "start:docker": "concurrently \"cd packages/server && npm run start:prod\" \"cd packages/capsule-kit && npm run preview\"",
     "docker:build": "docker build -t futurpanda/capsule .",
-    "capsule-kit": "cd packages/capsule-kit && npm run preview",
-    "dep": "npx depcruise ./packages --output-type dot | dot -T png > dependency-graph.png"
+    "capsule-kit": "cd packages/capsule-kit && npm run preview"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +22,11 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.12",
-    "concurrently": "^9.0.1",
-    "dependency-cruiser": "^16.9.0"
+    "concurrently": "^9.0.1"
+  },
+  "dependencies": {
+    "@capsulesh/chisel": "^0.1.1",
+    "@nestjs/cli": "^11.0.5",
+    "tsup": "^8.4.0"
   }
 }

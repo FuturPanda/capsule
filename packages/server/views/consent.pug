@@ -1,8 +1,10 @@
+doctype html
 html(lang="en")
   head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title Capsule OAuth Consent
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap")
     script.
           function submitForm(approved) {
             document.getElementById('authorizeBtn').disabled = true;
@@ -55,46 +57,93 @@ html(lang="en")
           }
     style.
       :root {
-        --background: #09090b;
+        --background: #000000;
         --foreground: #fafafa;
-        --card: #09090b;
+        --card: rgba(20, 25, 35, 0.7);
         --card-foreground: #fafafa;
-        --primary: #3b82f6;
+        --primary: #14b8a6;
         --primary-foreground: #fafafa;
         --muted: #27272a;
         --muted-foreground: #a1a1aa;
-        --border: #27272a;
-        --input: #27272a;
-        --ring: #3b82f6;
+        --border: rgba(39, 39, 42, 0.5);
+        --input: rgba(20, 25, 35, 0.7);
+        --ring: #14b8a6;
+      }
+      @font-face {
+        font-family: 'DelightExtraLight';
+        src: url('path-to-your-font/DelightExtraLight.woff2') format('woff2');
+        font-weight: 300;
+        font-style: normal;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: var(--background);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: radial-gradient(circle at center, #101820 0%, #000 100%);
         color: var(--foreground);
         display: flex;
         align-items: center;
         justify-content: center;
         min-height: 100vh;
         margin: 0;
+        position: relative;
+        overflow: hidden;
+      }
+      body::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 30% 40%, rgba(20, 30, 48, 0.4) 0%, transparent 70%);
+        z-index: -1;
+      }
+      .capsule-logo {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        font-family: 'DelightExtraLight', sans-serif;
+        color: #a1a1aa;
+        font-size: 1.125rem;
+        z-index: 10;
+      }
+      .gradient-circle {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 100%;
+        background: linear-gradient(
+          165deg,
+          rgba(40, 45, 55, 1) 0%,
+          rgb(30, 35, 45) 40%,
+          rgb(20, 25, 35) 98%,
+          rgb(10, 15, 25) 100%
+        );
+        z-index: -1;
+        filter: blur(1px);
       }
       .card {
         background-color: var(--card);
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         border: 1px solid var(--border);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         width: 100%;
-        max-width: 450px;
+        max-width: 480px;
         overflow: hidden;
+        position: relative;
+        z-index: 1;
+        backdrop-filter: blur(10px);
       }
       .header {
-        padding: 1.5rem;
+        padding: 1.75rem;
         border-bottom: 1px solid var(--border);
       }
       .title {
         margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
+        font-family: 'DelightExtraLight', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 300;
         color: var(--foreground);
+        letter-spacing: 0.01em;
       }
       .description {
         margin-top: 0.5rem;
@@ -102,23 +151,24 @@ html(lang="en")
         font-size: 0.875rem;
       }
       .content {
-        padding: 1.5rem;
+        padding: 1.75rem;
       }
       .app-info {
         display: flex;
         align-items: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.75rem;
       }
       .app-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 8px;
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
         background-color: var(--muted);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 1rem;
+        margin-right: 1.25rem;
         overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       .app-icon img {
         max-width: 100%;
@@ -127,46 +177,48 @@ html(lang="en")
       .app-name {
         font-weight: 600;
         font-size: 1.125rem;
+        color: #f0f0f0;
       }
       .permissions {
-        margin-top: 1rem;
+        margin-top: 1.25rem;
       }
       .permission-list {
         list-style: none;
         padding: 0;
-        margin: 1rem 0;
+        margin: 1.25rem 0;
       }
       .permission-item {
         display: flex;
-        align-items: center;
-        padding: 0.5rem 0;
-        gap: 0.75rem;
+        align-items: flex-start;
+        padding: 0.75rem 0;
+        gap: 0.875rem;
       }
       .permission-icon {
         display: flex;
         align-items: center;
         justify-content: center;
         color: var(--primary);
+        margin-top: 0.125rem;
       }
       .footer {
-        padding: 1rem 1.5rem;
-        margin-top: 2rem;
+        padding: 1.25rem 1.75rem;
+        margin-top: 1.5rem;
         display: flex;
         justify-content: flex-end;
-        gap: 0.75rem;
+        gap: 1rem;
         border-top: 1px solid var(--border);
       }
       .button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.5rem 1rem;
-        border-radius: 0.25rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 0.375rem;
         font-size: 0.875rem;
         font-weight: 500;
         line-height: 1.5;
         cursor: pointer;
-        transition: background-color 0.2s;
+        transition: all 0.2s ease;
       }
       .button-primary {
         background-color: var(--primary);
@@ -174,7 +226,9 @@ html(lang="en")
         border: none;
       }
       .button-primary:hover {
-        background-color: #2563eb;
+        background-color: #0d9488;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
       }
       .button-secondary {
         background-color: transparent;
@@ -183,6 +237,7 @@ html(lang="en")
       }
       .button-secondary:hover {
         background-color: var(--muted);
+        transform: translateY(-1px);
       }
       .user-info {
         font-size: 0.875rem;
@@ -193,6 +248,7 @@ html(lang="en")
       }
 
   body
+    //div.capsule-logo capsule
     div.card
       div.header
         h2.title Authorize Application

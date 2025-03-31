@@ -28,14 +28,8 @@ export class UrlStorage {
   }
 
   saveUrl(url: string): boolean {
-    const isValid = this.validateUrl(url);
-
-    if (!isValid) {
-      return false;
-    }
-
     if (typeof localStorage !== "undefined") {
-      localStorage.setItem(this.storageKey, url);
+      localStorage.setItem(this.storageKey, `${url}/api/v1`);
     }
 
     return true;
@@ -66,7 +60,7 @@ export class UrlStorage {
     }
 
     this.saveUrl(url ?? "");
-    return url;
+    return this.getUrl();
   }
 
   getOrPromptForUrl(): string | null {

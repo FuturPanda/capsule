@@ -3,39 +3,50 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { DynamicQueriesService } from './dynamic-queries.service';
+import { ApiTags } from '@nestjs/swagger';
 import { Protect } from 'src/auth/_utils/guards/protect.decorator';
-import { QueryOptionsDto } from './_utils/dto/request/query-options.dto';
 import { Database } from '../_utils/decorators/database.decorator';
 import {
   ValidateDatabasePipe,
   ValidateDatabaseTablePipe,
 } from '../_utils/pipe/database-validation.pipe';
-import { ApiTags } from '@nestjs/swagger';
-import { UpdateOptionsDto } from './_utils/dto/request/update-options.dto';
-import { InsertOptionsDto } from './_utils/dto/request/insert-options.dto';
 import { DeleteOptionsDto } from './_utils/dto/request/delete-options.dto';
-import { QueryParams } from './_utils/types/params.type';
+import { InsertOptionsDto } from './_utils/dto/request/insert-options.dto';
+import { QueryOptionsDto } from './_utils/dto/request/query-options.dto';
 import { SafeSqlStatement } from './_utils/dto/request/safe-sql-statement.dto';
+import { UpdateOptionsDto } from './_utils/dto/request/update-options.dto';
+import { QueryParams } from './_utils/types/params.type';
+import { DynamicQueriesService } from './dynamic-queries.service';
 
 @ApiTags('Dynamic Queries')
 @Controller('dynamic-queries')
 export class DynamicQueriesController {
   constructor(private readonly dynamicQueriesService: DynamicQueriesService) {}
 
-  @Protect()
+  // @Protect()
   @Get(':database/:table')
   query(
-    @Database(ValidateDatabaseTablePipe)
-    params: { dbName: string; tableName: string; clientId: string },
+    //@Database(ValidateDatabaseTablePipe)
+    //params: { dbName: string; tableName: string; clientId: string },
+    @Param() { database }: { database: string },
+    @Param() { table }: { table: string },
     @Query() queryOptions: QueryOptionsDto,
   ) {
-    console.log('In query Dynamic ::::: ', queryOptions);
-    return this.dynamicQueriesService.query(params, queryOptions);
+    console.log(
+      'In query Dynamic ::::: ',
+      'database',
+      database,
+      'table',
+      table,
+      'queryOptions',
+      queryOptions,
+    );
+    return this.dynamicQueriesService.query(database, table, queryOptions);
   }
 
   @Protect()

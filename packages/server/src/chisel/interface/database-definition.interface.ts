@@ -1,4 +1,4 @@
-import { TableInfoType } from '@capsulesh/chisel';
+import { TableInfoType } from '@capsulesh/shared-types';
 
 export interface DatabaseDefinition {
   dbName: string;

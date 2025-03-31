@@ -2,10 +2,11 @@
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import Separator from '$lib/components/separator.svelte';
-	import CustomCard from '$lib/components/custom-card.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import useCapsuleClient from '$lib/capsule.svelte';
-	import type { CapsuleClient } from '@capsule-mono-repo/capsule-client';
+	import Footer from './footer.svelte';
+	import Hero from './hero.svelte';
+	import type { CapsuleClient } from '@capsulesh/capsule-client';
 
 	let showBackground = false;
 	let showLoader = false;
@@ -58,9 +59,7 @@
 	];
 	async function handleLogin() {
 		console.log('Login button clicked');
-
 		console.log('Client created, handling login click');
-
 		await capsuleClient.handleOnLoginClick();
 	}
 </script>
@@ -79,10 +78,11 @@
 			<Button class="" variant="ghost">
 				<a href="https://docs.capsule.sh">Docs</a>
 			</Button>
-			<!-- <Button on:click={handleLogin}>Login with capsule</Button> -->
-			<Button onclick={handleLogin}
-				>{capsuleClient?.authStatus() ? 'AlreadyLoggedIn' : 'LoginWithCapsule'}</Button
-			>
+			{#if !capsuleClient?.authStatus()}
+				<Button onclick={handleLogin}>Login</Button>
+			{:else}
+				<Button onclick={() => {}}>Dashboard</Button>
+			{/if}
 			<Button variant="outline"><a href="./signup" data-sveltekit-reload>Get Started</a></Button>
 		</div>
 	{/if}
@@ -135,23 +135,8 @@
 			</section>
 
 			{#if showContent}
-				<section class="bg-black">
-					<div class="mx-auto flex max-w-6xl flex-col space-y-24 px-4 py-16">
-						{#each features as feature, i}
-							<div
-								class="flex {i % 2 === 0 ? 'justify-end' : 'justify-start'}"
-								in:fly={{ y: 50, duration: 800, delay: i * 200 }}
-							>
-								<div class="justify-end">
-									<CustomCard>
-										<h2 class="mb-4 text-2xl font-bold">{feature.title}</h2>
-										<p>{feature.content}</p>
-									</CustomCard>
-								</div>
-							</div>
-						{/each}
-					</div>
-				</section>
+				<Hero />
+				<Footer />
 			{/if}
 		</div>
 	{/if}
@@ -171,8 +156,20 @@
 	}
 
 	.background {
-		background: radial-gradient(#323232, #000);
+		background: radial-gradient(circle at center, #101820 0%, #000 100%);
+		position: relative;
 		z-index: 1;
+	}
+
+	.background::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: radial-gradient(circle at 30% 40%, rgba(20, 30, 48, 0.4) 0%, transparent 70%);
+		z-index: -1;
 	}
 
 	.loader {
@@ -218,10 +215,10 @@
 		border-radius: 100%;
 		background: linear-gradient(
 			165deg,
-			rgba(40, 40, 40, 1) 0%,
-			rgb(30, 30, 30) 40%,
-			rgb(20, 20, 20) 98%,
-			rgb(0, 0, 0) 100%
+			rgba(40, 45, 55, 1) 0%,
+			rgb(30, 35, 45) 40%,
+			rgb(20, 25, 35) 98%,
+			rgb(10, 15, 25) 100%
 		);
 		position: absolute;
 		z-index: 4;

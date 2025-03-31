@@ -3,7 +3,7 @@ import {
 	createCapsuleClient,
 	OAuthScopes,
 	type CapsuleConfig
-} from '@capsule-mono-repo/capsule-client';
+} from '@capsulesh/capsule-client';
 
 const config: CapsuleConfig = {
 	scopes: [OAuthScopes.PROFILE_READ, OAuthScopes.TASKS_READ, OAuthScopes.TASKS_WRITE],

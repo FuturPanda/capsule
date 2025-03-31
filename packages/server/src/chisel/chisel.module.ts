@@ -1,7 +1,8 @@
-import { ChiselDb, IFactoryOpts } from '@capsulesh/chisel';
+import { ChiselDb } from '@capsulesh/chisel';
 import { DynamicModule, Global, Inject, Module } from '@nestjs/common';
 import { ClassType } from 'src/_utils/_types/generics';
 import { ChiselService } from './chisel.service';
+import { IFactoryOpts } from '@capsulesh/shared-types';
 
 export const CHISEL_DB_CONNECTION = 'DbConnectionToken';
 

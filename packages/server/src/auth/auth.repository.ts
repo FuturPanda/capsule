@@ -18,16 +18,10 @@ export class AuthRepository {
     private readonly oauthAuthorizationModel: ChiselModel<OauthAuthorization>,
   ) {}
 
-  createRefreshToken = (
-    userId: number,
-    value: string,
-    expiryDate: Date,
-    clientId?: string,
-  ) =>
+  createRefreshToken = (userId: number, value: string, expiryDate: Date) =>
     this.oauthRefreshTokenModel.insert({
       token: value,
       user_id: userId,
-      client_id: clientId,
       expires_at: expiryDate.toString(),
     });
 
@@ -40,5 +34,6 @@ export class AuthRepository {
   revokeRefreshToken = (tokenId: number | bigint) =>
     this.oauthRefreshTokenModel
       .update({ revoked_at: Date.now().toString() })
-      .where({ id: { eq: tokenId } });
+      .where({ id: { eq: tokenId } })
+      .exec();
 }

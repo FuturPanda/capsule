@@ -1,7 +1,7 @@
 ---
 "demo1": minor
 "demo2": minor
-"capsule-client": minor
+"@capsulesh/capsule-client": minor
 "docs": minor
 "www": minor
 ---

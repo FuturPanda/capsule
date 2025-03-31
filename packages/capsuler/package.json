@@ -1,5 +1,5 @@
 {
-  "name": "@capsule/capsuler",
+  "name": "@capsulesh/capsuler",
   "version": "0.0.0",
   "description": "CLI to spin a capsule ",
   "main": "dist/index.js",
@@ -68,5 +68,8 @@
   },
   "bin": {
     "capsuler": "./dist/bin.js"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

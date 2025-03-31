@@ -1,11 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { AuthProvider } from "./_utils/providers/AuthProvider";
+import { CapsuleClientProvider } from "./_utils/providers/CapsuleClientProvider";
 import { ThemeProvider } from "./_utils/providers/ThemeProvider";
 import { App } from "./App";
 import "./styles/index.css";
-import { ReactFlowProvider } from "@xyflow/react";
 
 // register(`/service-worker.js`);
 
@@ -18,13 +17,9 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <ThemeProvider>
         <QueryClientProvider client={queryClient}>
-          <ReactFlowProvider>
-            <AuthProvider>
-              {/*<SyncProvider>*/}
-              <App />
-              {/*</SyncProvider>*/}
-            </AuthProvider>
-          </ReactFlowProvider>
+          <CapsuleClientProvider>
+            <App />
+          </CapsuleClientProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </StrictMode>,

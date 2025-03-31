@@ -38,6 +38,7 @@ export class AuthService {
   login(user: Omit<User, 'password'>) {
     const payload = { email: user.email, sub: user.id };
     const refreshToken = this.createOpaqueRefreshToken(user);
+    console.log('in login ::: RefreshToken', refreshToken);
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
       refresh_token: refreshToken,
@@ -69,6 +70,7 @@ export class AuthService {
   }
 
   validateRefreshToken(token: string) {
+    console.log('invalidaterefreshtoken ::: ', token);
     const tokenRecord = this.authRepository.findToken(token);
     console.log('TOKEN RECORD : ', tokenRecord);
     if (
@@ -76,7 +78,7 @@ export class AuthService {
       new Date() > tokenRecord.validUntil ||
       tokenRecord.deletedAt
     ) {
-      throw new Error('Invalid or expired refresh token');
+      return null;
     }
     return tokenRecord;
   }

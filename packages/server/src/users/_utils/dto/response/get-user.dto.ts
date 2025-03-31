@@ -1,4 +1,4 @@
-import { ChiselId } from '@capsulesh/chisel';
+import { ChiselId } from '@capsulesh/shared-types';
 
 export class GetUserDto {
   id: ChiselId;

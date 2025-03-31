@@ -1,6 +1,13 @@
+import {
+  AuthTokens,
+  CreateDatabase,
+  Migration,
+  OAuthConfig,
+} from "@capsulesh/shared-types";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import { SESSION_STORAGE_AUTH_TOKENS } from "./constants";
-import { AuthTokens, CapsuleConfig, Migration, OAuthConfig } from "./types";
+import { SSE } from "sse.js";
+import { SESSION_STORAGE_AUTH_TOKENS } from "./_utils/constants";
+import { CapsuleConfig } from "./client";
 
 export class ApiClient {
   private client: AxiosInstance;
@@ -151,10 +158,48 @@ export class ApiClient {
     }
   }
 
+  connectToSseEvents = (onEventCallback: (data: any) => void) => {
+    const url = this.baseUrl;
+    if (!url) throw new Error("URL not found");
+    console.log("reactivity connected");
+
+    const tokens = this.getAuthTokens();
+    const eventSource = new SSE(`${url}/reactivity/events`, {
+      headers: { Authorization: `Bearer ${tokens?.accessToken}` },
+    });
+
+    eventSource.onmessage = (event: any) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log("onMessage !! ::: , ", data);
+        if (onEventCallback) {
+          onEventCallback(data);
+        }
+      } catch (error) {
+        console.error("Error parsing SSE data:", error);
+      }
+    };
+
+    eventSource.onerror = (error: any) => {
+      console.error("SSE connection error:", error);
+      eventSource.close();
+
+      setTimeout(() => {
+        console.log("Attempting to reconnect SSE...");
+        this.connectToSseEvents(onEventCallback);
+      }, 5000);
+    };
+
+    return eventSource;
+  };
+
   private setTokens(tokenData: any): void {}
 
   async get<T>(url: string, params?: any): Promise<T> {
-    const config: AxiosRequestConfig = { params };
+    const config: AxiosRequestConfig = {
+      params: params,
+    };
+    console.log("in axios : config, ", config);
     const response = await this.client.get<T>(url, config);
     return response.data;
   }
@@ -176,6 +221,26 @@ export class ApiClient {
 
   async delete<T>(url: string): Promise<T> {
     const response = await this.client.delete<T>(url);
+    return response.data;
+  }
+
+  async createDatabase(database: CreateDatabase) {
+    const response = await this.client.post(`databases`, database);
+    return response.data;
+  }
+
+  async getDatabases() {
+    const response = await this.client.get("databases");
+    return response.data;
+  }
+
+  async queryDatabase(database: string, table: string, params: unknown) {
+    const response = await this.client.get(
+      `dynamic-queries/${database}/${table}`,
+      {
+        params: params,
+      },
+    );
     return response.data;
   }
 }

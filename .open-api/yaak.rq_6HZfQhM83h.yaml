@@ -1,0 +1,38 @@
+type: http_request
+model: http_request
+id: rq_6HZfQhM83h
+createdAt: 2025-03-29T14:29:55.671659
+updatedAt: 2025-03-29T15:03:56.423860
+workspaceId: wk_oXrjn67t3d
+folderId: fl_6ovYv4DZ86
+authentication:
+  token: ${[ token ]}
+authenticationType: bearer
+body:
+  text: |2-
+     {
+       "name": "New Database",
+       "entities" : [
+         {
+           "name" : "New table",
+           "columns" : {
+             "one": {
+               "type" : "text",
+               "primaryKey" : true
+             }
+           }
+         }
+       ]
+     }
+bodyType: application/json
+description: ''
+headers:
+- enabled: true
+  name: Content-Type
+  value: application/json
+  id: gYBXxC4WE5
+method: POST
+name: ''
+sortPriority: 999.9999
+url: ${[ BASE_URL ]}/databases
+urlParameters: []
