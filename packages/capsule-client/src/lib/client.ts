@@ -4,13 +4,14 @@ import {
   Migration,
   ModelType,
   OAuthConfig,
-  OAuthScopes,
+  OAuthScopes as _OAuthScopes,
 } from "@capsulesh/shared-types";
 import { ApiClient } from "./axios";
 import { EventEmitter } from "./event-emitter";
 import { Events, Tasks } from "./resources";
 import { Persons } from "./resources/person";
 import { UrlStorage } from "./urlstorage";
+export const OAuthScopes = _OAuthScopes;
 
 export interface CapsuleConfig extends OAuthConfig {
   redirectUri?: string;
@@ -242,8 +243,6 @@ export class CapsuleClient {
     return this.apiClient?.queryDatabase(databaseId, tableName, query);
   }
 }
-
-export { OAuthScopes };
 
 export function createCapsuleClient(config: CapsuleConfig): CapsuleClient {
   const capsuleClient = new CapsuleClient(config);
