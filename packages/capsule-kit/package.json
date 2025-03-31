@@ -11,7 +11,7 @@
     "seed": "tsc ./src/components/table/data/seed.ts"
   },
   "dependencies": {
-    "@capsulesh/capsule-client": "^0.0.1",
+    "@capsulesh/capsule-client": "^0.0.2",
     "@capsulesh/chisel": "^0.1.1",
     "@capsulesh/shared-types": "^0.1.0",
     "@hookform/resolvers": "^3.9.1",
