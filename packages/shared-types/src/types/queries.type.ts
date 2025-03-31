@@ -1,15 +1,13 @@
-import { Migration } from "./migrations.type";
-
 export type ClassType<T> = new (...args: any[]) => T;
 
-export interface IFactoryOpts {
-  uri: string;
-  dbName: string;
-  // entities?: TableOptions[];
-  migrations?: Migration[];
-  generateTypes?: boolean;
-  typesDir?: string;
-}
+// export interface IFactoryOpts {
+//   uri: string;
+//   dbName: string;
+//   // entities?: TableOptions[];
+//   migrations?: Migration[];
+//   generateTypes?: boolean;
+//   typesDir?: string;
+// }
 
 export interface IChiselDbParams {
   filePath?: string;
