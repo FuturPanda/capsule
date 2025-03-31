@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "",
   "author": "",
   "private": true,
@@ -21,8 +21,8 @@
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org hoareausteevy --project server-quiet-sea-9611 ./dist && sentry-cli sourcemaps upload --org hoareausteevy --project server-quiet-sea-9611 ./dist"
   },
   "dependencies": {
-    "@capsulesh/chisel": "^0.1.1",
-    "@capsulesh/shared-types": "^0.1.0",
+    "@capsulesh/chisel": "^0.2.0",
+    "@capsulesh/shared-types": "^0.2.0",
     "@iarna/toml": "^2.2.5",
     "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/common": "^10.0.0",
