@@ -51,7 +51,7 @@
 		"zod": "^3.24.1"
 	},
 	"dependencies": {
-		"@capsulesh/capsule-client": "^0.0.1",
+		"@capsulesh/capsule-client": "^0.0.2",
 		"@capsulesh/shared-types": "^0.1.0",
 		"@fontsource/atkinson-hyperlegible": "^5.1.0",
 		"@fontsource/jetbrains-mono": "^5.1.1",
