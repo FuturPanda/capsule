@@ -16,7 +16,6 @@
   --border-color: red;
 }
 
-/* Font face for DelightExtraLight */
 @font-face {
   font-family: "DelightExtraLight";
   src: url("/fonts/DelightExtraLight.woff2") format("woff2");
@@ -25,7 +24,6 @@
   font-display: swap;
 }
 
-/* Background radial gradient for that "capsule" feel */
 body::after {
   content: "";
   position: fixed;
@@ -42,7 +40,6 @@ body::after {
   pointer-events: none;
 }
 
-/* Custom fonts for headings */
 h1,
 h2,
 h3,
@@ -52,7 +49,6 @@ h3,
   letter-spacing: -0.02em;
 }
 
-/* Pure black background for all containers */
 html,
 body,
 .sl-container,
@@ -61,18 +57,13 @@ main,
   background: #000000;
 }
 
-.sl-content-wrapper {
-  background-color: red;
-}
-
-.sl-sidebar {
-  background-color: red;
-  border-right: 1px solid var(--border-color);
-}
-
-.sl-sidebar-header {
-  background-color: red;
-  border-bottom: 1px solid var(--border-color);
+.astro-6etearvc {
+  z-index: 10;
+  font-size: 1.125rem;
+  color: var(--sl-color-gray-2);
+  font-family: "DelightExtraLight", system-ui, sans-serif;
+  font-weight: 300;
+  letter-spacing: -0.02em;
 }
 
 .sl-sidebar h2 {
@@ -85,22 +76,13 @@ main,
 
 .sl-sidebar a:hover,
 .sl-sidebar a[aria-current="page"] {
-  color: var(--sl-color-accent);
   background-color: transparent;
 }
 
-/* Topbar styling with fine border */
 .sl-topbar {
-  background-color: red;
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Page header */
-.sl-page-header {
-  background-color: green;
-}
-
-/* Card styling */
 .sl-card {
   background: rgba(10, 15, 20, 0.2);
   border: 1px solid var(--border-color);
@@ -108,7 +90,6 @@ main,
   border-radius: 4px;
 }
 
-/* Code blocks */
 pre,
 code {
   background-color: rgba(10, 15, 20, 0.3) !important;
@@ -124,7 +105,6 @@ code {
   font-size: 0.9em;
 }
 
-/* Button styling */
 button,
 .sl-button {
   border-radius: 4px;
@@ -132,7 +112,6 @@ button,
   font-weight: 400;
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -156,7 +135,6 @@ button,
   scrollbar-color: #2a2a2a transparent;
 }
 
-/* Table styling */
 table {
   border-collapse: collapse;
   width: 100%;
@@ -175,14 +153,12 @@ td {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Main content */
 .sl-markdown-content {
   line-height: 1.6;
   color: var(--sl-color-gray-1);
 }
 
 a {
-  color: var(--sl-color-accent);
   text-decoration: none;
   transition: color 0.2s ease;
 }

@@ -1,10 +1,19 @@
-export class Task {
+import { Task } from '@capsulesh/shared-types';
+
+export class TaskModel implements Task {
   id: number;
   content: string;
-  assignee?: string;
-  due_date?: string;
+  due_date: string | null;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
   progress?: number;
-  is_completed?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string;
   completed_at?: string;
+  completed_by?: number;
+}
+
+export class AssigneeTaskModel {
+  person_id: number;
+  task_id: number;
 }

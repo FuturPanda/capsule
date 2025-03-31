@@ -19,7 +19,7 @@ type QueryBuilder = {
   orderBy?: (column: keyof any, order: "DESC" | "ASC") => QueryBuilder;
   exec: (params?: ExecParams) => any;
   limit?: (params: number) => { exec: (params?: ExecParams) => any };
-  join?: <Local, Foreign>(
+  join: <Local, Foreign>(
     fromTable: ClassType<Local>,
     toTable: ClassType<Foreign>,
     localKey: keyof Local & string,
@@ -135,7 +135,7 @@ export class ChiselModel<T> {
         toTable: ClassType<Foreign>,
         localKey: keyof Local & string,
         foreignKey: keyof Foreign & string,
-        type: "INNER" | "LEFT" | "RIGHT" = "INNER",
+        type: "" | "INNER" | "LEFT" | "RIGHT" = "",
       ) => {
         query += this.buildJoinClause(
           fromTable,
@@ -152,7 +152,7 @@ export class ChiselModel<T> {
     return queryBuilder;
   }
 
-  update(params: { [P in keyof T]?: T[P] }): QueryBuilder {
+  update(params: { [P in keyof T]?: T[P] }): Omit<QueryBuilder, "join"> {
     const entries = Object.entries(params);
     const placeholders = entries.map(([key]) => `${key} = ?`);
     const values = entries.map(([_, value]) => {
@@ -169,7 +169,7 @@ export class ChiselModel<T> {
 
     const exec = () => this.executeWrite(query, values);
 
-    const queryBuilder: QueryBuilder = {
+    const queryBuilder: Omit<QueryBuilder, "join"> = {
       where: (params: FilterQuery<T>) => {
         const { whereQuery, whereValues } =
           this.buildWhereClauseWithParams(params);
@@ -183,44 +183,13 @@ export class ChiselModel<T> {
 
     return queryBuilder;
   }
-  /*
 
-  update(params: { [P in keyof T]?: T[P] }): QueryBuilder {
-    const entries = Object.entries(params);
-    const placeholders = entries.map(([key]) => `${key} = ?`);
-    const values = entries.map(([_, value]) => {
-      console.log("IN update model ::: ", value);
-      if (typeof value === "boolean") {
-        return value ? 1 : 0;
-      }
-      return value;
-    });
-    console.log("BEFORE UYPDATE MODEL ==== ", values, params);
-
-    let query = `UPDATE ${this.modelName}
-                 SET ${placeholders.join(", ")} `;
-
-    const exec = () => this.executeWrite(query, values);
-
-    return {
-      where: (params: FilterQuery<T>) => {
-        const { whereQuery, whereValues } =
-          this.buildWhereClauseWithParams(params);
-        query += whereQuery;
-        return {
-          exec: () => this.executeWrite(query, [...values, ...whereValues]),
-        };
-      },
-      exec,
-    };
-  }
-*/
-  delete(): QueryBuilder {
+  delete(): Omit<QueryBuilder, "join"> {
     let query = `DELETE
                FROM ${this.modelName} `;
     const exec = () => this.executeWrite(query, []);
 
-    const queryBuilder: QueryBuilder = {
+    const queryBuilder: Omit<QueryBuilder, "join"> = {
       where: (params: FilterQuery<T>) => {
         query += this.buildWhereClause(params);
         return {
@@ -400,9 +369,9 @@ export class ChiselModel<T> {
     toTable: ClassType<Foreign>,
     localKey: keyof Local & string,
     foreignKey: keyof Foreign & string,
-    type: "INNER" | "LEFT" | "RIGHT",
+    type: "INNER" | "LEFT" | "RIGHT" | "",
   ): string {
-    return ` ${type} JOIN ${fromClassTypeToSnakeCase(toTable)} ON ${fromClassTypeToSnakeCase(fromTable)}.${localKey} = ${fromClassTypeToSnakeCase(toTable)}.${foreignKey}`;
+    return `${type ? type + " " : ""}JOIN ${fromClassTypeToSnakeCase(toTable)} ON ${fromClassTypeToSnakeCase(fromTable)}.${localKey} = ${fromClassTypeToSnakeCase(toTable)}.${foreignKey} `;
   }
 
   private executeSelect(

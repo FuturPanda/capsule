@@ -28,15 +28,13 @@ export default defineConfig({
 					autogenerate: { directory: 'chisel' },
 				},
 				{
-					label: 'Capsuler',
-					autogenerate: { directory: 'chisel' },
-				},
-				{
 					label: 'Sdk',
 					items : [
 					 {label: "Installation", link: "./sdk/installation"},
-					 {label: "Use Generic Objects", link: "./sdk/objects"},
-					 {label: "Create a database", link: "./sdk/models"},
+					 {label: "Use Predefined Models", link: "./sdk/models"},
+					 {label: "Create a database", link: "./sdk/database"},
+
+					 {label: "Handle login", link: "./sdk/login"},
 					],
 				},
 				{

@@ -2,7 +2,6 @@ import { ChiselModel } from '@capsulesh/chisel';
 import { Injectable } from '@nestjs/common';
 import { convertQueryOptionsToFilterQuery } from 'src/_utils/functions/query-options-transformation';
 import { PersonModel } from 'src/_utils/models/root/person';
-import { Task } from 'src/_utils/models/root/task';
 import { QueryOptionsDto } from 'src/dynamic-queries/_utils/dto/request/query-options.dto';
 import { InjectModel } from '../chisel/chisel.module';
 import { CreatePersonDto } from './dto/request/create-person.dto';
@@ -35,7 +34,7 @@ export class PersonsRepository {
     return this.model.select().where(filterQuery).exec();
   }
 
-  findPersonById = (id: number | bigint): Task =>
+  findPersonById = (id: number | bigint): PersonModel =>
     this.model
       .select()
       .where({ id: { $eq: id } })

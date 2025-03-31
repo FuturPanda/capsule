@@ -1,22 +1,22 @@
 import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
 } from "@/components/ui/avatar.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import {
-    SidebarMenu,
-    SidebarMenuItem,
-    useSidebar,
+  SidebarMenu,
+  SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar.tsx";
 import { useBoundStore } from "@/stores/global.store.ts";
 import { useNavigate } from "@tanstack/react-router";
@@ -57,7 +57,7 @@ export function NavUser() {
                   <Avatar className="h-8 w-8 rounded-lg border border-zinc-800">
                     <AvatarImage src={user.avatarUrl} alt={user.username} />
                     <AvatarFallback className="rounded-lg bg-zinc-900 text-teal-500">
-                      {user.username.substring(0, 2).toUpperCase()}
+                      "AV" {/* user.username.substring(0, 2).toUpperCase() */}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">

@@ -1,6 +1,18 @@
-A 3, 01 Utilisateurs,  11 REFRESH TOKENS
-Utilisateurs: email, mot de passe
-/\ Personne <- Utilisateurs
+
+Permission: name
+Composer, 0N permission, 1N role
+Role: name
+Detenir, 1N Utilisateurs, 0N role
+:
+:
+:
+:
+:
+
+
+Avoir 3, 0N Utilisateurs,  11 REFRESH TOKENS
+Utilisateurs: email, mot de passe, username, avatar url, description
+:
 :
 :
 Personne: email, nom de famille, prénom, date de naissance, téléphone, code postal, métier
@@ -8,16 +20,16 @@ Personne: email, nom de famille, prénom, date de naissance, téléphone, code p
 
 Refresh Tokens: token, date d'expiration, date de révocation
 :
-Est autorisé, NN Utilisateurs, 1N CLIENT, 0N Resource: nature de l'autorisation
-Resource: nom,type,
-/XT\ Resource <- Tâche, Personne, Database, Document
+Est autorisé, 1N CLIENT, 0N Ressource: nature de l'autorisation
+Ressource: nom, _type,
+/XT\ Ressource <- Tâche, Personne, Base de donnée, Document
 ASSIGNER, 0N TÂCHE, 0N PERSONNE
 :
 
-A 2, 01 client,  11 REFRESH TOKENS
-Client: nom, redirect_uri
+Avoir 2, 0N client,  11 REFRESH TOKENS
+Client: nom, _URL redirection
 :
-Database: nom, id client
+Base de donnée: nom, id client
 Document: titre, contenu
 Tâche:  contenu, date limite, date d'assignation, priorité, progrès
 EMPLOYER, 0N Entreprise, 0N Personne: poste
@@ -25,7 +37,7 @@ EMPLOYER, 0N Entreprise, 0N Personne: poste
 :
 :
 :
-Appartenir, 01 Entreprise, ON Client
+Appartenir, 0N Entreprise, 01 Client
 :
-Entreprise: nom, code postal, siret
+Entreprise: siret, nom, code postal
 :

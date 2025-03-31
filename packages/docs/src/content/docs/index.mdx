@@ -1,14 +1,78 @@
 ---
-title: Capsule
-description: Get started building your docs site with Starlight.
-template: doc
+title: Capsule Documentation
+description: The personal server for your digital space
+template: splash
 hero:
+  tagline: Create, control, and customize your own personal digital space
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Get Started
+      link: /guides/creation/
       icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/futurpanda/capsule
+      icon: github
+      variant: secondary
 ---
 
 import { Card, CardGrid } from "@astrojs/starlight/components";
 
-## Next steps
+<CardGrid >
+  <Card title="Build your digital home" icon="rocket">
+    Host your own personal data, applications, and online identity with complete control.
+  </Card>
+
+<Card title="Simple deployment" icon="approve-check">
+  Set up in minutes with Docker, Fly.io, or your own infrastructure.
+</Card>
+
+<Card title="Developer-friendly" icon="setting">
+  Leverage Chisel ORM and powerful SDKs to extend functionality and build custom
+  applications.
+</Card>
+
+  <Card title="Privacy-focused" icon="puzzle">
+    Keep your data private and secure with full ownership and control.
+  </Card>
+</CardGrid>
+
+## Get started with Capsule
+
+<CardGrid>
+  <Card title="Create your first Capsule" icon="pencil">
+    Learn how to [create a new Capsule](/guides/creation/) and start building your digital space.
+  </Card>
+
+<Card title="Self-host your Capsule" icon="open-book">
+  Follow our guide to [self-host your Capsule](/guides/self-hosting/) on your
+  own infrastructure.
+</Card>
+
+<Card title="Deploy with Docker" icon="document">
+  Quickly deploy using our [Docker container](/guides/docker/) for easy setup.
+</Card>
+
+  <Card title="Extend with SDK" icon="laptop">
+    Learn to build apps with the [Capsule SDK](/sdk/installation/).
+  </Card>
+</CardGrid>
+
+## Core components
+
+<CardGrid>
+  <Card title="Chisel ORM" icon="bars">
+    Interact with SQLite databases using our type-safe, intuitive [ORM tool](/chisel/example/).
+  </Card>
+
+<Card title="Authentication" icon="user">
+  Simple and secure [login handling](/sdk/login/) for your applications.
+</Card>
+
+<Card title="Models" icon="document">
+  Define and interact with your [data models](/sdk/models/) in a type-safe way.
+</Card>
+
+  <Card title="Caplets" icon="puzzle">
+    Create modular components with our [object system](/sdk/objects/).
+  </Card>
+</CardGrid>

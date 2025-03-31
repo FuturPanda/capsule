@@ -69,7 +69,7 @@ export class CapsuleClient {
         );
       }
     }
-    this.loadTokensFromStorage();
+    this.apiClient.getAuthTokens();
 
     return this.handleLoginRedirect(options);
   }
@@ -128,15 +128,9 @@ export class CapsuleClient {
           accessToken: response.data.access_token,
           refreshToken: response.data.refresh_token,
         };
+        console.log("Before Setting Tokens :::: ", tokens);
 
-        this.apiClient?.setAuthTokens(tokens);
-
-        if (typeof window !== "undefined") {
-          sessionStorage.setItem(
-            `${this.config.identifier}:::capsule_auth_tokens`,
-            JSON.stringify(tokens),
-          );
-        }
+        this.apiClient.setAuthTokens(tokens);
 
         return response;
       }
@@ -161,11 +155,12 @@ export class CapsuleClient {
   }
 
   authStatus(): boolean {
-    const tokens = JSON.parse(
-      sessionStorage.getItem("capsule_auth_tokens") || "{}",
-    );
-    console.log(!!tokens.accessToken, "In capsule client authStatus");
-    return !!tokens.accessToken;
+    const isAuthenticated = this.apiClient?.getAuthTokens() ?? false;
+    return !!isAuthenticated;
+  }
+
+  logout() {
+    this.apiClient?.logout();
   }
 
   async clearApiUrl(): Promise<void> {
@@ -205,21 +200,6 @@ export class CapsuleClient {
     }
     if (enabledResources.has("events")) {
       this.events = new Events(this.apiClient);
-    }
-  }
-
-  private loadTokensFromStorage(): void {
-    if (typeof window !== "undefined" && this.apiClient) {
-      const storedTokens = sessionStorage.getItem("capsule_auth_tokens");
-      if (storedTokens) {
-        try {
-          const tokens = JSON.parse(storedTokens);
-          this.apiClient.setAuthTokens(tokens);
-        } catch (e) {
-          console.error("Failed to parse stored tokens", e);
-          sessionStorage.removeItem("capsule_auth_tokens");
-        }
-      }
     }
   }
 

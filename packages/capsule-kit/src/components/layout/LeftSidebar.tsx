@@ -13,10 +13,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar.tsx";
 import { cn } from "@/lib/utils.ts";
-import { useBoundStore } from "@/stores/global.store.ts";
 import { Link, useRouter } from "@tanstack/react-router";
 import {
-  Calendar,
   DatabaseZap,
   FilePen,
   SquareCheck,
@@ -48,11 +46,6 @@ const navMain = [
     linkTo: "/models/tasks",
   },
   {
-    title: "events",
-    icon: <Calendar className="text-zinc-400 group-hover:text-teal-500" />,
-    linkTo: "/models/events",
-  },
-  {
     title: "persons",
     icon: <Users className="text-zinc-400 group-hover:text-teal-500" />,
     linkTo: "/models/persons",
@@ -63,7 +56,6 @@ export function LeftSidebar({
   className,
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const setBreadcrumbsPath = useBoundStore((state) => state.setBreadcrumbsPath);
   const router = useRouter();
   const currentPath = router.state.location.pathname;
 
@@ -91,9 +83,6 @@ export function LeftSidebar({
                           hidden: false,
                           className:
                             "bg-zinc-900 text-teal-500 border border-zinc-800",
-                        }}
-                        onClick={() => {
-                          setBreadcrumbsPath([item.title, "DATABASES"]);
                         }}
                         isActive={isActive}
                         className={cn(

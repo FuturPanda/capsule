@@ -1,7 +1,7 @@
 import {
-    CapsuleClient,
-    CapsuleConfig,
-    createCapsuleClient,
+  CapsuleClient,
+  CapsuleConfig,
+  createCapsuleClient,
 } from "@capsulesh/capsule-client";
 import { OAuthScopes } from "@capsulesh/shared-types";
 import React, { createContext, ReactNode, useEffect, useState } from "react";
@@ -10,9 +10,10 @@ import { migrations } from "../db";
 const defaultConfig: CapsuleConfig = {
   identifier: "Capsule-kit",
   scopes: [OAuthScopes.DATABASE_OWNER],
-  redirectUri: typeof window !== 'undefined'
+  redirectUri:
+    typeof window !== "undefined"
       ? `${window.location.origin}/`
-      : 'http://localhost:5173/',
+      : "http://localhost:5173/",
   databaseMigrations: migrations,
   models: ["tasks"],
 };
@@ -52,7 +53,6 @@ export const CapsuleClientProvider: React.FC<CapsuleClientProviderProps> = ({
     };
 
     try {
-      console.log("Creating Capsule client");
       const newClient = createCapsuleClient(mergedConfig);
       setClient(newClient);
 

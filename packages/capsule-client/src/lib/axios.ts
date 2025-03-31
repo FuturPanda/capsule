@@ -5,8 +5,9 @@ import {
   OAuthConfig,
 } from "@capsulesh/shared-types";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import Cookies from "js-cookie";
 import { SSE } from "sse.js";
-import { SESSION_STORAGE_AUTH_TOKENS } from "./_utils/constants";
+import { AUTH_TOKENS_COOKIE } from "./_utils/constants";
 import { CapsuleConfig } from "./client";
 
 export class ApiClient {
@@ -21,7 +22,6 @@ export class ApiClient {
     }
 
     this.baseUrl = config.capsuleUrl;
-    console.log("creating apiclient and axios instance");
     const tokens = this.getAuthTokens();
 
     this.client = axios.create({
@@ -113,7 +113,7 @@ export class ApiClient {
       }
 
       const response = await this.client.post("/oauth/token", payload);
-      this.setTokens(response.data);
+      this.setAuthTokens(response.data);
     } catch (error) {
       this.tokens = null;
       throw error;
@@ -121,24 +121,33 @@ export class ApiClient {
   }
 
   setAuthTokens(tokens: AuthTokens): void {
-    sessionStorage.setItem(
-      SESSION_STORAGE_AUTH_TOKENS,
+    Cookies.set(
+      AUTH_TOKENS_COOKIE,
       JSON.stringify({
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       }),
+      {
+        secure: true,
+        sameSite: "strict",
+        expires: 7,
+      },
     );
+    this.tokens = tokens;
   }
 
   getAuthTokens(): AuthTokens | null {
-    const tokensString = sessionStorage.getItem(SESSION_STORAGE_AUTH_TOKENS);
+    const tokensString = Cookies.get(AUTH_TOKENS_COOKIE);
     const tokens: AuthTokens | null = tokensString
       ? JSON.parse(tokensString)
       : null;
+    console.log("Getting auth tokens", tokens);
+    this.tokens = tokens;
     return tokens;
   }
 
   logout(): void {
+    Cookies.remove(AUTH_TOKENS_COOKIE);
     this.tokens = null;
   }
 
@@ -192,8 +201,6 @@ export class ApiClient {
 
     return eventSource;
   };
-
-  private setTokens(tokenData: any): void {}
 
   async get<T>(url: string, params?: any): Promise<T> {
     const config: AxiosRequestConfig = {
