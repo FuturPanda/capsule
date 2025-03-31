@@ -1,5 +1,5 @@
 ---
-tite: Chisel ORM
+title: Chisel ORM
 description: A reference page
 ---
 
