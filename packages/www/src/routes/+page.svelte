@@ -3,7 +3,6 @@
 	import { fade, fly } from 'svelte/transition';
 	import Separator from '$lib/components/separator.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import useCapsuleClient from '$lib/capsule.svelte';
 	import Footer from './footer.svelte';
 	import Hero from './hero.svelte';
 	import type { CapsuleClient } from '@capsulesh/capsule-client';
@@ -37,7 +36,7 @@
 		setTimeout(() => {
 			interval = setInterval(cycleWord, 3000);
 		}, 6000);
-		capsuleClient = useCapsuleClient();
+		//capsuleClient = useCapsuleClient();
 		return () => clearInterval(interval);
 	});
 	const features = [
@@ -60,7 +59,7 @@
 	async function handleLogin() {
 		console.log('Login button clicked');
 		console.log('Client created, handling login click');
-		await capsuleClient.handleOnLoginClick();
+		// await capsuleClient.handleOnLoginClick();
 	}
 </script>
 
@@ -78,11 +77,11 @@
 			<Button class="" variant="ghost">
 				<a href="https://docs.capsule.sh">Docs</a>
 			</Button>
-			{#if !capsuleClient?.authStatus()}
+			<!-- {#if !capsuleClient?.authStatus()}
 				<Button onclick={handleLogin}>Login</Button>
 			{:else}
 				<Button onclick={() => {}}>Dashboard</Button>
-			{/if}
+			{/if} -->
 			<Button variant="outline"><a href="./signup" data-sveltekit-reload>Get Started</a></Button>
 		</div>
 	{/if}
