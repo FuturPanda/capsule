@@ -11,5 +11,19 @@ export default defineConfig({
 		rollupOptions: {
 			external: ['@capsulesh/capsule-client']
 		}
+	},
+	optimizeDeps: {
+		include: ['@capsulesh/capsule-client'],
+		esbuildOptions: {
+			define: {
+				global: 'globalThis'
+			}
+		}
+	},
+	resolve: {
+		dedupe: ['@capsulesh/capsule-client']
+	},
+	ssr: {
+		noExternal: ['@capsulesh/capsule-client']
 	}
 });

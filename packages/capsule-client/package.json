@@ -1,6 +1,6 @@
 {
   "name": "@capsulesh/capsule-client",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "SDK for capsule ",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
