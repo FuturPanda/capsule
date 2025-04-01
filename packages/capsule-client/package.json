@@ -33,7 +33,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@capsulesh/shared-types": "^0.1.0",
+    "@capsulesh/shared-types": "^0.1.2",
     "sse.js": "^2.6.0"
   }
 }
