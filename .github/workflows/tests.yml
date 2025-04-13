@@ -1,0 +1,23 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev 
+
+jobs: 
+ test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14, 16]
+        
+    steps:
+      - name: Test Reporter
+        uses: dorny/test-reporter@v2.0.0
