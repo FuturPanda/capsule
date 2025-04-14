@@ -1,6 +1,6 @@
 describe('registration of a capsule', () => {
   beforeEach(() => {
-    cy.visit('http://localhost:5174')
+    cy.visit('http://localhost:3000')
     cy.waitForAnimations()
     cy.get('[data-cy="signup"]').click()
     cy.url().should('include', '/signup')
