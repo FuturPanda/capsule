@@ -50,7 +50,6 @@ export const POST = async ({ url }) => {
 			await res4.json();
 			emit('message', JSON.stringify({ content: `Volume Mounted`, progress: 85 }));
 			emit('message', JSON.stringify({ content: `Done. Your Capsule is ready`, progress: 90 }));
-			console.log('BEFORE SECOND REQUEST');
 		} catch (error) {
 			console.error(error);
 		}

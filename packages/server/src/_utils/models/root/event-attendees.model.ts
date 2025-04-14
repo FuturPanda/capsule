@@ -1,4 +1,4 @@
 export class EventAttendeeModel {
-  eventId: number;
-  attendeeId: number;
+  event_id: number;
+  attendee_id: number;
 }

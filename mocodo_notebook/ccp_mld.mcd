@@ -1,0 +1,38 @@
+%%mocodo
+:::
+HABITER: #name > Resource > name, _#nom de rue > Adresse > nom de rue
+:
+Adresse: nom de rue, code postal, pays
+:
+LOCALISER: #nom de rue > Adresse > nom de rue, _nom
+:::
+SITUER : nom, _#nom de rue > Adresse > nom de rue
+:
+
+
+:::
+EMPLOYER: nom, _#name > Resource > name
+:::
+SITUER : nom, _#nom de rue > Adresse > nom de rue
+:::::
+
+
+:
+Resource: name, type, id, contenu, date limite, assigné à, priorité, progrès, email, nom de famille, prénom, date de naissance, téléphone, addresse, code postal, métier, #name 2 > Resource > name
+:::::::::::
+
+
+:
+ACCEDER: #name 1 > Personne > name, _#name 2 > Personne > name, _name 3, _#name 4 > Resource > name
+:::
+HAS: #name 1 > Personne > name, _#name 2 > Personne > name, _#token > Refresh Token > token
+:
+Refresh Token: token, client id, user id, expires at, revoked at
+:::::
+
+
+:::::
+A: #name 1 > Personne > name, _#name 2 > Personne > name, _name 3
+:::
+COMPOSER: name 1, _name 2
+:::

@@ -8,7 +8,8 @@ import {
 const config: CapsuleConfig = {
 	scopes: [OAuthScopes.PROFILE_READ, OAuthScopes.TASKS_READ, OAuthScopes.TASKS_WRITE],
 	identifier: 'Beautiful Todo',
-	redirectUri: 'http://localhost:5173/'
+	redirectUri:
+		typeof window !== 'undefined' ? `${window.location.origin}/` : 'http://localhost:5174/'
 };
 
 let client: CapsuleClient | null = $state(null);

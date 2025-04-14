@@ -19,7 +19,7 @@
 		console.log('after query todos :: ', todos);
 	});
 
-	/*client.on(CapsuleEventType.TASKS_CREATED, ({ task }) => {
+	client.on(CapsuleEventType.TASKS_CREATED, ({ task }) => {
 		todos = [...todos, task];
 	});
 	client.on(CapsuleEventType.TASKS_DELETED, ({ task: id }) => {
@@ -27,7 +27,7 @@
 	});
 	client.on(CapsuleEventType.TASKS_UPDATED, ({ task }) => {
 		todos = todos?.map((todo) => (todo.id === task.id ? task : todo));
-		});*/
+	});
 
 	function handleLogout() {
 		localStorage.removeItem('isLoggedIn');
@@ -52,22 +52,23 @@
 	async function addTodo() {
 		if (!newTodoText.trim()) return;
 
-		// await db.todos.add({
-		// 	id: 1387,
-		// 	content: newTodoText,
-		// 	isCompleted: false,
-		// 	dueDate: newTodoDueDate ?? null
-		// });
-		//
 		client.models.tasks?.create({
 			content: newTodoText,
 			isCompleted: false,
-			dueDate: newTodoDueDate ?? null
+			dueDate: newTodoDueDate
 		});
 
 		newTodoText = '';
 		newTodoDueDate = '';
 	}
+
+	// await db.todos.add({
+	// 	id: 1387,
+	// 	content: newTodoText,
+	// 	isCompleted: false,
+	// 	dueDate: newTodoDueDate ?? null
+	// });
+	//
 
 	async function toggleTodo(todo: GetTask) {
 		if (!todo.id) return;
@@ -300,4 +301,4 @@
 		margin-left: auto;
 		padding: 0.25rem 0.5rem;
 	}
-</style
+</style>

@@ -15,7 +15,8 @@ const config: CapsuleConfig = {
 	],
 
 	identifier: 'Beautiful Calendar',
-	redirectUri: 'http://localhost:5174/'
+	redirectUri:
+		typeof window !== 'undefined' ? `${window.location.origin}/` : 'http://localhost:5175/'
 };
 
 let client: CapsuleClient | null = $state(null);

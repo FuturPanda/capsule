@@ -1,0 +1,116 @@
+classDiagram
+    class CapsuleClient {
+        -ApiClient apiClient
+        -UrlStorage urlStorage
+        -string capsuleUrl
+        -CapsuleConfig config
+        -Tasks tasks
+        -Persons persons
+        -Events events
+        -EventEmitter eventEmitter
+        +get models()
+        +get<T>(key: string): T
+        +handleOnLoginClick(options): Promise<boolean>
+        +handleLoginRedirect(options): Promise<boolean>
+        +handleLoginCallback(singleUseToken): Promise
+        +getRedirectUri(): string
+        +connectReactivity()
+        +authStatus(): boolean
+        +clearApiUrl(): Promise<void>
+        +createResources()
+        -loadTokensFromStorage(): void
+        +handleMigration(): Promise<void>
+        +on(event, callback): Function
+        +getAllDatabases()
+        +createDatabase(dto)
+        +queryDatabase(databaseId, tableName, query)
+    }
+
+    class ApiClient {
+        -AxiosInstance client
+        -AuthTokens tokens
+        -OAuthConfig oauthConfig
+        -string baseUrl
+        +updateBaseUrl(url): void
+        -setupInterceptors()
+        +exchangeSingleUseTokenForTokens(singleUseToken)
+        -refreshAccessToken(): Promise<void>
+        +setAuthTokens(tokens): void
+        +getAuthTokens(): AuthTokens
+        +logout(): void
+        +migrateDatabase(migrations)
+        +connectToSseEvents(onEventCallback)
+        -setTokens(tokenData): void
+        +get<T>(url, params): Promise<T>
+        +post<T>(url, data): Promise<T>
+        +put<T>(url, data): Promise<T>
+        +patch<T>(url, data): Promise<T>
+        +delete<T>(url): Promise<T>
+        +createDatabase(database)
+        +getDatabases()
+        +queryDatabase(database, table, params)
+    }
+
+    class UrlStorage {
+        -string storageKey
+        -Function validateUrl
+        -defaultUrlValidator(url): boolean
+        +getUrl(): string
+        +saveUrl(url): boolean
+        +promptUserForUrl(): string
+        +getOrPromptForUrl(): string
+        +clearUrl(): Promise<void>
+    }
+
+    class EventEmitter {
+        -Map events
+        +on(event, callback): Function
+        +emit(event, data): void
+    }
+
+    class BaseResource~T, CreateParams, UpdateParams~ {
+        #ApiClient apiClient
+        #string basePath
+        -QuerySerializer querySerializer
+        +list(params): Promise<any>
+        +create(data): Promise<T>
+        +update(id, data): Promise<T>
+        +delete(id): Promise<>
+        +select<T, K>(keys): QueryBuilder<T, K>
+    }
+
+    class Tasks {
+        -Task[] cachedTasks
+        -EventEmitter eventEmitter
+        +create(data): Promise<Task>
+        +update(id, data): Promise<Task>
+        +delete(id): Promise<>
+        +getCachedTasks(): Task[]
+    }
+
+    class Persons {
+    }
+
+    class Events {
+    }
+
+    class QuerySerializer {
+        +serializeQuery(queryOptions)
+        -transformCondition(condition)
+    }
+
+    %% Relationships
+    CapsuleClient *-- ApiClient
+    CapsuleClient *-- UrlStorage
+    CapsuleClient *-- EventEmitter
+    CapsuleClient *-- Tasks
+    CapsuleClient *-- Persons
+    CapsuleClient *-- Events
+
+    BaseResource <|-- Tasks
+    BaseResource <|-- Persons
+    BaseResource <|-- Events
+
+    Tasks o-- EventEmitter
+    BaseResource *-- QuerySerializer
+    ApiClient ..> EventEmitter : uses for SSE events

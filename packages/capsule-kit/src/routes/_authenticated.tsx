@@ -28,6 +28,7 @@ export const Route = createFileRoute("/_authenticated")({
     const tokens = JSON.parse(
       sessionStorage.getItem("capsule_auth_tokens") || "{}",
     );
+    console.log("IF NOT TOKENS REDIRECT ::::: ", tokens);
     if (!tokens.accessToken) {
       throw redirect({
         to: "/login",
