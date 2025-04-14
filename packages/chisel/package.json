@@ -57,7 +57,7 @@
       [
         "jest-junit",
         {
-          "outputDirectory": "./test/reports/jest",
+          "outputDirectory": "./tests/reports/jest",
           "outputName": "junit.xml"
         }
       ]
