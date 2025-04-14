@@ -132,7 +132,10 @@ export class CapsuleClient {
         this.apiClient?.setAuthTokens(tokens);
 
         if (typeof window !== "undefined") {
-          sessionStorage.setItem(`${this.config.identifier}:::capsule_auth_tokens", JSON.stringify(tokens));
+          sessionStorage.setItem(
+            `${this.config.identifier}:::capsule_auth_tokens`,
+            JSON.stringify(tokens),
+          );
         }
 
         return response;
@@ -144,6 +147,7 @@ export class CapsuleClient {
       throw error;
     }
   }
+
   getRedirectUri(): string {
     return this.config.redirectUri || "";
   }
