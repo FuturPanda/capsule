@@ -11,7 +11,7 @@ columns = [
     { name = "id", type = "integer", constraints = { primaryKey = true } },
     { name = "username", type = "text" },
     { name = "email", type = "text", constraints = { nullable = false, unique = true } },
-    { name = "password", type = "text" },
+    { name = "password", type = "text", constraints = { nullable = false } },
     { name = "avatar_url", type = "text" },
     { name = "description", type = "text" },
     { name = "type", type = "text", constraints = { nullable = false }, enumValues = ["OWNER", "USER", "CLIENT"] }

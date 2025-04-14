@@ -1,7 +1,7 @@
 import {
-  CapsuleClient,
-  CapsuleConfig,
-  createCapsuleClient,
+    CapsuleClient,
+    CapsuleConfig,
+    createCapsuleClient,
 } from "@capsulesh/capsule-client";
 import { OAuthScopes } from "@capsulesh/shared-types";
 import React, { createContext, ReactNode, useEffect, useState } from "react";
@@ -10,7 +10,9 @@ import { migrations } from "../db";
 const defaultConfig: CapsuleConfig = {
   identifier: "Capsule-kit",
   scopes: [OAuthScopes.DATABASE_OWNER],
-  redirectUri: window.location.origin,
+  redirectUri: typeof window !== 'undefined'
+      ? `${window.location.origin}/`
+      : 'http://localhost:5173/',
   databaseMigrations: migrations,
   models: ["tasks"],
 };

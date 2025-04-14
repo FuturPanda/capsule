@@ -17,8 +17,6 @@ export class ReactivityController {
     @ScopesAndClientIdentifier()
     { clientIdentifier, scopes }: ScopesAndClientIdentifierType,
   ): Observable<ChiselMessage> {
-    console.log('Scopes:', scopes);
-    console.log('Client Identifier:', clientIdentifier);
     return this.reactivityService.getSseConnectionObservable(
       clientIdentifier,
       scopes,

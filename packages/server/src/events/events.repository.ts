@@ -20,12 +20,12 @@ export class EventsRepository {
     this.model.insert({
       title: dto.title,
       description: dto.description,
-      startTime: dto.startTime,
-      endTime: dto.endTime,
+      start_time: dto.startTime,
+      end_time: dto.endTime,
       location: dto.location,
-      isAllDay: dto.isAllDay,
+      is_all_day: dto.isAllDay,
       category: dto.category,
-      createdBy: dto.createdBy,
+      created_by: dto.createdBy,
     });
 
   findAllEvents(queryOptions?: QueryOptionsDto): EventModel[] {
@@ -33,17 +33,19 @@ export class EventsRepository {
     return this.model
       .select()
       .where(filterQuery)
-      .join(EventModel, EventAttendeeModel, 'id', 'eventId')
-      .join(EventAttendeeModel, PersonModel, 'attendeeId', 'id')
+      .join(EventModel, EventAttendeeModel, 'id', 'event_id')
+      .join(EventAttendeeModel, PersonModel, 'attendee_id', 'id')
       .exec();
   }
+  getAllEvents = (queryOptions?: QueryOptionsDto): EventModel[] =>
+    this.model.select().exec();
 
   findEventById = (id: number | bigint): EventModel =>
     this.model
       .select()
       .where({ id: { $eq: id } })
-      .join(EventModel, EventAttendeeModel, 'id', 'eventId')
-      .join(EventAttendeeModel, PersonModel, 'attendeeId', 'id')
+      .join(EventModel, EventAttendeeModel, 'id', 'event_id')
+      .join(EventAttendeeModel, PersonModel, 'attendee_id', 'id')
       .exec({ one: true });
 
   updateEventById = (id: number, dto: UpdateEventDto) =>

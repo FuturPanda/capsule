@@ -59,7 +59,7 @@ columns = [
 
 [[operations]]
 type = "createTable"
-tableName = "event_attendees"
+tableName = "event_attendee"
 columns = [
     { name = "event_id", type = "integer" },
     { name = "attendee_id", type = "integer" },

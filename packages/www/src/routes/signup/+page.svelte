@@ -67,6 +67,13 @@
 			mounted = false;
 		};
 	});
+	function onTurnstileCallback(token) {
+		$formData['cf-turnstile-response'] = token;
+	}
+
+	if (browser) {
+		window.onTurnstileCallback = onTurnstileCallback;
+	}
 </script>
 
 <svelte:head>
@@ -117,6 +124,7 @@
 									<FormLabel class="text-gray-300">Password</FormLabel>
 									<div class="relative min-w-[300px]">
 										<Input
+											data-cy="password-input"
 											type={showPassword ? 'text' : 'password'}
 											{...props}
 											bind:value={$formData.password}
@@ -125,6 +133,7 @@
 											class="border-gray-700 bg-[rgba(20,25,35,0.7)] text-gray-200"
 										/>
 										<Button
+											data-cy="toggle-password"
 											variant="ghost"
 											size="icon"
 											type="button"
@@ -147,7 +156,7 @@
 						{#if isOpen}
 							<div class="mt-3 space-y-1 rounded-md bg-[rgba(20,25,35,0.7)] p-3">
 								{#each requirements as r}
-									<li class="flex items-center text-xs">
+									<li data-cy={r.text} class="flex items-center text-xs">
 										<Checkbox class="m-1 h-3 w-3" checked={r.met} disabled />
 										<p class={r.met ? 'text-teal-500' : 'text-gray-500'}>
 											{r.text}
@@ -162,6 +171,7 @@
 								{#snippet children({ props })}
 									<div class="mt-4 flex items-start space-x-2">
 										<Checkbox
+											{...props}
 											bind:checked={$formData.termsAccepted}
 											id="terms"
 											class="mt-1 data-[state=checked]:bg-teal-500 data-[state=checked]:text-white"
@@ -187,20 +197,27 @@
 							<FormControl>
 								{#snippet children()}
 									{#if mounted}
-										<div class="mt-4">
+										<div data-cy="cf-turnstile-container" class="mt-4">
 											<div
 												class="cf-turnstile"
 												data-sitekey="0x4AAAAAAA7oFhcbnoayUME5"
 												data-size="flexible"
+												data-callback="onTurnstileCallback"
 											></div>
 										</div>
+									{/if}
+									{#if $errors['cf-turnstile-response']}
+										<p class="mt-1 text-sm text-red-500">{$errors['cf-turnstile-response'][0]}</p>
 									{/if}
 								{/snippet}
 							</FormControl>
 						</FormField>
 						<FormButton
 							class="mt-6 w-full bg-teal-700 text-white transition-colors duration-200 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 enabled:hover:bg-teal-600 disabled:bg-gray-800 disabled:text-gray-400"
-							disabled={!$formData?.email || !$formData?.password || !$formData?.termsAccepted}
+							disabled={!$formData?.email ||
+								!$formData?.password ||
+								!$formData?.termsAccepted ||
+								!$formData?.['cf-turnstile-response']}
 						>
 							{#if isLoading}
 								<div class="flex items-center justify-center">
@@ -245,8 +262,9 @@
 						<Mail class="h-12 w-12 text-teal-500" />
 					</div>
 					<div class="space-y-4">
-						<CardTitle class="custom-text text-2xl font-light text-gray-200"
-							>Check your email</CardTitle
+						<CardTitle
+							data-cy="check-email-screen"
+							class="custom-text text-2xl font-light text-gray-200">Check your email</CardTitle
 						>
 						<p class="text-gray-400">
 							We just sent a verification link to <span class="text-teal-400"

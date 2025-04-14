@@ -5,7 +5,6 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Footer from './footer.svelte';
 	import Hero from './hero.svelte';
-	import type { CapsuleClient } from '@capsulesh/capsule-client';
 
 	let showBackground = false;
 	let showLoader = false;
@@ -15,7 +14,6 @@
 	const adjectives = ['better', 'private', 'sovereign', 'yours', 'secure', 'lame'];
 	let currentIndex = 0;
 	let currentWord = adjectives[0];
-	let capsuleClient: CapsuleClient;
 
 	let visible = true;
 	const cycleWord = () => {
@@ -27,6 +25,7 @@
 		}, 300);
 	};
 	onMount(() => {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		let interval: any;
 		setTimeout(() => (showBackground = true), 500);
 		setTimeout(() => (showLoader = true), 1500);
@@ -36,31 +35,8 @@
 		setTimeout(() => {
 			interval = setInterval(cycleWord, 3000);
 		}, 6000);
-		//capsuleClient = useCapsuleClient();
 		return () => clearInterval(interval);
 	});
-	const features = [
-		{
-			title: 'Personal VM, Enterprise Power',
-			content:
-				'Deploy your sovereign cloud in seconds. Each instance is a dedicated, private VM optimized for performance and security. No shared resources, no compromises. Your data lives exclusively on your infrastructure, giving you complete control over your digital footprint while maintaining the convenience of cloud computing.'
-		},
-		{
-			title: 'One Source, Infinite Possibilities',
-			content:
-				"Break free from data silos. Our interoperability layer creates a unified data foundation where applications seamlessly share and sync information through a robust SDK. Whether it's your calendar, documents, or custom apps, everything stays in perfect harmony. Developers can focus on building features while we handle the complex data orchestration."
-		},
-		{
-			title: 'Privacy by Architecture, Not Afterthought',
-			content:
-				"Security isn't just a feature—it's the foundation. Every aspect of the platform is built with zero-trust principles and end-to-end encryption. Your VM operates as a sovereign entity, with cryptographic guarantees ensuring that only you and your authorized applications can access your data. Take control of your digital sovereignty without sacrificing modern cloud conveniences."
-		}
-	];
-	async function handleLogin() {
-		console.log('Login button clicked');
-		console.log('Client created, handling login click');
-		// await capsuleClient.handleOnLoginClick();
-	}
 </script>
 
 <main class="mx-auto">
@@ -77,12 +53,9 @@
 			<Button class="" variant="ghost">
 				<a href="https://docs.capsule.sh">Docs</a>
 			</Button>
-			<!-- {#if !capsuleClient?.authStatus()}
-				<Button onclick={handleLogin}>Login</Button>
-			{:else}
-				<Button onclick={() => {}}>Dashboard</Button>
-			{/if} -->
-			<Button variant="outline"><a href="./signup" data-sveltekit-reload>Get Started</a></Button>
+			<Button data-cy="signup" variant="outline"
+				><a href="./signup" data-sveltekit-reload>Get Started</a></Button
+			>
 		</div>
 	{/if}
 	{#if showBackground}

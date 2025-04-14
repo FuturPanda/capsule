@@ -132,7 +132,7 @@ export class CapsuleClient {
         this.apiClient?.setAuthTokens(tokens);
 
         if (typeof window !== "undefined") {
-          sessionStorage.setItem("capsule_auth_tokens", JSON.stringify(tokens));
+          sessionStorage.setItem(`${this.config.identifier}:::capsule_auth_tokens", JSON.stringify(tokens));
         }
 
         return response;
@@ -150,11 +150,8 @@ export class CapsuleClient {
 
   connectReactivity() {
     this.apiClient?.connectToSseEvents((data) => {
-      console.log("connecting reactivity ::: ", data);
       if (data) {
-        console.log("in if after calbback");
         this.eventEmitter.emit(data.type, data.payload);
-        this.eventEmitter.emit("update", data.payload);
       }
     });
   }
@@ -248,7 +245,6 @@ export function createCapsuleClient(config: CapsuleConfig): CapsuleClient {
   const capsuleClient = new CapsuleClient(config);
 
   if (typeof window !== "undefined") {
-    console.log("creating window event listeners");
     window.addEventListener("message", async (event) => {
       const message = event.data;
 
@@ -265,9 +261,11 @@ export function createCapsuleClient(config: CapsuleConfig): CapsuleClient {
       }
     });
 
-    capsuleClient.createResources();
-    capsuleClient.connectReactivity();
-    capsuleClient.handleMigration();
+    if (capsuleClient.authStatus()) {
+      capsuleClient.createResources();
+      capsuleClient.connectReactivity();
+      capsuleClient.handleMigration();
+    }
   }
 
   return capsuleClient;
