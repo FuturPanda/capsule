@@ -33,6 +33,14 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: futurpanda/capsule
+          
+      - name: Install shared-types (package)
+        run: npm install && npm run build
+        working-directory: ./packages/shared-types
+        
+      - name: Install chisel (package)
+        run: npm install && npm run build
+        working-directory: ./packages/chisel
 
       - name: Build and push dev image
         if: github.ref == 'refs/heads/dev'
