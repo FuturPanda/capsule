@@ -11,7 +11,7 @@
   },
   "collectCoverageFrom": ["**/*.(t|j)s"],
   "coverageDirectory": "./coverage/integration",
-  "setupFilesAfterEnv": ["<rootDir>/test/integration-setup.ts"],
+  "setupFilesAfterEnv": ["<rootDir>/tests/integration-setup.ts"],
   "testTimeout": 10000,
   "reporters": [
     "default",
@@ -19,7 +19,7 @@
       "jest-junit",
       {
         "outputDirectory": "./tests/reports/jest",
-        "outputName": "junit.xml"
+        "outputName": "jest-server.xml"
       }
     ]
   ]

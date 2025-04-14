@@ -13,7 +13,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest --config test/jest-integration.json",
+    "test": "jest --config tests/jest-integration.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@capsulesh/chisel": "^0.1.1",
-    "@capsulesh/shared-types": "^0.1.1",
+    "@capsulesh/shared-types": "^0.1.2",
     "@iarna/toml": "^2.2.5",
     "@nestjs/cache-manager": "^2.3.0",
     "@nestjs/common": "^10.0.0",
@@ -88,7 +88,7 @@
       [
         "jest-junit",
         {
-          "outputDirectory": "./reports/jest",
+          "outputDirectory": "./tests/reports/jest",
           "outputName": "junit.xml"
         }
       ]
