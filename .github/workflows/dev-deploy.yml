@@ -31,6 +31,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Install shared-types (package)
+        run: npm install && npm run build
+        working-directory: ./packages/shared-types
+
+      - name: Install chisel (package)
+        run: npm install && npm run build
+        working-directory: ./packages/chisel
+
       - name: Setup flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
