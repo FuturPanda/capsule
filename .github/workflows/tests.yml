@@ -50,8 +50,7 @@ jobs:
         run: npm ci
         working-directory: ${{ matrix.path }}
 
-      - name: Install dependencies (package)
-        if: matrix.test-type == 'cypress'
+      - name: Build (package)
         run: npm run build
         working-directory: ${{ matrix.path }}
       
