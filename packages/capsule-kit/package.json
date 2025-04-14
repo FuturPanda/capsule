@@ -1,7 +1,7 @@
 {
   "name": "@capsule/capsule-kit",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,9 +11,9 @@
     "seed": "tsc ./src/components/table/data/seed.ts"
   },
   "dependencies": {
-    "@capsulesh/capsule-client": "^0.0.3",
-    "@capsulesh/chisel": "^0.1.1",
-    "@capsulesh/shared-types": "^0.1.2",
+    "@capsulesh/capsule-client": "^0.1.0",
+    "@capsulesh/chisel": "^0.2.0",
+    "@capsulesh/shared-types": "^0.2.0",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.3",
