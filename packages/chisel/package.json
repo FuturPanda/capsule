@@ -58,7 +58,7 @@
         "jest-junit",
         {
           "outputDirectory": "./tests/reports/jest",
-          "outputName": "junit.xml"
+          "outputName": "jest-chisel.xml"
         }
       ]
     ],

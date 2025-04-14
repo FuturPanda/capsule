@@ -4,10 +4,10 @@ export interface Event {
   id: number;
   title: string;
   description?: string;
-  startTime: Date;
-  endTime: Date;
+  start_time: Date;
+  end_time: Date;
   location?: string;
-  isAllDay: boolean;
+  is_all_day: boolean;
   category?: string;
   created_by: string;
   created_at: Date;
