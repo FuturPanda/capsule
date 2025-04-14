@@ -73,7 +73,7 @@ jobs:
         if: (success() || failure()) && matrix.test-type == 'jest'
         with:
           name: JEST Tests - ${{ matrix.package }}
-          path: ${{ matrix.path }}/reports/jest-${{ matrix.package }}.xml
+          path: ${{ matrix.path }}/tests/reports/jest-${{ matrix.package }}.xml
           reporter: jest-junit
       
       # Run Cypress tests for www package
