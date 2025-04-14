@@ -82,7 +82,7 @@ jobs:
       
       # Report Cypress tests if you have a cypress report
       - name: Upload Cypress screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure() && matrix.test-type == 'cypress'
         with:
           name: cypress-screenshots-${{ matrix.package }}
@@ -90,7 +90,7 @@ jobs:
           retention-days: 5
       
       - name: Upload Cypress videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always() && matrix.test-type == 'cypress'
         with:
           name: cypress-videos-${{ matrix.package }}
