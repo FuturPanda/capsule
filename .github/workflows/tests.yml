@@ -44,10 +44,10 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies (root)
-        run: npm ci
+        run: npm install
       
       - name: Install dependencies (package)
-        run: npm ci
+        run: npm install
         working-directory: ${{ matrix.path }}
 
       - name: Build (package)
