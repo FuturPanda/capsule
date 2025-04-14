@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="6" failures="0" errors="0" time="1.114">
+  <testsuite name="ChiselDb" errors="0" failures="0" skipped="0" timestamp="2025-04-14T09:54:55" time="1.015" tests="6">
+    <testcase classname="ChiselDb static create should create a new database connection" name="ChiselDb static create should create a new database connection" time="0.007">
+    </testcase>
+    <testcase classname="ChiselDb initializeFromMigrations should apply migrations if not already executed" name="ChiselDb initializeFromMigrations should apply migrations if not already executed" time="0.003">
+    </testcase>
+    <testcase classname="ChiselDb initializeFromMigrations should throw an error if no migrations provided" name="ChiselDb initializeFromMigrations should throw an error if no migrations provided" time="0.003">
+    </testcase>
+    <testcase classname="ChiselDb getTables should return a list of tables" name="ChiselDb getTables should return a list of tables" time="0.001">
+    </testcase>
+    <testcase classname="ChiselDb getTableInfo should return column information for a table" name="ChiselDb getTableInfo should return column information for a table" time="0.001">
+    </testcase>
+    <testcase classname="ChiselDb getDbDefinition should return the database schema definition" name="ChiselDb getDbDefinition should return the database schema definition" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>
