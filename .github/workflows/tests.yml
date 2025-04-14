@@ -49,6 +49,11 @@ jobs:
       - name: Install dependencies (package)
         run: npm ci
         working-directory: ${{ matrix.path }}
+
+      - name: Install dependencies (package)
+        if: matrix.test-type == 'cypress'
+        run: npm run build
+        working-directory: ${{ matrix.path }}
       
       # Run Jest tests for chisel and server packages
       - name: Run Jest tests
