@@ -46,9 +46,13 @@ jobs:
       - name: Install dependencies (root)
         run: npm install
 
-      - name: Install dependencies (package)
+      - name: Install shared-types (package)
         run: npm install && npm run build
         working-directory: ./packages/shared-types
+
+      - name: Install chisel (package)
+        run: npm install && npm run build
+        working-directory: ./packages/chisel
       
       - name: Install dependencies (package)
         run: npm install
