@@ -4,7 +4,7 @@ import { AuthGuard } from './auth.guard';
 
 export function Protect() {
   return applyDecorators(
-    ApiBearerAuth('client-id'),
+    ApiBearerAuth(),
     ApiUnauthorizedResponse({ description: 'Unauthorized' }),
     UseGuards(AuthGuard),
   );

@@ -71,6 +71,6 @@ export default function CapletComponent() {
   );
 }
 
-export const Route = createFileRoute("/_authenticated/caplets/$capletId")({
+export const Route = createFileRoute("/_authenticated/caplets 17-46-56-827/$capletId")({
   component: CapletComponent,
 });

@@ -1,0 +1,110 @@
+name: test
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev 
+       
+jobs:
+  test-packages:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ['chisel', 'server', 'www']
+        include:
+          - package: chisel
+            path: ./packages/chisel
+            test-command: npm test
+            test-type: jest
+          - package: server
+            path: ./packages/server
+            test-command: npm test
+            test-type: jest
+          - package: www
+            path: ./packages/www
+            test-command: npm run test:cypress
+            test-type: cypress
+            port: 3000
+      fail-fast: false
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - name: Install dependencies (root)
+        run: npm install
+
+      - name: Install shared-types (package)
+        run: npm install && npm run build
+        working-directory: ./packages/shared-types
+
+      - name: Install chisel (package)
+        run: npm install && npm run build
+        working-directory: ./packages/chisel
+      
+      - name: Install dependencies (package)
+        run: npm install
+        working-directory: ${{ matrix.path }}
+
+      - name: Build (package)
+        run: npm run build
+        working-directory: ${{ matrix.path }}
+      
+      # Run Jest tests for chisel and server packages
+      - name: Run Jest tests
+        if: matrix.test-type == 'jest'
+        run: ${{ matrix.test-command }}
+        working-directory: ${{ matrix.path }}
+        env:
+          JEST_JUNIT_OUTPUT_DIR: reports
+          JEST_JUNIT_OUTPUT_NAME: jest-${{ matrix.package }}.xml
+      
+      # Report Jest tests
+      - name: Test Report for Jest
+        uses: dorny/test-reporter@v2
+        if: (success() || failure()) && matrix.test-type == 'jest'
+        with:
+          name: JEST Tests - ${{ matrix.package }}
+          path: ${{ matrix.path }}/tests/reports/jest-${{ matrix.package }}.xml
+          reporter: jest-junit
+      
+      # Run Cypress tests for www package
+      - name: Run Cypress tests
+        if: matrix.test-type == 'cypress'
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: ${{ matrix.path }}
+          start: npm start
+          wait-on: http://localhost:${{ matrix.port }}
+          command: ${{ matrix.test-command }}
+        env:
+          CI: true
+      
+      # Report Cypress tests if you have a cypress report
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v4
+        if: failure() && matrix.test-type == 'cypress'
+        with:
+          name: cypress-screenshots-${{ matrix.package }}
+          path: ${{ matrix.path }}/cypress/screenshots
+          retention-days: 5
+      
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always() && matrix.test-type == 'cypress'
+        with:
+          name: cypress-videos-${{ matrix.package }}
+          path: ${{ matrix.path }}/cypress/videos
+          retention-days: 5

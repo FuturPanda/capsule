@@ -1,6 +1,6 @@
 {
   "name": "@capsulesh/shared-types",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared TypeScript types for Capsule",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,8 +9,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --platform=browser",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --platform=browser",
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "test": "jest",
     "lint": "eslint 'src/**/*.{js,ts}'",
     "format": "prettier --write 'src/**/*.{js,ts}'",

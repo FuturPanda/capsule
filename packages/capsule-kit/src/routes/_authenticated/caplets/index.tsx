@@ -1,19 +1,10 @@
 import { Button } from "@/components/ui/button.tsx";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { capletRequest } from "@/stores/caplets/caplet.request.ts";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
-import { z } from "zod";
-
-const formSchema = z.object({
-  name: z.string().min(2).max(100),
-});
-
-export type CreateCapletFormValues = z.infer<typeof formSchema>;
 
 export const CapletDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -47,16 +38,10 @@ export const CapletDashboard = () => {
     }
   };
 
-  const query = useQuery({
-    queryKey: ["caplets"],
-    queryFn: capletRequest.getAllCaplets,
-  });
-
   useEffect(() => {
     loadCaplets();
   }, []);
 
-  console.log("DATA = ", query.data);
   return (
     <>
       <div className="hidden h-2/3 w-full px-20 m-auto flex-1 flex-col space-y-8 p-8 md:flex">

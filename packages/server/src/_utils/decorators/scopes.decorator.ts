@@ -19,8 +19,8 @@ export const ScopesAndClientIdentifier = createParamDecorator(
       if (decoded && typeof decoded === 'object') {
         const payload = decoded as JwtPayloadWithScopes;
         return {
-          clientIdentifier: payload.clientIdentifier.split('::')[0],
-          scopes: payload.scopes.split(',') || [],
+          clientIdentifier: payload.clientIdentifier?.split('::')[0],
+          scopes: payload.scopes?.split(',') || [],
         };
       }
       return [];

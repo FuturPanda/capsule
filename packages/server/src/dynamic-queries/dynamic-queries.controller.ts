@@ -28,7 +28,7 @@ import { DynamicQueriesService } from './dynamic-queries.service';
 export class DynamicQueriesController {
   constructor(private readonly dynamicQueriesService: DynamicQueriesService) {}
 
-  // @Protect()
+  @Protect()
   @Get(':database/:table')
   query(
     //@Database(ValidateDatabaseTablePipe)

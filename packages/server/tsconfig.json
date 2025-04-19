@@ -15,25 +15,11 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
-
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/_utils/_types"
-    ],
-
-    "inlineSources": true,
-
-    // Set `sourceRoot` to  "/" to strip the build path prefix
-    // from generated source code references.
-    // This improves issue grouping in Sentry.
-    "sourceRoot": "/"
+    "esModuleInterop": true,
+    "inlineSources": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.toml",
-    "src/_utils/_types/*.d.ts"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.toml", "src/_utils/_types/*.d.ts"]
 }

@@ -1,0 +1,31 @@
+A 3, 01 Utilisateurs,  11 REFRESH TOKENS
+Utilisateurs: email, mot de passe
+/\ Personne <- Utilisateurs
+:
+:
+Personne: email, nom de famille, prénom, date de naissance, téléphone, code postal, métier
+:
+
+Refresh Tokens: token, date d'expiration, date de révocation
+:
+Est autorisé, NN Utilisateurs, 1N CLIENT, 0N Resource: nature de l'autorisation
+Resource: nom,type,
+/XT\ Resource <- Tâche, Personne, Database, Document
+ASSIGNER, 0N TÂCHE, 0N PERSONNE
+:
+
+A 2, 01 client,  11 REFRESH TOKENS
+Client: nom, redirect_uri
+:
+Database: nom, id client
+Document: titre, contenu
+Tâche:  contenu, date limite, date d'assignation, priorité, progrès
+EMPLOYER, 0N Entreprise, 0N Personne: poste
+
+:
+:
+:
+Appartenir, 01 Entreprise, ON Client
+:
+Entreprise: nom, code postal, siret
+:

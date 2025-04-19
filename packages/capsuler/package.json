@@ -1,6 +1,6 @@
 {
   "name": "@capsulesh/capsuler",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "CLI to spin a capsule ",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

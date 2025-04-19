@@ -12,7 +12,7 @@ export class EventsService {
     private readonly eventsRepository: EventsRepository,
   ) {}
   deleteEvent(id: number) {
-    throw new Error('Method not implemented.');
+    return this.eventsRepository.deleteEventById(id);
   }
   updateEvent(id: number, updateTaskDto: UpdateEventDto) {
     throw new Error('Method not implemented.');
@@ -24,7 +24,8 @@ export class EventsService {
     const event = this.eventsRepository.createEvent(createEventDto);
   }
   listEvents(queryOptions: QueryOptionsDto) {
-    const events = this.eventsRepository.findAllEvents();
+    const events = this.eventsRepository.getAllEvents();
+    if (!events || events.length <= 0) return [];
     return this.eventsMapper.toGetEventsDto(events);
   }
 }

@@ -18,10 +18,9 @@ import { Cache } from 'cache-manager';
 @Injectable()
 export class ChiselService {
   private connections: Map<string, DatabaseConnection> = new Map();
-  private readonly DEFAULT_MAX_IDLE_TIME = 300000; // 5 minutes
-  private readonly CACHE_TTL = 3600000; // 1 hour
+  private readonly DEFAULT_MAX_IDLE_TIME = 300000;
+  private readonly CACHE_TTL = 3600000;
   private readonly DB_DEFINITION_CACHE_PREFIX = 'database-definition:';
-  private readonly CLIENT_CACHE_PREFIX = 'client:';
   private readonly logger = new Logger(ChiselService.name);
 
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}

@@ -76,7 +76,6 @@
 
 <section id="features-section" class="bg-black pb-32 pt-40">
 	<div class="container mx-auto px-8">
-		<!-- Section header -->
 		<div class="mb-28 text-center">
 			<h2
 				class="custom-text mb-8 text-3xl font-light text-gray-200 md:text-4xl"

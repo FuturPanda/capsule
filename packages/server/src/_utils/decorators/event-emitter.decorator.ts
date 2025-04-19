@@ -35,7 +35,6 @@ export function EmitEvent(options: EmitEventOptions) {
             `Error transforming payload for event ${options.eventName}:`,
             payloadError,
           );
-          // Still emit the event with the raw result
           payload = {
             error: 'Error transforming payload',
             rawResult: result,
@@ -50,7 +49,6 @@ export function EmitEvent(options: EmitEventOptions) {
             emitError,
           );
         }
-        console.error(`Emitting`, result);
 
         return result;
       } catch (error) {

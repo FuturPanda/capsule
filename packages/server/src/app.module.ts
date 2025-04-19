@@ -1,6 +1,5 @@
-import { Module } from '@nestjs/common';
-
 import { CacheModule } from '@nestjs/cache-manager';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -18,11 +17,11 @@ import { DynamicQueriesModule } from './dynamic-queries/dynamic-queries.module';
 import { EventsModule } from './events/events.module';
 import { MigrationsModule } from './migrations/migrations.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { PersonsModule } from './persons/persons.module';
 import { ReactivityModule } from './reactivity/reactivity.module';
 import { SurrealModule } from './surreal/surreal.module';
 import { TasksModule } from './tasks/tasks.module';
 import { UsersModule } from './users/users.module';
-import { PersonsModule } from './persons/persons.module';
 
 @Module({
   imports: [

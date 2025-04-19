@@ -13,12 +13,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { FormDataRequest } from 'nestjs-form-data';
 import { AuthService } from 'src/auth/auth.service';
-import { PermissionsService } from 'src/permissions/permissions.service';
-import { SurrealService } from 'src/surreal/surreal.service';
 import { LoginUserDto } from './_utils/dto/request/login-user.dto';
 import { OauthQueryDto } from './_utils/dto/request/oauth.dto';
 import { UpdateProfileDto } from './_utils/dto/request/update-profile.dto';
-import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -27,14 +24,10 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly authService: AuthService,
-    private readonly surrealService: SurrealService,
-    private readonly permissionService: PermissionsService,
-    private readonly usersRepository: UsersRepository,
   ) {}
 
   @Post('/login')
   loginUser(@Body() loginUserDto: LoginUserDto) {
-    console.log('in usecontroller ', loginUserDto);
     return this.usersService.loginUser(loginUserDto);
   }
 
@@ -99,8 +92,6 @@ export class UsersController {
     @Query()
     query: OauthQueryDto,
   ) {
-    console.log('loginOauthUser', loginUserDto);
-    console.log('loginOauthUser', query);
     const { refreshToken, redirectUrl, error } =
       await this.usersService.loginViaOauth(
         loginUserDto,
@@ -150,7 +141,6 @@ export class UsersController {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    response.json(tokens);
-    return response;
+    return response.json(tokens);
   }
 }

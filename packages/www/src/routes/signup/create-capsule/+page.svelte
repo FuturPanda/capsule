@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { source } from 'sveltekit-sse';
 	import { onMount } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
@@ -129,4 +129,4 @@
 			transform: rotate(360deg);
 		}
 	}
-</style>
+</style> -->

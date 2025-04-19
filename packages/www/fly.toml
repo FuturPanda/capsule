@@ -16,6 +16,9 @@ auto_start_machines = true
 min_machines_running = 0
 processes = ['app']
 
+[deploy]
+  strategy = "bluegreen"
+
 [[vm]]
 memory = '1gb'
 cpu_kind = 'shared'
@@ -23,3 +26,10 @@ cpus = 1
 
 [env]
 REDIS_CACHE_DB = "0"
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/"

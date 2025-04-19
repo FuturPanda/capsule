@@ -1,0 +1,61 @@
+{
+  "width": 987,
+  "height": 532,
+  "cx": [
+    [ "A_3", 90 ],
+    [ "UTILISATEURS", 204 ],
+    [ "PERSONNE_PARENT_#1", 326 ],
+    [ "PERSONNE", 769 ],
+    [ "REFRESH_TOKENS", 90 ],
+    [ "EST_AUTORISE", 326 ],
+    [ "RESOURCE", 488 ],
+    [ "RESOURCE_PARENT_#2", 622 ],
+    [ "ASSIGNER", 769 ],
+    [ "A_2", 90 ],
+    [ "CLIENT", 204 ],
+    [ "DATABASE", 488 ],
+    [ "DOCUMENT", 622 ],
+    [ "TACHE", 769 ],
+    [ "EMPLOYER", 920 ],
+    [ "APPARTENIR", 488 ],
+    [ "ENTREPRISE", 769 ]
+  ],
+  "cy": [
+    [ "A_3", 90 ],
+    [ "UTILISATEURS", 90 ],
+    [ "PERSONNE_PARENT_#1", 90 ],
+    [ "PERSONNE", 90 ],
+    [ "REFRESH_TOKENS", 224 ],
+    [ "EST_AUTORISE", 224 ],
+    [ "RESOURCE", 224 ],
+    [ "RESOURCE_PARENT_#2", 224 ],
+    [ "ASSIGNER", 224 ],
+    [ "A_2", 341 ],
+    [ "CLIENT", 341 ],
+    [ "DATABASE", 341 ],
+    [ "DOCUMENT", 341 ],
+    [ "TACHE", 341 ],
+    [ "EMPLOYER", 341 ],
+    [ "APPARTENIR", 476 ],
+    [ "ENTREPRISE", 476 ]
+  ],
+  "shift": [
+    [ "A_3,UTILISATEURS,0", 0 ],
+    [ "A_3,REFRESH_TOKENS,0", 0 ],
+    [ "EST_AUTORISE,UTILISATEURS,0", 0 ],
+    [ "EST_AUTORISE,CLIENT,0", 0 ],
+    [ "EST_AUTORISE,RESOURCE,0", 0 ],
+    [ "ASSIGNER,TACHE,0", 0 ],
+    [ "ASSIGNER,PERSONNE,0", 0 ],
+    [ "A_2,CLIENT,0", 0 ],
+    [ "A_2,REFRESH_TOKENS,0", 0 ],
+    [ "EMPLOYER,ENTREPRISE,0", 0 ],
+    [ "EMPLOYER,PERSONNE,0", 0 ],
+    [ "APPARTENIR,ENTREPRISE,0", 0 ],
+    [ "APPARTENIR,CLIENT,0", 0 ]
+  ],
+  "ratio": [
+    [ "PERSONNE_PARENT_#1 / PERSONNE", 1.0 ],
+    [ "RESOURCE_PARENT_#2 / RESOURCE", 1.0 ]
+  ]
+}

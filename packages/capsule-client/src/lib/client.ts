@@ -4,13 +4,14 @@ import {
   Migration,
   ModelType,
   OAuthConfig,
-  OAuthScopes,
+  OAuthScopes as _OAuthScopes,
 } from "@capsulesh/shared-types";
 import { ApiClient } from "./axios";
 import { EventEmitter } from "./event-emitter";
 import { Events, Tasks } from "./resources";
 import { Persons } from "./resources/person";
 import { UrlStorage } from "./urlstorage";
+export const OAuthScopes = _OAuthScopes;
 
 export interface CapsuleConfig extends OAuthConfig {
   redirectUri?: string;
@@ -131,7 +132,10 @@ export class CapsuleClient {
         this.apiClient?.setAuthTokens(tokens);
 
         if (typeof window !== "undefined") {
-          sessionStorage.setItem("capsule_auth_tokens", JSON.stringify(tokens));
+          sessionStorage.setItem(
+            `${this.config.identifier}:::capsule_auth_tokens`,
+            JSON.stringify(tokens),
+          );
         }
 
         return response;
@@ -143,17 +147,15 @@ export class CapsuleClient {
       throw error;
     }
   }
+
   getRedirectUri(): string {
     return this.config.redirectUri || "";
   }
 
   connectReactivity() {
     this.apiClient?.connectToSseEvents((data) => {
-      console.log("connecting reactivity ::: ", data);
       if (data) {
-        console.log("in if after calbback");
         this.eventEmitter.emit(data.type, data.payload);
-        this.eventEmitter.emit("update", data.payload);
       }
     });
   }
@@ -243,32 +245,31 @@ export class CapsuleClient {
   }
 }
 
-export { OAuthScopes };
-
 export function createCapsuleClient(config: CapsuleConfig): CapsuleClient {
   const capsuleClient = new CapsuleClient(config);
 
   if (typeof window !== "undefined") {
-    console.log("creating window event listeners");
-    window.addEventListener("message", async (event) => {
-      const message = event.data;
+    if (!capsuleClient.authStatus()) {
+      window.addEventListener("message", async (event) => {
+        const message = event.data;
 
-      if (message && message.type === "oauth_complete") {
-        if (message.approved) {
-          console.log("User approved the authorization");
-          await capsuleClient.handleLoginCallback(message.singleUseToken);
-          await capsuleClient.handleMigration();
-          window.removeEventListener("message", () => {});
-          window.location.replace(capsuleClient.getRedirectUri());
-        } else {
-          console.log("User denied the authorization");
+        if (message && message.type === "oauth_complete") {
+          if (message.approved) {
+            console.log("User approved the authorization");
+            await capsuleClient.handleLoginCallback(message.singleUseToken);
+            await capsuleClient.handleMigration();
+            window.removeEventListener("message", () => {});
+            window.location.replace(capsuleClient.getRedirectUri());
+          } else {
+            console.log("User denied the authorization");
+          }
         }
-      }
-    });
-
-    capsuleClient.createResources();
-    capsuleClient.connectReactivity();
-    capsuleClient.handleMigration();
+      });
+    } else {
+      capsuleClient.createResources();
+      capsuleClient.connectReactivity();
+      capsuleClient.handleMigration();
+    }
   }
 
   return capsuleClient;

@@ -1,0 +1,66 @@
+
+Tâche:  contenu, date limite, assigné à, priorité, progrès
+:
+ASSIGNED TO, 0N TÂCHE, 01 PERSONNE
+:
+:
+:
+
+/XT\ Resource <- Tâche, Personne
+    :
+Personne: email, nom de famille, prénom, date de naissance, téléphone, code postal, métier
+EMPLOYER, NN Organisation, NN Personne
+Organisation: nom, code postal, siret, dirigeant
+:
+:
+
+:
+:
+/\ Personne <- User, Client
+:
+:
+:
+
+A, NN User, NN Role
+Role : name
+COMPOSER,  NN Permission, NN Role
+Permission: name
+User: email, mot de passe
+Client: name, redirect_uri
+:
+:
+
+
+Resource: name, type
+MODIFIER, 1N User, 0N CLIENT, 0N DATABASE, 0N Resource
+:
+
+
+
+Database: name,
+ACCEDER, 1N User, 0N CLIENT, 0N DATABASE, 0N Resource
+:
+DEMANDER, NN CLIENT, NN AUTHORISATIONS
+AUTHORISATIONS: NAME
+:
+
+:
+CREER, 1N User, 0N CLIENT, 0N DATABASE, 0N Resource
+:
+:
+:
+:
+:
+
+:
+Refresh Token: token, client id, user id, expires at, revoked at
+HAS, 1N USER, 1N Client, 0N REFRESH TOKEN
+:
+:
+:
+
+:
+
+:
+:
+

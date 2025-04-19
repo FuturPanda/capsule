@@ -1,6 +1,7 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { useCapsuleClient } from "./hooks/use-capsule-client";
 import { routeTree } from "./routeTree.gen";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 const router = createRouter({
   routeTree,
@@ -18,5 +19,10 @@ declare module "@tanstack/react-router" {
 
 export const App = () => {
   const client = useCapsuleClient();
-  return <RouterProvider router={router} context={{ capsuleClient: client }} />;
+  return (
+    <>
+      <RouterProvider router={router} context={{ capsuleClient: client }} />;
+      <TanStackRouterDevtools router={router} />
+    </>
+  );
 };

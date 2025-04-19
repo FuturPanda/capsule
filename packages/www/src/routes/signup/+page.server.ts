@@ -15,12 +15,15 @@ export const load: PageServerLoad = async () => {
 
 export const actions = {
 	default: async ({ request, fetch }) => {
+		console.log('Form action');
 		const form = await superValidate(request, zod(formSchema));
 		if (!form.valid) {
+			console.log(`Form INVALID, ${JSON.stringify(form.errors)}, ${JSON.stringify(form.data)}`);
 			return fail(400, { form });
 		}
 		const redis = new Redis(env.REDIS_URL);
-		const email = await redis.get(`${form.data.email}`);
+		// const email = await redis.get(`${form.data.email}`);
+
 		// console.log(email);
 		// if (email) {
 		// 	return { success: false, error: ' Email already used' };

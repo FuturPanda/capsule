@@ -80,7 +80,7 @@
 				</div>
 			</div>
 
-			{#each footerLinks as section, i}
+			{#each footerLinks as section}
 				<div class="md:col-span-1 lg:col-span-2">
 					<h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
 						{section.title}
