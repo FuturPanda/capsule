@@ -5,9 +5,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PlusCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { v4 } from "uuid";
-import { z } from "zod";
-
-export type CreateCapletFormValues = z.infer<typeof formSchema>;
 
 export const CapletDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);

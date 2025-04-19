@@ -28,7 +28,6 @@ export class UsersController {
 
   @Post('/login')
   loginUser(@Body() loginUserDto: LoginUserDto) {
-    console.log('in usecontroller ', loginUserDto);
     return this.usersService.loginUser(loginUserDto);
   }
 
@@ -93,8 +92,6 @@ export class UsersController {
     @Query()
     query: OauthQueryDto,
   ) {
-    console.log('loginOauthUser', loginUserDto);
-    console.log('loginOauthUser', query);
     const { refreshToken, redirectUrl, error } =
       await this.usersService.loginViaOauth(
         loginUserDto,
@@ -144,7 +141,6 @@ export class UsersController {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    response.json(tokens);
-    return response;
+    return response.json(tokens);
   }
 }

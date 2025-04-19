@@ -21,11 +21,9 @@ export const POST = async ({ url }) => {
 	return produce(async function start({ emit }) {
 		const redis = new Redis(env.REDIS_URL);
 		try {
-			console.log('BEFORE FIRST REQUEST');
 			emit('message', JSON.stringify({ content: 'Creating capsule...', progress: 0 }));
 			const res1: CreateCapsuleRequestDto = await createFlyAppRequest();
 			const appName = res1.appName;
-			console.log(appName);
 			emit(
 				'message',
 				JSON.stringify({ content: `Capsule created with name ${appName}`, progress: 20 })
@@ -50,11 +48,14 @@ export const POST = async ({ url }) => {
 			await res4.json();
 			emit('message', JSON.stringify({ content: `Volume Mounted`, progress: 85 }));
 			emit('message', JSON.stringify({ content: `Done. Your Capsule is ready`, progress: 90 }));
+			redis.set(`${token}::isCapsuleCreated`, 'true');
+			emit(
+				'message',
+				JSON.stringify({ content: `Redirecting to capsule dashboard`, progress: 98 })
+			);
+			emit('message', JSON.stringify({ content: `END`, progress: 100, appName: appName }));
 		} catch (error) {
 			console.error(error);
 		}
-		redis.set(`${token}::isCapsuleCreated`, 'true');
-		emit('message', JSON.stringify({ content: `Redirecting to capsule dashboard`, progress: 98 }));
-		emit('message', JSON.stringify({ content: `END`, progress: 100 }));
 	});
 };

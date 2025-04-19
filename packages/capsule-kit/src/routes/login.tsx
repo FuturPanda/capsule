@@ -1,10 +1,9 @@
 import { useCapsuleClient } from "@/hooks/use-capsule-client";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
 function LoginComponent() {
-  const router = useRouter();
   const client = useCapsuleClient();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -134,7 +133,7 @@ function LoginComponent() {
 }
 
 export const Route = createFileRoute("/login")({
-  beforeLoad: ({ context }) => {
+  beforeLoad: () => {
     const tokens = JSON.parse(
       sessionStorage.getItem("capsule_auth_tokens") || "{}",
     );

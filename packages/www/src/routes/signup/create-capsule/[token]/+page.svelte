@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { source } from 'sveltekit-sse';
 	import { onMount } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import { goto } from '$app/navigation';
-	import { Terminal } from 'lucide-svelte';
+	import { fly } from 'svelte/transition';
+	import { Terminal, Copy, Check } from 'lucide-svelte';
 
 	let { data } = $props();
 	let progress = $state(0);
 	let estimatedProgress = $state(0);
+	let maxEstimatedAdvance = $state(15);
 
 	let messages: string[] = $state([]);
 	const maxMessages = 4;
@@ -17,11 +16,28 @@
 	let maxProgress = $state(100);
 	let progressInterval = null;
 	let currentSpeed = initialSpeed;
+	let copied = $state(false);
 
 	let showEndMessage = $state(false);
+	let appName = $state('');
+
+	function copyToClipboard() {
+		const url = `https://${appName}.fly.dev`;
+		navigator.clipboard
+			.writeText(url)
+			.then(() => {
+				copied = true;
+				setTimeout(() => {
+					copied = false;
+				}, 2000);
+			})
+			.catch((err) => {
+				console.error('Could not copy text: ', err);
+			});
+	}
 
 	function updateEstimatedProgress() {
-		if (estimatedProgress < maxProgress) {
+		if (estimatedProgress < maxProgress && estimatedProgress < progress + maxEstimatedAdvance) {
 			estimatedProgress = Math.min(estimatedProgress + 1, maxProgress);
 
 			if (progress > estimatedProgress) {
@@ -35,8 +51,6 @@
 			}
 
 			progress = Math.max(progress, estimatedProgress);
-		} else {
-			stopProgress();
 		}
 	}
 
@@ -57,8 +71,9 @@
 
 		if (actualProgress > estimatedProgress) {
 			estimatedProgress = actualProgress;
-			currentSpeed = acceleratedSpeed;
-			stopProgress();
+		}
+
+		if (!progressInterval) {
 			startProgress();
 		}
 	}
@@ -76,6 +91,9 @@
 
 				if (data.progress !== undefined) {
 					handleServerProgress(data.progress);
+				}
+				if (data.appName !== undefined) {
+					appName = data.appName;
 				}
 
 				if (data.content === 'END') {
@@ -154,10 +172,37 @@
 			{:else}
 				<h2 class="custom-text mb-4 text-2xl font-light text-gray-200">Capsule Launch Initiated</h2>
 				<p class="mb-2 text-gray-400">Your capsule is now launching...</p>
-				<p class="mb-4 text-gray-400">
-					You will receive an email with your access details shortly.
-				</p>
 				<p class="text-xs text-gray-500">This process may take a few minutes to complete.</p>
+				<div class="mb-4 mt-6">
+					<p class="mb-2 text-gray-400">Your capsule URL:</p>
+					<div
+						class="flex w-full max-w-xs items-center overflow-hidden rounded-lg border border-teal-600 bg-black/40 font-mono text-gray-300 sm:max-w-sm"
+					>
+						<div class="flex-1 overflow-hidden px-4 py-2">
+							<div class="select-all truncate">
+								https://{appName}.fly.dev
+							</div>
+						</div>
+						<button
+							onclick={copyToClipboard}
+							class="flex flex-shrink-0 items-center justify-center px-3 py-2 transition-colors duration-200"
+							title="Copy to clipboard"
+						>
+							{#if copied}
+								<Check class="h-5 w-5 text-white" />
+							{:else}
+								<Copy class="h-5 w-5 text-white" />
+							{/if}
+						</button>
+					</div>
+				</div>
+
+				<p class="mb-2 text-gray-400">You can access it via</p>
+				<div
+					class="flex w-full max-w-xs items-center overflow-hidden rounded-lg border border-teal-600 bg-black/40 font-mono text-gray-300 sm:max-w-sm"
+				>
+					<a href="http://localhost:5173" class="truncate p-3">capsule-kit</a>
+				</div>
 			{/if}
 		</div>
 	</div>
@@ -245,6 +290,17 @@
 		position: absolute;
 		z-index: 4;
 		transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		padding: 2rem;
+	}
+
+	/* Add this new style for the inner content container */
+	.gradient-circle > div {
+		max-width: 100%;
+		width: 100%;
 	}
 
 	.loader,

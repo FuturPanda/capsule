@@ -6,8 +6,6 @@ import { ThemeProvider } from "./_utils/providers/ThemeProvider";
 import { App } from "./App";
 import "./styles/index.css";
 
-// register(`/service-worker.js`);
-
 const queryClient = new QueryClient();
 
 const rootElement = document.getElementById("root")!;

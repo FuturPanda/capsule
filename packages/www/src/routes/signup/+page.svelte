@@ -267,9 +267,8 @@
 							class="custom-text text-2xl font-light text-gray-200">Check your email</CardTitle
 						>
 						<p class="text-gray-400">
-							We just sent a verification link to <span class="text-teal-400"
-								>{$formData.email}</span
-							>. Click on it to create your capsule.
+							We've just sent you an email to verify your account ! Please proceed to create your
+							Capsule
 						</p>
 					</div>
 				</CardHeader>

@@ -249,23 +249,23 @@ export function createCapsuleClient(config: CapsuleConfig): CapsuleClient {
   const capsuleClient = new CapsuleClient(config);
 
   if (typeof window !== "undefined") {
-    window.addEventListener("message", async (event) => {
-      const message = event.data;
+    if (!capsuleClient.authStatus()) {
+      window.addEventListener("message", async (event) => {
+        const message = event.data;
 
-      if (message && message.type === "oauth_complete") {
-        if (message.approved) {
-          console.log("User approved the authorization");
-          await capsuleClient.handleLoginCallback(message.singleUseToken);
-          await capsuleClient.handleMigration();
-          window.removeEventListener("message", () => {});
-          window.location.replace(capsuleClient.getRedirectUri());
-        } else {
-          console.log("User denied the authorization");
+        if (message && message.type === "oauth_complete") {
+          if (message.approved) {
+            console.log("User approved the authorization");
+            await capsuleClient.handleLoginCallback(message.singleUseToken);
+            await capsuleClient.handleMigration();
+            window.removeEventListener("message", () => {});
+            window.location.replace(capsuleClient.getRedirectUri());
+          } else {
+            console.log("User denied the authorization");
+          }
         }
-      }
-    });
-
-    if (capsuleClient.authStatus()) {
+      });
+    } else {
       capsuleClient.createResources();
       capsuleClient.connectReactivity();
       capsuleClient.handleMigration();

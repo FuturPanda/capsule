@@ -11,7 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as LoginOldImport } from './routes/loginOld'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
@@ -25,12 +24,6 @@ import { Route as AuthenticatedCapletsCapletIdImport } from './routes/_authentic
 import { Route as AuthenticatedDataDatabaseIdTableNameImport } from './routes/_authenticated/data/$databaseId.$tableName'
 
 // Create/Update Routes
-
-const LoginOldRoute = LoginOldImport.update({
-  id: '/loginOld',
-  path: '/loginOld',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
@@ -116,13 +109,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/loginOld': {
-      id: '/loginOld'
-      path: '/loginOld'
-      fullPath: '/loginOld'
-      preLoaderRoute: typeof LoginOldImport
       parentRoute: typeof rootRoute
     }
     '/_authenticated/': {
@@ -238,7 +224,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/loginOld': typeof LoginOldRoute
   '/': typeof AuthenticatedIndexRoute
   '/caplets/$capletId': typeof AuthenticatedCapletsCapletIdRoute
   '/data/$databaseId': typeof AuthenticatedDataDatabaseIdRouteWithChildren
@@ -252,7 +237,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
-  '/loginOld': typeof LoginOldRoute
   '/': typeof AuthenticatedIndexRoute
   '/caplets/$capletId': typeof AuthenticatedCapletsCapletIdRoute
   '/data/$databaseId': typeof AuthenticatedDataDatabaseIdRouteWithChildren
@@ -268,7 +252,6 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
-  '/loginOld': typeof LoginOldRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/caplets/$capletId': typeof AuthenticatedCapletsCapletIdRoute
   '/_authenticated/data/$databaseId': typeof AuthenticatedDataDatabaseIdRouteWithChildren
@@ -285,7 +268,6 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/login'
-    | '/loginOld'
     | '/'
     | '/caplets/$capletId'
     | '/data/$databaseId'
@@ -298,7 +280,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/loginOld'
     | '/'
     | '/caplets/$capletId'
     | '/data/$databaseId'
@@ -312,7 +293,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
-    | '/loginOld'
     | '/_authenticated/'
     | '/_authenticated/caplets/$capletId'
     | '/_authenticated/data/$databaseId'
@@ -328,13 +308,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
-  LoginOldRoute: typeof LoginOldRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
-  LoginOldRoute: LoginOldRoute,
 }
 
 export const routeTree = rootRoute
@@ -348,8 +326,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_authenticated",
-        "/login",
-        "/loginOld"
+        "/login"
       ]
     },
     "/_authenticated": {
@@ -367,9 +344,6 @@ export const routeTree = rootRoute
     },
     "/login": {
       "filePath": "login.tsx"
-    },
-    "/loginOld": {
-      "filePath": "loginOld.tsx"
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",

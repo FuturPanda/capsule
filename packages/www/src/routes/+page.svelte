@@ -41,21 +41,23 @@
 
 <main class="mx-auto">
 	{#if showContent}
-		<h2
-			class="custom-text absolute left-0 top-0 z-10 mt-4 pl-4 text-lg text-gray-400"
-			in:fly={{ y: -50, duration: 800 }}
-		>
-			capsule
-		</h2>
-		<div
-			class="custom-text absolute right-0 top-0 z-10 mr-3 mt-4 flex flex-row gap-3 pl-4 text-lg text-gray-400"
-		>
-			<Button class="" variant="ghost">
-				<a href="https://docs.capsule.sh">Docs</a>
-			</Button>
-			<Button data-cy="signup" variant="outline"
-				><a href="./signup" data-sveltekit-reload>Get Started</a></Button
+		<div>
+			<h2
+				class="custom-text absolute left-0 top-0 z-10 mt-4 pl-4 text-lg text-gray-400"
+				in:fly={{ y: -50, duration: 800 }}
 			>
+				capsule
+			</h2>
+			<div
+				class="custom-text absolute right-0 top-0 z-10 mr-3 mt-4 flex flex-row gap-3 pl-4 text-lg text-gray-400"
+			>
+				<Button class="" variant="ghost">
+					<a href="https://docs.capsule.sh">Docs</a>
+				</Button>
+				<Button data-cy="signup" variant="outline"
+					><a href="./signup" data-sveltekit-reload>Get Started</a></Button
+				>
+			</div>
 		</div>
 	{/if}
 	{#if showBackground}
