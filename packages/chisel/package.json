@@ -1,6 +1,6 @@
 {
   "name": "@capsulesh/chisel",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A lightweight and efficient ORM for SQLite",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -28,7 +28,7 @@
   "license": "MIT",
   "homepage": "https://capsule.sh",
   "dependencies": {
-    "@capsulesh/shared-types": "^0.2.0",
+    "@capsulesh/shared-types": "^0.3.0",
     "better-sqlite3": "^11.3.0",
     "pino": "^9.4.0",
     "unique-names-generator": "^4.7.1",

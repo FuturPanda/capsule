@@ -1,5 +1,12 @@
 # demo2
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`25f136a`](https://github.com/FuturPanda/capsule/commit/25f136aa2d76313d231818f2ec25f1553735b611)]:
+  - @capsulesh/capsule-client@0.2.0
+
 ## 0.1.0
 
 ### Minor Changes
