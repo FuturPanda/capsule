@@ -2,11 +2,9 @@ export interface Person {
   id: number;
   first_name: string;
   last_name: string;
-  date_of_birth: string | null;
-  gender?: "male" | "female" | "non-binary" | "other" | "prefer_not_to_say";
+  date_of_birth: string;
   email?: string;
-  phone?: string;
-  address?: string;
+  phone_number?: string;
   occupation?: string;
   created_at: Date;
   updated_at?: Date;

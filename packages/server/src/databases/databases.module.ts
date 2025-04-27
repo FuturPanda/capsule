@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
-import { DatabasesService } from './databases.service';
-import { DatabasesController } from './databases.controller';
-import { DatabasesRepository } from './databases.repository';
+import { ResourcesModule } from 'src/resources/resources.module';
+import { DatabaseModel } from '../_utils/models/root/database';
 import { ChiselModule } from '../chisel/chisel.module';
-import { Database } from '../_utils/models/root/database';
-import { EntityAttribute } from '../_utils/models/root/entity_attribute';
+import { DatabasesController } from './databases.controller';
 import { DatabasesMapper } from './databases.mapper';
-import { DatabaseEntity } from '../_utils/models/root/entity';
+import { DatabasesRepository } from './databases.repository';
+import { DatabasesService } from './databases.service';
 
 @Module({
-  imports: [ChiselModule.forFeature(Database, EntityAttribute, DatabaseEntity)],
+  imports: [ChiselModule.forFeature(DatabaseModel), ResourcesModule],
   controllers: [DatabasesController],
   providers: [DatabasesService, DatabasesRepository, DatabasesMapper],
   exports: [DatabasesService, DatabasesRepository, DatabasesMapper],

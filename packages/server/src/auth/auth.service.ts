@@ -2,11 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { SurrealService } from 'src/surreal/surreal.service';
-import { UsersRepository } from 'src/users/users.repository';
-import { User } from '../_utils/models/root/user';
+import { UserModel } from '../_utils/models/root/user';
 import { UsersMapper } from '../users/users.mapper';
 import { AuthRepository } from './auth.repository';
+import { UsersRepository } from '../users/users.repository';
+import { SurrealService } from '../surreal/surreal.service';
+import { PERMISSIONS_ENUM } from '../roles/utils/permissions.enum';
+import { RolesRepository } from '../roles/roles.repository';
 
 @Injectable()
 export class AuthService {
@@ -29,16 +31,22 @@ export class AuthService {
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch) {
-      this.logger.log(`User ${email} has been found`);
       return this.usersMapper.toPublicProfile(user);
     }
     return null;
   }
 
-  login(user: Omit<User, 'password'>) {
-    const payload = { email: user.email, sub: user.id };
+  login(user: Omit<UserModel, 'password'>) {
+    const userWithRoles = this.usersRepository.findUserWithRolesById(user.id);
+    if (!userWithRoles) {
+      throw new Error('User not found');
+    }
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: { id: userWithRoles.role_id, name: userWithRoles.role_name },
+    };
     const refreshToken = this.createOpaqueRefreshToken(user);
-    console.log('in login ::: RefreshToken', refreshToken);
     return {
       access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
       refresh_token: refreshToken,
@@ -48,6 +56,7 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     const user = this.getUserDataFromToken(refreshToken);
+    if (!user) throw new Error();
     const payload = { email: user.email, sub: user.id };
     const newAccessToken = this.jwtService.sign(payload, {
       expiresIn: '15m',
@@ -58,13 +67,21 @@ export class AuthService {
     };
   }
 
-  private createOpaqueRefreshToken(user: Omit<User, 'password'>): string {
+  private createOpaqueRefreshToken(
+    user: Omit<UserModel, 'password'>,
+    clientId?: number,
+  ): string {
     const tokenValue = crypto.randomBytes(40).toString('hex');
 
     const validUntil = new Date();
     validUntil.setDate(validUntil.getDate() + this.REFRESH_TOKEN_EXPIRY_DAYS);
 
-    this.authRepository.createRefreshToken(user.id, tokenValue, validUntil);
+    this.authRepository.createRefreshToken(
+      user.id,
+      tokenValue,
+      validUntil,
+      clientId,
+    );
 
     return tokenValue;
   }
@@ -75,8 +92,8 @@ export class AuthService {
     console.log('TOKEN RECORD : ', tokenRecord);
     if (
       !tokenRecord ||
-      new Date() > tokenRecord.validUntil ||
-      tokenRecord.deletedAt
+      new Date() > new Date(tokenRecord.expires_at) ||
+      tokenRecord.revoked_at
     ) {
       return null;
     }
@@ -86,7 +103,7 @@ export class AuthService {
   generateThirdPartyTokens(
     clientIdentifier: string,
     scopes: string,
-    user: User,
+    user: Omit<UserModel, 'password'>,
   ) {
     const validUntil = new Date();
     validUntil.setDate(
@@ -103,14 +120,14 @@ export class AuthService {
     };
   }
 
-  getUserDataFromToken(token: string): User | null {
+  getUserDataFromToken(token: string): UserModel | null {
     try {
       const tokenRecord = this.authRepository.findToken(token);
       console.log('TOKEN RECORD : ', tokenRecord);
       if (
         !tokenRecord ||
-        new Date() > tokenRecord.validUntil ||
-        tokenRecord.deletedAt
+        new Date() > new Date(tokenRecord.expires_at) ||
+        tokenRecord.revoked_at
       ) {
         return null;
       }

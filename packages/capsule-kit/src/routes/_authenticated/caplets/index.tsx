@@ -75,7 +75,6 @@ export const CapletDashboard = () => {
                   <CardHeader className="">
                     <CardTitle>{caplet.title}</CardTitle>
                   </CardHeader>
-                  {/* gcc {caplet.title} */}
                 </Card>
               </Link>
             ))}

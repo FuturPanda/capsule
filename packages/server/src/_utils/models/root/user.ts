@@ -1,9 +1,9 @@
-export class User {
+export class UserModel {
   id: number;
-  username: string | null;
   email: string;
-  password?: string;
-  type: string;
+  password: string;
+  username: string | null;
   avatar_url: string | null;
   description: string | null;
+  person_id?: number;
 }
