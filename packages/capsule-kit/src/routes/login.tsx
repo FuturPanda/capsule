@@ -1,6 +1,7 @@
 import { useCapsuleClient } from "@/hooks/use-capsule-client";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import Cookies from "js-cookie";
 import { useState } from "react";
 
 function LoginComponent() {
@@ -119,7 +120,7 @@ function LoginComponent() {
             <p>
               Need help? Check the{" "}
               <a
-                href="#"
+                href="docs.capsule.sh"
                 className="text-teal-400 hover:text-teal-300 transition-colors"
               >
                 documentation
@@ -133,13 +134,13 @@ function LoginComponent() {
 }
 
 export const Route = createFileRoute("/login")({
-  beforeLoad: () => {
-    const tokens = JSON.parse(
-      sessionStorage.getItem("capsule_auth_tokens") || "{}",
-    );
-    console.log("tokens", tokens);
-    if (tokens.accessToken) {
-      throw redirect({ to: "/" });
+  loader: () => {
+    const authCookieStr = Cookies.get("capsule_auth_tokens");
+
+    if (authCookieStr) {
+      throw redirect({
+        to: "/",
+      });
     }
   },
   component: LoginComponent,

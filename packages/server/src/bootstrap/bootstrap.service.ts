@@ -6,30 +6,30 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { DatabasesRepository } from 'src/databases/databases.repository';
-import { UserTypeEnum } from '../_utils/schemas/root.schema';
-import { ApiKeysService } from '../api-keys/api-keys.service';
 import { ChiselService } from '../chisel/chisel.service';
-import { PermissionsRepository } from '../permissions/permissions.repository';
 import { UsersRepository } from '../users/users.repository';
-
-export enum TestEnum {
-  ONE = 'ONE',
-}
+import { DatabasesRepository } from '../databases/databases.repository';
+import { ResourcesRepository } from '../resources/resources.repository';
+import { ResourceTypeEnum } from '../_utils/models/root/resource';
+import { RolesRepository } from '../roles/roles.repository';
+import { PERMISSIONS_ENUM } from '../roles/utils/permissions.enum';
 
 @Injectable()
 export class BootstrapService
   implements OnApplicationBootstrap, OnApplicationShutdown
 {
   private readonly logger = new Logger(BootstrapService.name);
+  private readonly DATABASE_NAME = 'root';
+
+  private readonly OWNER_ROLE = 'owner';
 
   constructor(
     private readonly configService: ConfigService,
     private readonly usersRepository: UsersRepository,
     private readonly chiselService: ChiselService,
-    private readonly apiKeysService: ApiKeysService,
-    private readonly permissionRepository: PermissionsRepository,
     private readonly databaseRepository: DatabasesRepository,
+    private readonly resourcesRepository: ResourcesRepository,
+    private readonly rolesRepository: RolesRepository,
   ) {}
 
   async onApplicationBootstrap(): Promise<any> {
@@ -38,46 +38,42 @@ export class BootstrapService
     const password = this.configService.get('OWNER_PASSWORD');
     this.logger.log(ownerEmail, password);
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const user = this.usersRepository.findOneByEmail(ownerEmail);
-    this.logger.debug(`user : ${user}`);
-
-    const apiKey = this.apiKeysService.createApiKeyIfNotExists();
+    const user = this.usersRepository.findUserWithRolesById(ownerEmail);
+    let newUser;
     if (!user) {
-      this.usersRepository.createUserIfNotExists(
-        {
-          email: ownerEmail,
-          password: hashedPassword,
-        },
-        UserTypeEnum.OWNER,
+      newUser = this.usersRepository.createUserIfNotExists({
+        email: ownerEmail,
+        password: hashedPassword,
+      });
+    }
+    if (!user && !newUser) {
+      throw new Error('User not found');
+    }
+
+    const rootDb = this.databaseRepository.findDatabaseByName('root');
+    if (!rootDb) {
+      const resource = this.resourcesRepository.createResource(
+        this.DATABASE_NAME,
+        ResourceTypeEnum.DATABASE,
+      );
+      if (resource.id)
+        this.databaseRepository.createDatabase(resource.id, 'root');
+    }
+
+    const ownerRole = this.rolesRepository.createRole(this.OWNER_ROLE);
+    const ownerPermission = this.rolesRepository.createPermission(
+      PERMISSIONS_ENUM.OWNER,
+    );
+    if (ownerRole.id && ownerPermission.id) {
+      this.rolesRepository.addPermissionToRole(
+        ownerRole.id as number,
+        ownerPermission.id as number,
+      );
+      this.rolesRepository.giveRoleToUser(
+        (user ? user.id : newUser.id) as number,
+        ownerRole.id as number,
       );
     }
-    this.databaseRepository.createDatabase('root', 'root');
-
-    const isCloudProvided = this.configService.get('IS_CLOUD_PROVIDED');
-    const callbackUrl = this.configService.get('CLOUD_CAPSULE_CALLBACK_URL');
-    const capsuleUrl = this.configService.get('CLOUD_CAPSULE_URL');
-
-    if (isCloudProvided === 'true' && callbackUrl && !user) {
-      this.logger.debug('Sending callback to cloud provider --> ', apiKey);
-      try {
-        await fetch(callbackUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: ownerEmail,
-            apiKey,
-            capsuleUrl,
-          }),
-        });
-      } catch (e: any) {
-        this.logger.error('Error sending callback to cloud provider', e);
-      }
-      this.logger.debug('Application Bootstrap Completed');
-    }
-
-    // await this.permissionRepository.createPermissions();
   }
 
   onApplicationShutdown(signal?: string): any {

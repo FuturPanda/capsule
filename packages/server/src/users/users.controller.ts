@@ -12,11 +12,11 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { FormDataRequest } from 'nestjs-form-data';
-import { AuthService } from 'src/auth/auth.service';
 import { LoginUserDto } from './_utils/dto/request/login-user.dto';
 import { OauthQueryDto } from './_utils/dto/request/oauth.dto';
 import { UpdateProfileDto } from './_utils/dto/request/update-profile.dto';
 import { UsersService } from './users.service';
+import { AuthService } from '../auth/auth.service';
 
 @ApiTags('Users')
 @Controller('users')

@@ -6,5 +6,14 @@ export class OauthRefreshToken {
   expires_at: string;
   revoked_at: string | null;
   created_at: string;
-  updated_at: string | null;
+}
+
+export class RefreshTokenModel {
+  id: number;
+  token: string;
+  client_id?: number;
+  user_id?: number;
+  expires_at: string;
+  revoked_at: string | null;
+  created_at: string;
 }

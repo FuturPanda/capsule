@@ -1,5 +1,11 @@
 # @capsulesh/shared-types
 
+## 0.3.0
+
+### Minor Changes
+
+- [#42](https://github.com/FuturPanda/capsule/pull/42) [`25f136a`](https://github.com/FuturPanda/capsule/commit/25f136aa2d76313d231818f2ec25f1553735b611) Thanks [@FuturPanda](https://github.com/FuturPanda)! - fix for prez
+
 ## 0.2.0
 
 ### Minor Changes

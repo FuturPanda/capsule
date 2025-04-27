@@ -1,13 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
-import { PermissionsService } from 'src/permissions/permissions.service';
-import { SurrealService } from 'src/surreal/surreal.service';
+
 import { v4 } from 'uuid';
 import { LoginUserDto } from './_utils/dto/request/login-user.dto';
 import { OauthQueryDto } from './_utils/dto/request/oauth.dto';
 import { UpdateProfileDto } from './_utils/dto/request/update-profile.dto';
 import { UsersMapper } from './users.mapper';
 import { UsersRepository } from './users.repository';
+import { AuthService } from '../auth/auth.service';
+import { SurrealService } from '../surreal/surreal.service';
+import { AuthorizationsService } from '../authorizations/authorizations.service';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +16,7 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
     private readonly authService: AuthService,
     private readonly usersMapper: UsersMapper,
-    private readonly permissionService: PermissionsService,
+    private readonly authorizationService: AuthorizationsService,
     private readonly surrealService: SurrealService,
   ) {}
 
@@ -24,7 +25,6 @@ export class UsersService {
       loginUserDto.email,
       loginUserDto.password,
     );
-    console.log(user);
     return this.authService.login(user);
   }
 
@@ -62,7 +62,7 @@ export class UsersService {
     if (!userData || userData.id !== sessionData.userId) {
       throw new UnauthorizedException('User authentication mismatch');
     }
-    const scopes = this.permissionService.getScopeDisplayInfo(
+    const scopes = this.authorizationService.getScopeDisplayInfo(
       sessionData.scopes as string,
     );
     return {
@@ -82,7 +82,7 @@ export class UsersService {
     redirect_uri: string,
     scopes: string,
     token: string,
-  ): Promise<string> | null {
+  ) {
     try {
       const userData = this.authService.getUserDataFromToken(token);
       if (userData) {
@@ -100,7 +100,7 @@ export class UsersService {
         );
         const consentUrl = `/api/v1/users/consent?client_identifier=${client_identifier}&redirect_uri=${encodeURIComponent(redirect_uri)}&scopes=${encodeURIComponent(scopes)}&session_id=${session.id}`;
         return consentUrl;
-      }
+      } else return '';
     } catch (error) {
       console.error('Error checking token:', error);
     }
@@ -144,7 +144,7 @@ export class UsersService {
         );
         console.log('Consent URL::: ', consentUrl);
 
-        output.redirectUrl = consentUrl;
+        output.redirectUrl = consentUrl ?? '';
       } else {
         throw new UnauthorizedException('Invalid Crédentials');
       }

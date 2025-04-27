@@ -7,3 +7,10 @@ export class OauthClients {
   created_at: Date;
   updated_at: Date | null;
 }
+
+export class ClientModel {
+  id: number;
+  name: string;
+  redirect_uri: string;
+  organization_id?: number;
+}

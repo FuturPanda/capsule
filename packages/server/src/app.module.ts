@@ -6,7 +6,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 import { validateEnv } from './_utils/config/env.config';
 import { migrations } from './_utils/db';
-import { ApiKeysModule } from './api-keys/api-keys.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -14,14 +13,14 @@ import { BootstrapModule } from './bootstrap/bootstrap.module';
 import { ChiselModule } from './chisel/chisel.module';
 import { DatabasesModule } from './databases/databases.module';
 import { DynamicQueriesModule } from './dynamic-queries/dynamic-queries.module';
-import { EventsModule } from './events/events.module';
 import { MigrationsModule } from './migrations/migrations.module';
-import { PermissionsModule } from './permissions/permissions.module';
 import { PersonsModule } from './persons/persons.module';
 import { ReactivityModule } from './reactivity/reactivity.module';
 import { SurrealModule } from './surreal/surreal.module';
 import { TasksModule } from './tasks/tasks.module';
 import { UsersModule } from './users/users.module';
+import { ResourcesModule } from './resources/resources.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -56,14 +55,13 @@ import { UsersModule } from './users/users.module';
       password: 'root',
     }),
     DatabasesModule,
-    ApiKeysModule,
-    PermissionsModule,
     MigrationsModule,
     DynamicQueriesModule,
-    EventsModule,
     TasksModule,
     ReactivityModule,
     PersonsModule,
+    ResourcesModule,
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

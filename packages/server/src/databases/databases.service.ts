@@ -1,6 +1,8 @@
 import { ChiselDb } from '@capsulesh/chisel';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { DEFAULT_DB_PATH } from 'src/_utils/constants/database.constant';
+import { ResourceTypeEnum } from 'src/_utils/models/root/resource';
+import { ResourcesRepository } from 'src/resources/resources.repository';
 import { ChiselService } from '../chisel/chisel.service';
 import { CreateDatabaseDto } from './_utils/dto/request/create-database.dto';
 import { DatabasesMapper } from './databases.mapper';
@@ -12,6 +14,7 @@ export class DatabasesService {
     private readonly databasesRepository: DatabasesRepository,
     private readonly databasesMapper: DatabasesMapper,
     private readonly chiselService: ChiselService,
+    private readonly resourcesRepository: ResourcesRepository,
   ) {}
 
   async createDatabase(
@@ -29,10 +32,7 @@ export class DatabasesService {
       createDatabaseDto.name,
       clientIdentifier,
     );
-    const res = this.databasesRepository.createDatabase(
-      createDatabaseDto.name,
-      clientIdentifier,
-    );
+    const res = this.saveDatabaseInfo(createDatabaseDto.name, clientIdentifier);
 
     if (createDatabaseDto.entities.length > 0) {
       const operations =
@@ -59,7 +59,17 @@ export class DatabasesService {
   }
 
   saveDatabaseInfo(dbName: string, clientId: string) {
-    const { id: databaseId } = this.databasesRepository.createDatabase(
+    const database = this.databasesRepository.findDatabaseByName(dbName);
+    if (database) return database;
+    const resource = this.resourcesRepository.createResource(
+      dbName,
+      ResourceTypeEnum.DATABASE,
+    );
+    if (!resource.id) {
+      throw new Error('error during resource creation');
+    }
+    return this.databasesRepository.createDatabase(
+      resource.id,
       dbName,
       clientId,
     );

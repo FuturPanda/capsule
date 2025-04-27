@@ -1,23 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { Task } from 'src/_utils/models/root/task';
+import { TaskModel } from '../_utils/models/root/task';
 
 @Injectable()
 export class TasksMapper {
   constructor() {}
 
-  toGetTasksDto(tasks: Task[]) {
+  toGetTasksDto(tasks: TaskModel[]) {
     return tasks.map((task) => this.toGetTaskDto(task));
   }
 
-  toGetTaskDto(task: Task) {
+  toGetTaskDto(task: TaskModel) {
     return {
       id: task.id,
-      assignee: task.assignee,
       content: task.content,
       dueDate: task.due_date,
       priority: task.priority,
       progress: task.progress,
-      isCompleted: task.is_completed,
+      isCompleted: !!task.completed_at,
       completedAt: task.completed_at,
     };
   }

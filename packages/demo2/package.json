@@ -1,7 +1,7 @@
 {
 	"name": "demo2",
 	"private": true,
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -35,7 +35,7 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"@capsulesh/capsule-client": "^0.1.0",
+		"@capsulesh/capsule-client": "^0.2.0",
 		"dexie": "^4.0.11"
 	}
 }
