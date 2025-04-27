@@ -5,9 +5,7 @@ export class GetPersonDto implements GetPerson {
   firstName: string;
   lastName: string;
   dateOfBirth: string;
-  gender: string;
   email: string;
   phone: string;
-  address: string;
   occupation: string;
 }

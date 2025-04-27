@@ -49,6 +49,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "highlight.js": "^11.11.1",
+    "js-cookie": "^3.0.5",
     "lowlight": "^3.3.0",
     "lucide-react": "^0.453.0",
     "motion": "^11.11.15",

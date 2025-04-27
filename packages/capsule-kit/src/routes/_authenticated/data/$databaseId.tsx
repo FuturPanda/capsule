@@ -45,10 +45,8 @@ const DatabaseScreen = () => {
 
   useEffect(() => {
     if (database?.entities && database.entities.length > 0) {
-      // Set the selected table in the store
       setSelectedTable(database.entities[0]);
 
-      // Navigate to the first table
       navigate({
         to: "/data/$databaseId/$tableName",
         params: {

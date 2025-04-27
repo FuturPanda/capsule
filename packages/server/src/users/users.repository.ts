@@ -1,24 +1,22 @@
 import { ChiselModel } from '@capsulesh/chisel';
 import { Injectable } from '@nestjs/common';
-import { UserTypeEnum } from '../_utils/schemas/root.schema';
 import { InjectModel } from '../chisel/chisel.module';
 import { CreateUserDto } from './_utils/dto/request/create-user.dto';
-import { User } from '../_utils/models/root/user';
+import { UserModel } from '../_utils/models/root/user';
+import { RoleModel, UserRoleModel } from '../_utils/models/root/role';
 import { UpdateProfileDto } from './_utils/dto/request/update-profile.dto';
-import { ChiselId } from '@capsulesh/shared-types';
 
 @Injectable()
 export class UsersRepository {
   constructor(
-    @InjectModel(User.name) private readonly model: ChiselModel<User>,
+    @InjectModel(UserModel.name) private readonly model: ChiselModel<UserModel>,
   ) {}
 
-  createUserIfNotExists = (createUserDto: CreateUserDto, type: UserTypeEnum) =>
+  createUserIfNotExists = (createUserDto: CreateUserDto) =>
     this.model.insert(
       {
         email: createUserDto.email,
         password: createUserDto.password,
-        type: type,
       },
       { ignoreExisting: true },
     );
@@ -33,15 +31,31 @@ export class UsersRepository {
     this.model
       .select()
       .where({ email: { $eq: email } })
-      .exec({ one: true }) as User | null;
+      .exec({ one: true }) as UserModel | null;
 
   findOneById = (id: number) =>
     this.model
       .select()
       .where({ id: { $eq: id } })
-      .exec({ one: true }) as User | null;
+      .exec({ one: true }) as UserModel | null;
 
-  updateUser = (id: ChiselId, updateProfileDto: UpdateProfileDto) =>
+  findUserWithRolesById = (id: number) =>
+    this.model
+      .select({
+        id: 'user.id',
+        email: 'user.email',
+        username: 'user.username',
+        description: 'user.description',
+        avatar_url: 'user.avatar_url',
+        role_id: 'role.id',
+        role_name: 'role.name',
+      })
+      .join(UserModel, UserRoleModel, 'id', 'user_id')
+      .join(UserRoleModel, RoleModel, 'role_id', 'id')
+      .where({ id: { $eq: id } })
+      .exec({ one: true });
+
+  updateUser = (id: number, updateProfileDto: UpdateProfileDto) =>
     this.model
       .update({
         ...(updateProfileDto.avatarUrl && {
@@ -55,5 +69,5 @@ export class UsersRepository {
         }),
       })
       .where({ id: { $eq: id } })
-      .exec({ one: true }) as User | null;
+      .exec({ one: true }) as UserModel;
 }

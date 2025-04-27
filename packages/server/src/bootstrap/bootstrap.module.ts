@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { DatabasesModule } from 'src/databases/databases.module';
-import { ApiKeysModule } from '../api-keys/api-keys.module';
-import { PermissionsModule } from '../permissions/permissions.module';
 import { UsersModule } from '../users/users.module';
 import { BootstrapService } from './bootstrap.service';
+import { DatabasesModule } from '../databases/databases.module';
+import { ResourceModel } from '../_utils/models/root/resource';
+import { ResourcesModule } from '../resources/resources.module';
+import { RolesModule } from '../roles/roles.module';
 
 @Module({
-  imports: [UsersModule, ApiKeysModule, PermissionsModule, DatabasesModule],
+  imports: [UsersModule, DatabasesModule, ResourcesModule, RolesModule],
   providers: [BootstrapService],
 })
 export class BootstrapModule {}

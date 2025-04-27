@@ -1,13 +1,12 @@
-import { Cmdk } from "@/components/commandk/Cmdk.tsx";
 import { LeftSidebar } from "@/components/layout/LeftSidebar.tsx";
 import { Topbar } from "@/components/layout/Topbar.tsx";
 import { SidebarProvider } from "@/components/ui/sidebar.tsx";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import Cookies from "js-cookie";
 
 export const AppLayout = () => {
   return (
     <div className="h-screen w-screen flex flex-col bg-background text-foreground overflow-hidden">
-      <Cmdk />
       <Topbar className="shrink-0 border-b border-zinc-800 h-[var(--topbar-height)] z-10" />
 
       <SidebarProvider className="flex-1 flex overflow-hidden relative">
@@ -24,17 +23,12 @@ export const AppLayout = () => {
 };
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: ({ location }) => {
-    const tokens = JSON.parse(
-      sessionStorage.getItem("capsule_auth_tokens") || "{}",
-    );
-    console.log("IF NOT TOKENS REDIRECT ::::: ", tokens);
-    if (!tokens.accessToken) {
+  loader: () => {
+    const authCookieStr = Cookies.get("capsule_auth_tokens");
+
+    if (!authCookieStr) {
       throw redirect({
         to: "/login",
-        search: {
-          redirect: location.href,
-        },
       });
     }
   },

@@ -11,6 +11,7 @@
 	let todos: GetTask[] | undefined = $state([]);
 	onMount(async () => {
 		isLoggedIn = client.authStatus();
+		console.log('isLoggedIn :: ', isLoggedIn);
 
 		if (!isLoggedIn) {
 			goto('/login');
@@ -30,24 +31,9 @@
 	});
 
 	function handleLogout() {
-		localStorage.removeItem('isLoggedIn');
+		client.logout();
 		goto('/login');
 	}
-
-	// let todos = liveQuery(() =>
-	// 	db.todos
-	// 		.orderBy('dueDate')
-	// 		.filter((todo) => todo.dueDate !== null)
-	// 		.reverse()
-	// 		.toArray()
-	// 		.then(async (todosWithDueDate) => {
-	// 			const todosWithoutDueDate = await db.todos
-	// 				.filter((todo) => todo.dueDate === null)
-	// 				.reverse()
-	// 				.toArray();
-	// 			return [...todosWithDueDate, ...todosWithoutDueDate];
-	// 		})
-	// );
 
 	async function addTodo() {
 		if (!newTodoText.trim()) return;
@@ -62,31 +48,17 @@
 		newTodoDueDate = '';
 	}
 
-	// await db.todos.add({
-	// 	id: 1387,
-	// 	content: newTodoText,
-	// 	isCompleted: false,
-	// 	dueDate: newTodoDueDate ?? null
-	// });
-	//
-
 	async function toggleTodo(todo: GetTask) {
 		if (!todo.id) return;
-		//await db.todos.update(todo.id, { completed: !todo.completed });
-		console.log('todo toggled ::: ', todo, todo.isCompleted);
 		client.models.tasks?.update(todo.id, { isCompleted: !todo.isCompleted });
 	}
 
 	async function deleteTodo(id: number) {
-		// await db.todos.delete(id);
 		await client.models.tasks?.delete(id);
 	}
 
 	async function updateDueDate(todo: GetTask, dueDate: string) {
 		if (!todo.id) return;
-		// await db.todos.update(todo.id, {
-		// 	dueDate: dueDate ? new Date(dueDate) : null
-		// });
 		client.models.tasks?.update(todo.id, { dueDate: dueDate });
 	}
 
@@ -127,24 +99,6 @@
 		<button type="submit">Add</button>
 	</form>
 
-	<!-- {#if $todos}
-		<ul>
-			{#each $todos as todo (todo.id)}
-				<li class={getDueDateStatus(todo.dueDate ?? null)}>
-					<input type="checkbox" checked={todo.completed} onchange={() => toggleTodo(todo)} />
-					<span class:completed={todo.completed}>
-						{todo.text}
-					</span>
-					<input
-						type="date"
-						value={formatDateForInput(todo.dueDate ?? null)}
-						onchange={(e) => updateDueDate(todo, e.currentTarget.value)}
-						class="due-date-input"
-					/>
-					<button onclick={() => deleteTodo(todo.id!)}>×</button>
-				</li>
-			{/each}
-		</ul> -->
 	{#if todos}
 		<ul>
 			{#each todos as todo (todo)}
@@ -226,17 +180,13 @@
 		margin-bottom: 0.5rem;
 	}
 
-	/* Override the existing li button style */
 	li button {
 		padding: 0.25rem 0.5rem;
 	}
-
-	/* Add a hover effect for the date input */
 	.due-date-input:hover {
 		border-color: #333;
 	}
 
-	/* Style for empty date input */
 	.due-date-input:not([value]) {
 		color: #666;
 	}
