@@ -1,5 +1,11 @@
 # @capsulesh/capsule-client
 
+## 0.2.2
+
+### Patch Changes
+
+- [`4bc7b09`](https://github.com/FuturPanda/capsule/commit/4bc7b09c35068f287e1b5f53a5ec2e7e6ab9e40e) Thanks [@FuturPanda](https://github.com/FuturPanda)! - fix getAuthTokens
+
 ## 0.2.0
 
 ### Minor Changes
