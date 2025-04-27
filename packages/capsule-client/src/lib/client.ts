@@ -155,9 +155,10 @@ export class CapsuleClient {
   }
 
   authStatus(): boolean {
-    const isAuthenticated = !!this.apiClient.getAuthTokens();
-    return isAuthenticated;
+    const isAuthenticated = this.apiClient?.getAuthTokens() ?? false;
+    return !!isAuthenticated;
   }
+
   logout() {
     this.apiClient?.logout();
   }

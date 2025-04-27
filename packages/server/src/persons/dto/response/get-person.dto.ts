@@ -1,6 +1,4 @@
-import { GetPerson } from '@capsulesh/shared-types';
-
-export class GetPersonDto implements GetPerson {
+export class GetPersonDto {
   id: number;
   firstName: string;
   lastName: string;

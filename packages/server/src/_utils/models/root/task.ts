@@ -1,7 +1,7 @@
 import { Task } from '@capsulesh/shared-types';
 
 export class TaskModel implements Task {
-  id: number | bigint;
+  id: number;
   content: string;
   due_date: string | null;
   priority?: 'low' | 'medium' | 'high' | 'urgent';

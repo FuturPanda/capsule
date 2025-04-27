@@ -29,7 +29,7 @@ export class TasksService {
     if (resource.id) {
       const result = this.tasksRepository.createTask(
         createTaskDto,
-        resource.id,
+        resource.id as number,
       );
       console.log('Result', resource, result);
       const createdTask = this.tasksRepository.findTaskById(resource.id);

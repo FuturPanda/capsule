@@ -13,7 +13,7 @@ export class TasksRepository {
     @InjectModel(TaskModel.name) private readonly model: ChiselModel<TaskModel>,
   ) {}
 
-  createTask = (dto: CreateTaskDto, id: number | bigint) =>
+  createTask = (dto: CreateTaskDto, id: number) =>
     this.model.insert({
       id: id,
       content: dto.content,
